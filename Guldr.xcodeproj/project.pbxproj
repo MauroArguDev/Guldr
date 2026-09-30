@@ -1,0 +1,564 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		6AA4F851306CB56B00EAB927 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6AA4F83B306CB56A00EAB927 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6AA4F842306CB56A00EAB927;
+			remoteInfo = Guldr;
+		};
+		6AA4F85B306CB56C00EAB927 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6AA4F83B306CB56A00EAB927 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6AA4F842306CB56A00EAB927;
+			remoteInfo = Guldr;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6AA4F843306CB56A00EAB927 /* Guldr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Guldr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AA4F850306CB56B00EAB927 /* GuldrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuldrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AA4F85A306CB56C00EAB927 /* GuldrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuldrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6AA4F845306CB56A00EAB927 /* Guldr */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Guldr;
+			sourceTree = "<group>";
+		};
+		6AA4F853306CB56B00EAB927 /* GuldrTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GuldrTests;
+			sourceTree = "<group>";
+		};
+		6AA4F85D306CB56C00EAB927 /* GuldrUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GuldrUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6AA4F840306CB56A00EAB927 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		6AA4F84D306CB56B00EAB927 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		6AA4F857306CB56C00EAB927 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6AA4F83A306CB56A00EAB927 = {
+			isa = PBXGroup;
+			children = (
+				6AA4F845306CB56A00EAB927 /* Guldr */,
+				6AA4F853306CB56B00EAB927 /* GuldrTests */,
+				6AA4F85D306CB56C00EAB927 /* GuldrUITests */,
+				6AA4F844306CB56A00EAB927 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6AA4F844306CB56A00EAB927 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6AA4F843306CB56A00EAB927 /* Guldr.app */,
+				6AA4F850306CB56B00EAB927 /* GuldrTests.xctest */,
+				6AA4F85A306CB56C00EAB927 /* GuldrUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6AA4F842306CB56A00EAB927 /* Guldr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AA4F862306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "Guldr" */;
+			buildPhases = (
+				6AA4F83F306CB56A00EAB927 /* Sources */,
+				6AA4F840306CB56A00EAB927 /* Frameworks */,
+				6AA4F841306CB56A00EAB927 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				6AA4F845306CB56A00EAB927 /* Guldr */,
+			);
+			name = Guldr;
+			productName = Guldr;
+			productReference = 6AA4F843306CB56A00EAB927 /* Guldr.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6AA4F84F306CB56B00EAB927 /* GuldrTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AA4F865306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "GuldrTests" */;
+			buildPhases = (
+				6AA4F84C306CB56B00EAB927 /* Sources */,
+				6AA4F84D306CB56B00EAB927 /* Frameworks */,
+				6AA4F84E306CB56B00EAB927 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6AA4F852306CB56B00EAB927 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6AA4F853306CB56B00EAB927 /* GuldrTests */,
+			);
+			name = GuldrTests;
+			productName = GuldrTests;
+			productReference = 6AA4F850306CB56B00EAB927 /* GuldrTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6AA4F859306CB56C00EAB927 /* GuldrUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AA4F868306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "GuldrUITests" */;
+			buildPhases = (
+				6AA4F856306CB56C00EAB927 /* Sources */,
+				6AA4F857306CB56C00EAB927 /* Frameworks */,
+				6AA4F858306CB56C00EAB927 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6AA4F85C306CB56C00EAB927 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6AA4F85D306CB56C00EAB927 /* GuldrUITests */,
+			);
+			name = GuldrUITests;
+			productName = GuldrUITests;
+			productReference = 6AA4F85A306CB56C00EAB927 /* GuldrUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6AA4F83B306CB56A00EAB927 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					6AA4F842306CB56A00EAB927 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					6AA4F84F306CB56B00EAB927 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 6AA4F842306CB56A00EAB927;
+					};
+					6AA4F859306CB56C00EAB927 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 6AA4F842306CB56A00EAB927;
+					};
+				};
+			};
+			buildConfigurationList = 6AA4F83E306CB56A00EAB927 /* Build configuration list for PBXProject "Guldr" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6AA4F83A306CB56A00EAB927;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6AA4F844306CB56A00EAB927 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6AA4F842306CB56A00EAB927 /* Guldr */,
+				6AA4F84F306CB56B00EAB927 /* GuldrTests */,
+				6AA4F859306CB56C00EAB927 /* GuldrUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6AA4F841306CB56A00EAB927 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		6AA4F84E306CB56B00EAB927 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		6AA4F858306CB56C00EAB927 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6AA4F83F306CB56A00EAB927 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		6AA4F84C306CB56B00EAB927 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		6AA4F856306CB56C00EAB927 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6AA4F852306CB56B00EAB927 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6AA4F842306CB56A00EAB927 /* Guldr */;
+			targetProxy = 6AA4F851306CB56B00EAB927 /* PBXContainerItemProxy */;
+		};
+		6AA4F85C306CB56C00EAB927 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6AA4F842306CB56A00EAB927 /* Guldr */;
+			targetProxy = 6AA4F85B306CB56C00EAB927 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6AA4F860306CB56C00EAB927 /* Debug configuration for PBXProject "Guldr" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6AA4F861306CB56C00EAB927 /* Release configuration for PBXProject "Guldr" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = XRC983479Z;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6AA4F863306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "Guldr" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.guldr;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		6AA4F864306CB56C00EAB927 /* Release configuration for PBXNativeTarget "Guldr" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.guldr;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		6AA4F866306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "GuldrTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.GuldrTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Guldr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Guldr";
+			};
+			name = Debug;
+		};
+		6AA4F867306CB56C00EAB927 /* Release configuration for PBXNativeTarget "GuldrTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.GuldrTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Guldr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Guldr";
+			};
+			name = Release;
+		};
+		6AA4F869306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "GuldrUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.GuldrUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Guldr;
+			};
+			name = Debug;
+		};
+		6AA4F86A306CB56C00EAB927 /* Release configuration for PBXNativeTarget "GuldrUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XRC983479Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.argudev.GuldrUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Guldr;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6AA4F83E306CB56A00EAB927 /* Build configuration list for PBXProject "Guldr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA4F860306CB56C00EAB927 /* Debug configuration for PBXProject "Guldr" */,
+				6AA4F861306CB56C00EAB927 /* Release configuration for PBXProject "Guldr" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6AA4F862306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "Guldr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA4F863306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "Guldr" */,
+				6AA4F864306CB56C00EAB927 /* Release configuration for PBXNativeTarget "Guldr" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6AA4F865306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "GuldrTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA4F866306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "GuldrTests" */,
+				6AA4F867306CB56C00EAB927 /* Release configuration for PBXNativeTarget "GuldrTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6AA4F868306CB56C00EAB927 /* Build configuration list for PBXNativeTarget "GuldrUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA4F869306CB56C00EAB927 /* Debug configuration for PBXNativeTarget "GuldrUITests" */,
+				6AA4F86A306CB56C00EAB927 /* Release configuration for PBXNativeTarget "GuldrUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6AA4F83B306CB56A00EAB927 /* Project object */;
+	validationLevel = 1;
+}
