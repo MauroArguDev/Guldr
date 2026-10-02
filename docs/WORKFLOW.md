@@ -77,22 +77,51 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Continuous integration
 
-GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every pull request against `main` and on every push to `main`.
+Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode and boots the simulator before anything is built.
 
-- **Runner:** `macos-latest` with the latest stable Xcode.
-- **Job `test`:** builds the `Guldr` scheme and runs unit and UI tests on the iPhone 17 simulator, with code signing disabled.
-- **Required:** the `main` ruleset blocks merging until `test` passes.
-- **Concurrency:** a new push to the same branch cancels the run in progress.
+### `CI` — required on every pull request
 
-Reproduce it locally with the same command CI runs:
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pull requests against `main`, on pushes to `main` and on demand.
+
+| Job | Runner | What it does |
+|---|---|---|
+| `changes` | `ubuntu-latest` | Lists the files the PR changes. If they are only Markdown or under `docs/`, the macOS job is skipped. |
+| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
+
+- **Required:** the `main` ruleset blocks merging until `test` succeeds. A `test` job skipped for a docs-only PR reports success, so documentation changes are not blocked.
+- **Pushes to `main` always run `test`**, whatever changed.
+- **Concurrency:** a new push to a PR cancels its run in progress; runs on `main` always finish.
+- **Speed:** code coverage, indexing and parallel simulator clones are disabled in CI; UI tests run in their own workflow.
+- **Security:** the workflow token is read-only (`contents: read`), checkout does not persist credentials, third-party actions are pinned to a commit SHA, and [Dependabot](../.github/dependabot.yml) proposes weekly updates for them.
+
+### `UI tests` — weekly and on demand
+
+[`.github/workflows/ui-tests.yml`](../.github/workflows/ui-tests.yml) runs `GuldrUITests` every Monday at 06:00 UTC and whenever it is started from the **Actions** tab. It is not a required check: UI tests are slow and sensitive to simulator performance on shared runners. Its `.xcresult` bundle is always uploaded for 14 days.
+
+UI tests must pass before every release (see the [Release](#release) checklist).
+
+### Reproduce CI locally
 
 ```bash
-xcodebuild test -project Guldr.xcodeproj -scheme Guldr \
-  -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
-  -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO
+UDID=$(xcrun simctl list devices available -j \
+  | jq -r '[.devices[][] | select(.name == "iPhone 17")] | last | .udid')
+xcrun simctl bootstatus "$UDID" -b
+
+xcodebuild build-for-testing -project Guldr.xcodeproj -scheme Guldr \
+  -destination "id=$UDID" -only-testing:GuldrTests -derivedDataPath DerivedData \
+  -enableCodeCoverage NO COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGNING_ALLOWED=NO
+
+xcodebuild test-without-building -project Guldr.xcodeproj -scheme Guldr \
+  -destination "id=$UDID" -only-testing:GuldrTests -derivedDataPath DerivedData \
+  -enableCodeCoverage NO -parallel-testing-enabled NO
 ```
 
-If CI fails but the local run passes, check the "Show Xcode and simulators" step first: the runner may have a different Xcode or no iPhone 17 simulator.
+Use `-only-testing:GuldrUITests` instead to run the UI tests.
+
+### When Xcode changes
+
+- The pinned version lives in `XCODE_VERSION` in both workflows and must exist on the `macos-26` runner image. Bump it when GitHub ships a newer Xcode.
+- The project file must stay in a format the CI Xcode can open (currently `objectVersion = 77`). In Xcode, keep **Minimize Project References** and **Strictly Validate** unchecked in the project's File Inspector.
 
 ## Definition of Done
 
@@ -121,6 +150,7 @@ If CI fails but the local run passes, check the "Show Xcode and simulators" step
 - [ ] Every v1.0 item in the [roadmap](ROADMAP.md) is checked
 - [ ] No crashes in a 10-minute session on a real device
 - [ ] Privacy manifest up to date
+- [ ] UI tests pass (`UI tests` workflow run or locally)
 - [ ] README with screenshots and demo GIF
 - [ ] Version tagged on `main`
 
