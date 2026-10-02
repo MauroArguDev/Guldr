@@ -1,0 +1,54 @@
+name: Prepare simulator
+description: Select a pinned Xcode and boot an iPhone simulator on the newest installed iOS runtime.
+
+inputs:
+  xcode-version:
+    description: Xcode version installed on the runner image, e.g. "26.6".
+    required: true
+  simulator-name:
+    description: Simulator device name, e.g. "iPhone 17".
+    required: true
+
+outputs:
+  udid:
+    description: UDID of the booted simulator, used as the xcodebuild destination.
+    value: ${{ steps.boot.outputs.udid }}
+
+runs:
+  using: composite
+  steps:
+    - name: Select Xcode
+      shell: bash
+      env:
+        XCODE_VERSION: ${{ inputs.xcode-version }}
+      run: |
+        set -euo pipefail
+        sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
+        xcodebuild -version
+
+    # Booting before xcodebuild runs keeps the cold-boot cost in its own, measurable step
+    # and lets the build start against a simulator that is already up.
+    - name: Boot simulator
+      id: boot
+      shell: bash
+      env:
+        SIMULATOR_NAME: ${{ inputs.simulator-name }}
+      run: |
+        set -euo pipefail
+        udid="$(xcrun simctl list devices available -j | jq -r --arg name "$SIMULATOR_NAME" '
+          [.devices | to_entries[]
+            | select(.key | test("SimRuntime\\.iOS-"))
+            | (.key | capture("iOS-(?<major>[0-9]+)-(?<minor>[0-9]+)")) as $version
+            | .value[]
+            | select(.name == $name)
+            | {udid, order: [($version.major | tonumber), ($version.minor | tonumber)]}]
+          | sort_by(.order) | last | .udid // empty')"
+        if [ -z "$udid" ]; then
+          echo "::error::No available '$SIMULATOR_NAME' simulator found."
+          xcrun simctl list devices available
+          exit 1
+        fi
+        echo "Booting $SIMULATOR_NAME ($udid)"
+        # -b boots the device if needed and waits until it has finished booting.
+        xcrun simctl bootstatus "$udid" -b
+        echo "udid=$udid" >> "$GITHUB_OUTPUT"
