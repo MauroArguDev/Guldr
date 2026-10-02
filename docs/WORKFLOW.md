@@ -49,7 +49,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Testing
 
-- **Framework:** Swift Testing (`@Test`, `#expect`) for unit tests; XCTest only for UI tests.
+- **Framework:** Swift Testing (`@Test`, `#expect`). The project has no UI test target: UI is verified with light/dark previews and on device (see the Definition of Done), which keeps CI fast.
 - **Persistence:** tests that touch SwiftData use an in-memory container, never the on-disk store:
 
   ```swift
@@ -77,7 +77,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Continuous integration
 
-Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 30 attempts, about 10 minutes; ~6 minutes observed) and `-destination-timeout 120` absorb that race.
+The workflow uses the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 30 attempts, about 10 minutes; ~6 minutes observed) and `-destination-timeout 120` absorb that race.
 
 ### `CI` — required on every pull request
 
@@ -91,14 +91,8 @@ Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/
 - **Required:** the `main` ruleset blocks merging until `test` succeeds. A `test` job skipped for a docs-only PR reports success, so documentation changes are not blocked.
 - **Pushes to `main` always run `test`**, whatever changed.
 - **Concurrency:** a new push to a PR cancels its run in progress; runs on `main` always finish.
-- **Speed:** code coverage, indexing and parallel simulator clones are disabled in CI; UI tests run in their own workflow.
+- **Speed:** code coverage, indexing and parallel simulator clones are disabled in CI.
 - **Security:** the workflow token is read-only (`contents: read`), checkout does not persist credentials, third-party actions are pinned to a commit SHA, and [Dependabot](../.github/dependabot.yml) proposes weekly updates for them.
-
-### `UI tests` — weekly and on demand
-
-[`.github/workflows/ui-tests.yml`](../.github/workflows/ui-tests.yml) runs `GuldrUITests` every Monday at 06:00 UTC and whenever it is started from the **Actions** tab. It is not a required check: UI tests are slow and sensitive to simulator performance on shared runners. Its `.xcresult` bundle is always uploaded for 14 days.
-
-UI tests must pass before every release (see the [Release](#release) checklist).
 
 ### Reproduce CI locally
 
@@ -116,11 +110,9 @@ xcodebuild test-without-building -project Guldr.xcodeproj -scheme Guldr \
   -enableCodeCoverage NO -parallel-testing-enabled NO
 ```
 
-Use `-only-testing:GuldrUITests` instead to run the UI tests.
-
 ### When Xcode changes
 
-- The pinned version lives in `XCODE_VERSION` in both workflows and must exist on the `macos-26` runner image. Bump it when GitHub ships a newer Xcode.
+- The pinned version lives in `XCODE_VERSION` in the workflow and must exist on the `macos-26` runner image. Bump it when GitHub ships a newer Xcode.
 - The project file must stay in a format the CI Xcode can open (currently `objectVersion = 77`). In Xcode, keep **Minimize Project References** and **Strictly Validate** unchecked in the project's File Inspector.
 
 ## Definition of Done
@@ -150,7 +142,6 @@ Use `-only-testing:GuldrUITests` instead to run the UI tests.
 - [ ] Every v1.0 item in the [roadmap](ROADMAP.md) is checked
 - [ ] No crashes in a 10-minute session on a real device
 - [ ] Privacy manifest up to date
-- [ ] UI tests pass (`UI tests` workflow run or locally)
 - [ ] README with screenshots and demo GIF
 - [ ] Version tagged on `main`
 
