@@ -74,6 +74,8 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
           simulator-name: ${{ env.SIMULATOR_NAME }}
+          project: Guldr.xcodeproj
+          scheme: Guldr
 
       - name: Build for testing
         env:
@@ -83,7 +85,8 @@ jobs:
           xcodebuild build-for-testing \
             -project Guldr.xcodeproj \
             -scheme Guldr \
-            -destination "id=$UDID" \
+            -destination "platform=iOS Simulator,id=$UDID" \
+            -destination-timeout 120 \
             -only-testing:GuldrTests \
             -derivedDataPath DerivedData \
             -enableCodeCoverage NO \
@@ -102,7 +105,8 @@ jobs:
           xcodebuild test-without-building \
             -project Guldr.xcodeproj \
             -scheme Guldr \
-            -destination "id=$UDID" \
+            -destination "platform=iOS Simulator,id=$UDID" \
+            -destination-timeout 120 \
             -only-testing:GuldrTests \
             -derivedDataPath DerivedData \
             -enableCodeCoverage NO \

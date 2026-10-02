@@ -77,7 +77,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Continuous integration
 
-Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode and boots the simulator before anything is built.
+Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 10 × 15 s) and `-destination-timeout 120` absorb that race.
 
 ### `CI` — required on every pull request
 
