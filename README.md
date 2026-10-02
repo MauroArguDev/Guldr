@@ -1,5 +1,7 @@
 # Guldr
 
+[![CI](https://github.com/MauroArguDev/Guldr/actions/workflows/ci.yml/badge.svg)](https://github.com/MauroArguDev/Guldr/actions/workflows/ci.yml)
+
 *Your gold, in order.* A local-first personal finance app for iPhone.
 
 **Status:** building v1.0 · iOS 26+ · SwiftUI · SwiftData

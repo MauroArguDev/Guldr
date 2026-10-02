@@ -43,7 +43,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 ## Pull requests
 
 1. Push the branch and open a PR against `main`. The template asks for what, why, how to test, light/dark screenshots and the checklist below.
-2. CI must be green.
+2. CI must be green (see [Continuous integration](#continuous-integration)).
 3. Merge with `gh pr merge --rebase --delete-branch`. Only rebase merging is enabled, so history stays linear.
 4. `git switch main && git pull`.
 
@@ -74,6 +74,25 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
   xcodebuild test -project Guldr.xcodeproj -scheme Guldr \
     -destination "platform=iOS Simulator,name=iPhone 17,OS=latest"
   ```
+
+## Continuous integration
+
+GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every pull request against `main` and on every push to `main`.
+
+- **Runner:** `macos-latest` with the latest stable Xcode.
+- **Job `test`:** builds the `Guldr` scheme and runs unit and UI tests on the iPhone 17 simulator, with code signing disabled.
+- **Required:** the `main` ruleset blocks merging until `test` passes.
+- **Concurrency:** a new push to the same branch cancels the run in progress.
+
+Reproduce it locally with the same command CI runs:
+
+```bash
+xcodebuild test -project Guldr.xcodeproj -scheme Guldr \
+  -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
+  -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO
+```
+
+If CI fails but the local run passes, check the "Show Xcode and simulators" step first: the runner may have a different Xcode or no iPhone 17 simulator.
 
 ## Definition of Done
 
