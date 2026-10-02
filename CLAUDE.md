@@ -5,6 +5,7 @@ Local-first personal finance app. iOS 26+, iPhone only, SwiftUI, SwiftData, MVVM
 Targets: Guldr (app), GuldrWidget (widget extension). App Group: `group.com.argudev.guldr`, read from Info.plist key `AppGroupID`.
 
 ## Rules
+- English only, everywhere in the project: code, identifiers, comments, docs, ADRs, commit messages, PRs, error and alert strings, logs. Spanish exists only as translations in the String Catalog (source language: English). This applies even when the conversation is in another language.
 - Never commit or push to `main`. Every change goes through a branch and a PR (see `docs/WORKFLOW.md`).
 - Read the relevant ADR in `docs/decisions/` before changing architecture. New non-obvious decisions get a new ADR.
 - SwiftData models must stay CloudKit-compatible: no `@Attribute(.unique)`, all relationships optional, every property has a default value.
