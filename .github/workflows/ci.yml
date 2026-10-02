@@ -5,34 +5,136 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+
+# Least privilege: the workflow only needs to read the repository.
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Superseded PR runs are cancelled; runs on main always finish.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  XCODE_VERSION: "26.6"
+  SIMULATOR_NAME: "iPhone 17"
+  NSUnbufferedIO: "YES"
 
 jobs:
-  test:
-    runs-on: macos-latest
-    timeout-minutes: 30
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          xcode-version: latest-stable
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Show Xcode and simulators
+      # Pull requests that only touch Markdown or docs/ skip the macOS job. A job skipped
+      # by its condition reports success, so the required `test` check is still satisfied.
+      # Pushes to main and manual runs always test.
+      - name: Classify changed files
+        id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          xcodebuild -version
-          xcrun simctl list devices available | grep iPhone | head -5
+          set -euo pipefail
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BASE_SHA" HEAD)"
+          echo "Changed files:"
+          echo "$changed"
+          if echo "$changed" | grep -qvE '(\.md$|^docs/)'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Build and test
+  # The job id is the required status check in the main ruleset. Do not rename it.
+  test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare simulator
+        id: simulator
+        uses: ./.github/actions/prepare-simulator
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+          simulator-name: ${{ env.SIMULATOR_NAME }}
+
+      - name: Build for testing
+        env:
+          UDID: ${{ steps.simulator.outputs.udid }}
         run: |
           set -o pipefail
-          xcodebuild test \
+          xcodebuild build-for-testing \
             -project Guldr.xcodeproj \
             -scheme Guldr \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -destination "id=$UDID" \
+            -only-testing:GuldrTests \
+            -derivedDataPath DerivedData \
+            -enableCodeCoverage NO \
             -skipPackagePluginValidation \
+            -skipMacroValidation \
+            -showBuildTimingSummary \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcbeautify
+            | xcbeautify --renderer github-actions
+
+      - name: Run unit tests
+        env:
+          UDID: ${{ steps.simulator.outputs.udid }}
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -project Guldr.xcodeproj \
+            -scheme Guldr \
+            -destination "id=$UDID" \
+            -only-testing:GuldrTests \
+            -derivedDataPath DerivedData \
+            -enableCodeCoverage NO \
+            -parallel-testing-enabled NO \
+            -resultBundlePath TestResults.xcresult \
+            | xcbeautify --renderer github-actions
+
+      # Guards against a green check that ran nothing (e.g. a test target dropped from the scheme).
+      - name: Verify tests ran
+        run: |
+          set -euo pipefail
+          summary="$(xcrun xcresulttool get test-results summary --path TestResults.xcresult)"
+          total="$(echo "$summary" | jq '.totalTestCount')"
+          passed="$(echo "$summary" | jq '.passedTests')"
+          failed="$(echo "$summary" | jq '.failedTests')"
+          skipped="$(echo "$summary" | jq '.skippedTests')"
+          {
+            echo "### Unit tests"
+            echo "| Total | Passed | Failed | Skipped |"
+            echo "|---|---|---|---|"
+            echo "| $total | $passed | $failed | $skipped |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$total" -eq 0 ]; then
+            echo "::error::No tests were executed."
+            exit 1
+          fi
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unit-test-results
+          path: TestResults.xcresult
+          retention-days: 7
+          if-no-files-found: ignore
