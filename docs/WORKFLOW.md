@@ -13,6 +13,10 @@ open Guldr.xcodeproj
 
 The hooks in `.githooks/` reject commits on `main` and pushes to `main`. They are the local half of the branch protection; the GitHub ruleset is the remote half.
 
+## Language
+
+Everything in the repository is written in English: code, identifiers, comments, documentation, ADRs, commit messages, pull requests, error and alert strings, and logs. User-facing text is written in English in code and translated to Spanish in the String Catalog; no other file contains Spanish.
+
 ## Branches
 
 `main` is always buildable and is never committed to directly. Every change starts on a short-lived branch named `type/short-description`:
