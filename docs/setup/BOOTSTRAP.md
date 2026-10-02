@@ -8,8 +8,8 @@
 | Phase | Topic | Branch | Status | PR |
 |---|---|---|---|---|
 | 0 | Preparation | — | ✅ Done | — |
-| 1 | Foundations and repo | `chore/project-foundations` | 🟡 In progress | — |
-| 2 | CI | `ci/github-actions` | ⬜ Pending | — |
+| 1 | Foundations and repo | `chore/project-foundations` | ✅ Done | [#1](https://github.com/MauroArguDev/Guldr/pull/1) |
+| 2 | CI | `ci/github-actions` | 🟡 In progress | — |
 | 3 | Widget target | `feat/widget-target` | ⬜ Pending | — |
 | 4 | Signing, App Group and configuration | `chore/build-configuration` | ⬜ Pending | — |
 | 5 | Structure and design system | `feat/design-system` | ⬜ Pending | — |
@@ -44,7 +44,7 @@ Rules:
 1. A step is marked `[x]` only when it is **done and verified**, not when it starts.
 2. Claude Code marks its 🤖 and ✅ steps as soon as it finishes them. 🧑 steps are marked by Claude Code **after the author confirms** in the chat and, when possible, after checking with a command.
 3. Marks travel with the work: the last commit before opening each phase's PR is `docs: update bootstrap progress for phase N`.
-4. Steps that happen after the PR is opened (CI, merge, final checks) are marked in the first commit of the **next phase**, together with the ✅ status of the finished phase.
+4. Steps that happen after the PR is opened (CI, merge, final checks) are marked at the start of the **next phase** (step N.2), together with the ✅ status of the finished phase, and committed with that phase's progress commit.
 5. Phase 0 marks go into the Phase 1 PR.
 6. Findings worth keeping are recorded under the step as `Result: …`.
 
@@ -293,7 +293,7 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
     --description "Your gold, in order. Local-first personal finance app for iOS."
   ```
   Result: done before Phase 1 (the repo already existed on GitHub with `main` = `Initial commit`); verified on 2026-10-01.
-- [ ] **1.29** Push only the branch: `git push -u origin chore/project-foundations`
+- [x] **1.29** Push only the branch: `git push -u origin chore/project-foundations`
 - [x] **1.30** Create `main` on GitHub pointing at the `Initial commit`, through the API:
   ```bash
   gh api repos/MauroArguDev/Guldr/git/refs -f ref=refs/heads/main -f sha="$(git rev-parse main)"
@@ -322,20 +322,22 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 **🤖 CLAUDE CODE — PR cycle** (no CI yet)
 
-- [ ] **1.35** `gh pr create --base main --title "chore: add project foundations" --fill`
-- [ ] **1.36** `gh pr merge --rebase --delete-branch`
-- [ ] **1.37** `git switch main && git pull`
+- [x] **1.35** `gh pr create --base main --title "chore: add project foundations" --fill`
+- [x] **1.36** `gh pr merge --rebase --delete-branch`
+  Result: [#1](https://github.com/MauroArguDev/Guldr/pull/1) merged by the author from GitHub on 2026-10-02 (rebase); branch deleted.
+- [x] **1.37** `git switch main && git pull`
 
 **✅ VERIFY**
 
-- [ ] **1.38** History: `git log --oneline` → `Initial commit` + 8 commits.
-- [ ] **1.39** No user data: `git ls-files | grep -c xcuserdata` → `0`.
-- [ ] **1.40** Hooks enabled: `git config core.hooksPath` → `.githooks`.
-- [ ] **1.41** Public repo with `main` as default:
+- [x] **1.38** History: `git log --oneline` → `Initial commit` + 8 commits.
+  Result: 8 commits on top of `Initial commit`, no merge commits.
+- [x] **1.39** No user data: `git ls-files | grep -c xcuserdata` → `0`.
+- [x] **1.40** Hooks enabled: `git config core.hooksPath` → `.githooks`.
+- [x] **1.41** Public repo with `main` as default:
   ```bash
   gh repo view MauroArguDev/Guldr --json visibility,defaultBranchRef -q '.visibility + " " + .defaultBranchRef.name'   # PUBLIC main
   ```
-- [ ] **1.42** Ruleset active: `gh api repos/MauroArguDev/Guldr/rulesets -q '.[].name'`
+- [x] **1.42** Ruleset active: `gh api repos/MauroArguDev/Guldr/rulesets -q '.[].name'`
 
 ---
 
@@ -343,9 +345,9 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 **🤖 CLAUDE CODE**
 
-- [ ] **2.1** `git switch -c ci/github-actions`
-- [ ] **2.2** Mark the remaining Phase 1 steps and its ✅ status in the **Progress** table.
-- [ ] **2.3** Create `.github/workflows/ci.yml`:
+- [x] **2.1** `git switch -c ci/github-actions`
+- [x] **2.2** Mark the remaining Phase 1 steps and its ✅ status in the **Progress** table.
+- [x] **2.3** Create `.github/workflows/ci.yml`:
   ```yaml
   name: CI
 
@@ -390,11 +392,12 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
   - `-skipPackagePluginValidation`: lets SwiftLint (Phase 8) run on CI without the manual "Trust" prompt.
   - If the runner has no "iPhone 17", the "Show Xcode and simulators" step lists what it has: adjust `-destination`.
   - Once Xcode 27 is available on the runner, pin `xcode-version: '27'`.
-- [ ] **2.4** Commit: `ci: run build and tests on pull requests`
-- [ ] **2.5** Add a **Continuous integration** section to `docs/WORKFLOW.md`: what runs, on which runner, and how to reproduce it locally.
-- [ ] **2.6** Add the CI badge to `README.md`.
-- [ ] **2.7** Commit: `docs: document ci workflow`
-- [ ] **2.8** Commit: `docs: update bootstrap progress for phase 2`
+- [x] **2.4** Commit: `ci: run build and tests on pull requests`
+  Result: the same command passed locally before pushing (Xcode 27.0, iPhone 17): 1 unit test and 2 UI tests; `testLaunchPerformance` alone takes ~85 s.
+- [x] **2.5** Add a **Continuous integration** section to `docs/WORKFLOW.md`: what runs, on which runner, and how to reproduce it locally.
+- [x] **2.6** Add the CI badge to `README.md`.
+- [x] **2.7** Commit: `docs: document ci workflow`
+- [x] **2.8** Commit: `docs: update bootstrap progress for phase 2`
 
 **🤖 CLAUDE CODE — PR cycle**
 
