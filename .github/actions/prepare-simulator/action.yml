@@ -8,6 +8,12 @@ inputs:
   simulator-name:
     description: Simulator device name, e.g. "iPhone 17".
     required: true
+  project:
+    description: Xcode project used to confirm the simulator is a valid destination.
+    required: true
+  scheme:
+    description: Scheme used to confirm the simulator is a valid destination.
+    required: true
 
 outputs:
   udid:
@@ -52,3 +58,27 @@ runs:
         # -b boots the device if needed and waits until it has finished booting.
         xcrun simctl bootstatus "$udid" -b
         echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+    # On a cold runner CoreSimulator can report the device as booted before xcodebuild
+    # lists it as a destination, and xcodebuild then fails with "Unable to find a device".
+    # Wait until the scheme's destinations include the simulator before building.
+    - name: Wait for xcodebuild to see the simulator
+      shell: bash
+      env:
+        UDID: ${{ steps.boot.outputs.udid }}
+        PROJECT: ${{ inputs.project }}
+        SCHEME: ${{ inputs.scheme }}
+      run: |
+        set -euo pipefail
+        for attempt in $(seq 1 10); do
+          destinations="$(xcodebuild -showdestinations -project "$PROJECT" -scheme "$SCHEME" 2>/dev/null || true)"
+          if grep -q "id:$UDID" <<< "$destinations"; then
+            echo "Simulator $UDID is available to xcodebuild (attempt $attempt)."
+            exit 0
+          fi
+          echo "Simulator not listed yet (attempt $attempt/10); retrying in 15 s."
+          sleep 15
+        done
+        echo "::error::xcodebuild never listed simulator $UDID as a destination."
+        xcrun simctl list devices booted
+        exit 1
