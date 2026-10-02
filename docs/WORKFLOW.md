@@ -77,7 +77,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Continuous integration
 
-Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 10 × 15 s) and `-destination-timeout 120` absorb that race.
+Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 30 attempts, about 10 minutes; ~6 minutes observed) and `-destination-timeout 120` absorb that race.
 
 ### `CI` — required on every pull request
 
@@ -86,7 +86,7 @@ Two GitHub Actions workflows share the [`prepare-simulator`](../.github/actions/
 | Job | Runner | What it does |
 |---|---|---|
 | `changes` | `ubuntu-latest` | Lists the files the PR changes. If they are only Markdown or under `docs/`, the macOS job is skipped. |
-| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
+| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran. Timeout: 25 minutes. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
 
 - **Required:** the `main` ruleset blocks merging until `test` succeeds. A `test` job skipped for a docs-only PR reports success, so documentation changes are not blocked.
 - **Pushes to `main` always run `test`**, whatever changed.
