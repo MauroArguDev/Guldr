@@ -461,11 +461,12 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 **🤖 CLAUDE CODE — Simulator readiness fix** · branch `ci/wait-for-simulator`
 
 - [x] **2.36** `git switch -c ci/wait-for-simulator`
-- [x] **2.37** In `prepare-simulator`, wait (up to 10 × 15 s) until `xcodebuild -showdestinations` lists the booted simulator; in both workflows use `platform=iOS Simulator,id=$UDID` with `-destination-timeout 120`.
+- [x] **2.37** In `prepare-simulator`, wait (up to 30 attempts) until `xcodebuild -showdestinations` lists the booted simulator; in both workflows use `platform=iOS Simulator,id=$UDID` with `-destination-timeout 120`.
 - [x] **2.38** ✅ Local check: the wait finds the real simulator and rejects a fake UDID; build and unit tests pass with the new destination.
 - [x] **2.39** Commit: `ci: wait until xcodebuild lists the booted simulator`
 - [x] **2.40** Commit: `docs: update bootstrap progress for phase 2`
-- [ ] **2.41** Push, `gh pr create --base main --title "ci: wait until xcodebuild lists the booted simulator" --fill`, CI green.
+- [x] **2.41** Push, `gh pr create --base main --title "ci: wait until xcodebuild lists the booted simulator" --fill`, CI green.
+  Result: [#4](https://github.com/MauroArguDev/Guldr/pull/4) passed in 10 min 18 s, but the simulator only appeared on attempt 10 of 10 (5:43 after boot). Raised to 30 attempts and a 25-minute job timeout in `ci: allow more time for the simulator to register`.
 - [ ] **2.42** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
 - [ ] **2.43** ✅ The push run on `main` is green; then mark 2.34.
 

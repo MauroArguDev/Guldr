@@ -62,6 +62,7 @@ runs:
     # On a cold runner CoreSimulator can report the device as booted before xcodebuild
     # lists it as a destination, and xcodebuild then fails with "Unable to find a device".
     # Wait until the scheme's destinations include the simulator before building.
+    # Observed on macos-26: up to ~6 min after boot, so allow up to ~10 min (30 attempts).
     - name: Wait for xcodebuild to see the simulator
       shell: bash
       env:
@@ -70,13 +71,13 @@ runs:
         SCHEME: ${{ inputs.scheme }}
       run: |
         set -euo pipefail
-        for attempt in $(seq 1 10); do
+        for attempt in $(seq 1 30); do
           destinations="$(xcodebuild -showdestinations -project "$PROJECT" -scheme "$SCHEME" 2>/dev/null || true)"
           if grep -q "id:$UDID" <<< "$destinations"; then
             echo "Simulator $UDID is available to xcodebuild (attempt $attempt)."
             exit 0
           fi
-          echo "Simulator not listed yet (attempt $attempt/10); retrying in 15 s."
+          echo "Simulator not listed yet (attempt $attempt/30); retrying in 15 s."
           sleep 15
         done
         echo "::error::xcodebuild never listed simulator $UDID as a destination."
