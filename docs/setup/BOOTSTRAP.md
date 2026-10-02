@@ -444,16 +444,30 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **2.29** `git push -u origin ci/speed-up-tests`
-- [ ] **2.30** `gh pr create --base main --title "ci: speed up and harden the CI workflow" --fill`
-- [ ] **2.31** `gh pr checks --watch` → `test` green; compare its duration with the 19–25 min of the old workflow.
-- [ ] **2.32** `gh pr merge --rebase --delete-branch`
-- [ ] **2.33** `git switch main && git pull`
+- [x] **2.29** `git push -u origin ci/speed-up-tests`
+- [x] **2.30** `gh pr create --base main --title "ci: speed up and harden the CI workflow" --fill`
+- [x] **2.31** `gh pr checks --watch` → `test` green; compare its duration with the 19–25 min of the old workflow.
+  Result: [#3](https://github.com/MauroArguDev/Guldr/pull/3) passed in 9 min 45 s (simulator 2:54, build 2:09, unit tests 2:53, verify 0:32).
+- [x] **2.32** `gh pr merge --rebase --delete-branch`
+  Result: merged by the author from GitHub on 2026-10-02 (rebase).
+- [x] **2.33** `git switch main && git pull`
 
 **✅ VERIFY**
 
 - [ ] **2.34** The push run on `main` is green (badge back to passing).
+  Result (first attempt): failed after 4.5 min with `Unable to find a device matching the provided destination specifier` although the simulator had booted. Fixed in steps 2.36–2.43.
 - [ ] **2.35** Start the `UI tests` workflow once from the Actions tab (`gh workflow run ui-tests.yml`) and confirm it runs; it is informational, not blocking.
+
+**🤖 CLAUDE CODE — Simulator readiness fix** · branch `ci/wait-for-simulator`
+
+- [x] **2.36** `git switch -c ci/wait-for-simulator`
+- [x] **2.37** In `prepare-simulator`, wait (up to 10 × 15 s) until `xcodebuild -showdestinations` lists the booted simulator; in both workflows use `platform=iOS Simulator,id=$UDID` with `-destination-timeout 120`.
+- [x] **2.38** ✅ Local check: the wait finds the real simulator and rejects a fake UDID; build and unit tests pass with the new destination.
+- [x] **2.39** Commit: `ci: wait until xcodebuild lists the booted simulator`
+- [x] **2.40** Commit: `docs: update bootstrap progress for phase 2`
+- [ ] **2.41** Push, `gh pr create --base main --title "ci: wait until xcodebuild lists the booted simulator" --fill`, CI green.
+- [ ] **2.42** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
+- [ ] **2.43** ✅ The push run on `main` is green; then mark 2.34.
 
 ---
 
