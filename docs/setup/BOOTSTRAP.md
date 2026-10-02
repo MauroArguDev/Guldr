@@ -137,7 +137,7 @@ Project changes from this phase are not committed here: they go into the first c
 - [x] **0.8** **Project Guldr ▸ Build Settings ▸ iOS Deployment Target**: **26.0**.
 - [x] **0.9** **GuldrTests** and **GuldrUITests ▸ Build Settings**: *iOS Deployment Target* = **26.0** and *Targeted Device Family* = **iPhone**.
 - [x] **0.10** **Project Guldr ▸ File Inspector ▸ Project Format**: the oldest compatible format offered (ideally *Xcode 26.0-compatible*), so CI can open it if the runner still has Xcode 26.
-  Result: *Compatibility: Xcode 16.0* (`preferredProjectObjectVersion = 77`), but the file still declares `objectVersion = 110`. Phase 2 CI confirms whether an older Xcode opens it.
+  Result: *Compatibility: Xcode 16.0* alone left the file at `objectVersion = 110` (Xcode 27 format), which Xcode 26.6 on CI could not open. Fixed in Phase 2: in the same panel, uncheck **Minimize Project References** and **Strictly Validate** (Xcode 27-only options), re-select the oldest compatibility, save and close the project → `objectVersion = 77`.
 - [x] **0.11** **Product ▸ Scheme ▸ Manage Schemes**: check **Shared** on the `Guldr` scheme.
 - [x] **0.12** Copy this file to `docs/setup/BOOTSTRAP.md` and open Claude Code in `~/Documents/Portfolio/Guldr`.
 
