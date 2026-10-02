@@ -39,16 +39,6 @@
                ReferencedContainer = "container:Guldr.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6AA4F859306CB56C00EAB927"
-               BuildableName = "GuldrUITests.xctest"
-               ReferencedContainer = "container:Guldr.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
