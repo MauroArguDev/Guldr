@@ -454,9 +454,9 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 **✅ VERIFY**
 
-- [ ] **2.34** The push run on `main` is green (badge back to passing).
+- [x] **2.34** The push run on `main` is green (badge back to passing).
   Result (first attempt): failed after 4.5 min with `Unable to find a device matching the provided destination specifier` although the simulator had booted. Fixed in steps 2.36–2.43.
-- [ ] **2.35** Start the `UI tests` workflow once from the Actions tab (`gh workflow run ui-tests.yml`) and confirm it runs; it is informational, not blocking.
+- [x] **2.35** Start the `UI tests` workflow once and confirm it runs. — ⏭️ skipped: UI tests removed from the project (steps 2.44–2.58); the manual run was cancelled.
 
 **🤖 CLAUDE CODE — Simulator readiness fix** · branch `ci/wait-for-simulator`
 
@@ -467,9 +467,38 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 - [x] **2.40** Commit: `docs: update bootstrap progress for phase 2`
 - [x] **2.41** Push, `gh pr create --base main --title "ci: wait until xcodebuild lists the booted simulator" --fill`, CI green.
   Result: [#4](https://github.com/MauroArguDev/Guldr/pull/4) passed in 10 min 18 s, but the simulator only appeared on attempt 10 of 10 (5:43 after boot). Raised to 30 attempts and a 25-minute job timeout in `ci: allow more time for the simulator to register`.
-- [ ] **2.42** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
-- [ ] **2.43** ✅ The push run on `main` is green; then mark 2.34.
+- [x] **2.42** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
+- [x] **2.43** ✅ The push run on `main` is green; then mark 2.34.
+  Result: [#4](https://github.com/MauroArguDev/Guldr/pull/4) merged by the author on 2026-10-02; push run on `main` green in 7 min 53 s (simulator listed on attempt 1).
 
+
+**Remove UI tests** · branch `chore/remove-ui-tests`
+
+UI tests cost minutes on every run and were flaky on shared runners. Decision (2026-10-02): the project keeps unit tests only; UI is verified with previews and on device.
+
+- [x] **2.44** `git switch -c chore/remove-ui-tests`
+- [x] **2.45** Cancel the queued `UI tests` run.
+- [x] **2.46** Delete `.github/workflows/ui-tests.yml` and remove UI tests from `docs/WORKFLOW.md` (testing, CI and release checklist).
+
+**🧑 YOU — Xcode**
+
+- [x] **2.47** In the Project Navigator select the project ▸ **TARGETS ▸ GuldrUITests** ▸ press **Delete** (or the **−** button) and confirm.
+- [x] **2.48** In the Project Navigator select the **GuldrUITests** folder ▸ **Delete** ▸ **Move to Trash**.
+- [x] **2.49** **Product ▸ Scheme ▸ Edit Scheme ▸ Test**: only `GuldrTests` is listed. Save (⌘S) and close the project.
+  Result: Xcode does not show the deleted target in the scheme editor and kept its `TestableReference` in `Guldr.xcscheme`; with the author's approval Claude Code removed that block from the scheme XML (the `.pbxproj` was not touched).
+
+**🤖 CLAUDE CODE**
+
+- [x] **2.50** ✅ No `GuldrUITests` left in the project, the scheme or the repo; `objectVersion` is still `77`; build and unit tests pass.
+  Result: targets `Guldr` and `GuldrTests` only; `GuldrUITests-Runner.app` is no longer built; 1 unit test passed locally.
+- [x] **2.51** Commit: `chore: remove ui test target`
+- [x] **2.52** Commit: `ci: remove ui tests workflow`
+- [x] **2.53** Commit: `docs: update bootstrap progress for phase 2`
+- [ ] **2.54** `git push -u origin chore/remove-ui-tests`
+- [ ] **2.55** `gh pr create --base main --title "chore: remove ui tests" --fill`
+- [ ] **2.56** `gh pr checks --watch` → `test` green.
+- [ ] **2.57** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
+- [ ] **2.58** ✅ The push run on `main` is green.
 ---
 
 ## Phase 3 — Widget target · branch `feat/widget-target`
@@ -919,7 +948,7 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 |---|---|---|---|
 | 0 | — | — | — |
 | 1 | `chore/project-foundations` | chore: add project foundations | 8 |
-| 2 | `ci/github-actions`, `ci/speed-up-tests` | ci: add GitHub Actions workflow; ci: speed up and harden the CI workflow | 5 + 5 |
+| 2 | `ci/github-actions`, `ci/speed-up-tests`, `ci/wait-for-simulator`, `chore/remove-ui-tests` | #2, #3, #4 and the UI test removal | 5 + 5 + 3 + 3 |
 | 3 | `feat/widget-target` | feat: add GuldrWidget extension target | 2 |
 | 4 | `chore/build-configuration` | chore: configure signing, app group and build settings | 5 |
 | 5 | `feat/design-system` | feat: add design system foundations | 6 |
