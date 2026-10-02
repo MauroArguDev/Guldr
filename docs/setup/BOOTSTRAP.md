@@ -403,21 +403,57 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 - [ ] **2.9** `git push -u origin ci/github-actions`
 - [ ] **2.10** `gh pr create --base main --title "ci: add GitHub Actions workflow" --fill`
-- [ ] **2.11** `gh pr checks --watch` → CI green.
-- [ ] **2.12** `gh pr merge --rebase --delete-branch`
-- [ ] **2.13** `git switch main && git pull`
+- [x] **2.11** `gh pr checks --watch` → CI green.
+  Result: first run failed in 3 s (project format 110, fixed in `chore: lower project format for xcode 26 compatibility`); second run passed in 19 min 33 s.
+- [x] **2.12** `gh pr merge --rebase --delete-branch`
+  Result: [#2](https://github.com/MauroArguDev/Guldr/pull/2) merged by the author from GitHub on 2026-10-02 (rebase).
+- [x] **2.13** `git switch main && git pull`
 
 **🧑 YOU**
 
-- [ ] **2.14** In the `main` ruleset (step 1.33), enable **Require status checks to pass → `test`**. The check appears in the list after its first run.
+- [x] **2.14** In the `main` ruleset (step 1.33), enable **Require status checks to pass → `test`**. The check appears in the list after its first run.
 
 **✅ VERIFY**
 
-- [ ] **2.15** Latest run is green: `gh run list --limit 1` → `completed / success`.
-- [ ] **2.16** The ruleset requires the check:
+- [x] **2.15** Latest run is green: `gh run list --limit 1` → `completed / success`.
+  Result: the push run on `main` **failed** after 25 min: the template UI test `testExample` timed out (253 s) while unit tests passed. Root cause: ~15–18 min of simulator cold boot and parallel clones before any test, plus slow UI tests on the shared runner. Fixed in steps 2.17–2.35.
+- [x] **2.16** The ruleset requires the check:
   ```bash
   gh api repos/MauroArguDev/Guldr/rules/branches/main -q '.[].type'   # includes required_status_checks
   ```
+  Result: `required_status_checks` with `test` (GitHub Actions), not strict.
+
+**🤖 CLAUDE CODE — Faster, hardened CI** · branch `ci/speed-up-tests`
+
+- [x] **2.17** `git switch -c ci/speed-up-tests`
+- [x] **2.18** Create `.github/actions/prepare-simulator/action.yml`: selects the pinned Xcode with `xcode-select` (no third-party action) and boots the newest iPhone 17 simulator with `simctl bootstatus -b`, so the cold boot is its own step.
+- [x] **2.19** Rewrite `.github/workflows/ci.yml`:
+  - `changes` job on `ubuntu-latest` skips the macOS job for PRs that only touch Markdown or `docs/`; a skipped `test` job reports success to the ruleset.
+  - `test` job (id unchanged, it is the required check) on `macos-26` with Xcode 26.6: `build-for-testing` + `test-without-building`, `-only-testing:GuldrTests`, destination by simulator UDID, no code coverage, no indexing, no parallel clones, 20-minute timeout.
+  - Fails if zero tests ran and writes a summary table; uploads the `.xcresult` on failure.
+  - Security: `permissions: contents: read`, `persist-credentials: false`, actions pinned to commit SHAs.
+- [x] **2.20** ✅ Local dry run (Xcode 27.0, simulator already booted): `build-for-testing` 9 s, `test-without-building` 3 s, `xcresulttool` reports 1 test passed; change classifier checked for docs-only, mixed, workflow and project-file changes.
+- [x] **2.21** Commit: `ci: build once and run unit tests on a pre-booted simulator`
+- [x] **2.22** Create `.github/workflows/ui-tests.yml`: `GuldrUITests` every Monday 06:00 UTC and on demand, not required, `.xcresult` always uploaded.
+- [x] **2.23** Commit: `ci: move ui tests to a weekly and manual workflow`
+- [x] **2.24** Create `.github/dependabot.yml`: weekly updates for the SHA-pinned actions.
+- [x] **2.25** Commit: `ci: add dependabot for github actions`
+- [x] **2.26** Rewrite the **Continuous integration** section of `docs/WORKFLOW.md` and add "UI tests pass" to the release checklist.
+- [x] **2.27** Commit: `docs: document the faster ci setup`
+- [x] **2.28** Commit: `docs: update bootstrap progress for phase 2`
+
+**🤖 CLAUDE CODE — PR cycle**
+
+- [ ] **2.29** `git push -u origin ci/speed-up-tests`
+- [ ] **2.30** `gh pr create --base main --title "ci: speed up and harden the CI workflow" --fill`
+- [ ] **2.31** `gh pr checks --watch` → `test` green; compare its duration with the 19–25 min of the old workflow.
+- [ ] **2.32** `gh pr merge --rebase --delete-branch`
+- [ ] **2.33** `git switch main && git pull`
+
+**✅ VERIFY**
+
+- [ ] **2.34** The push run on `main` is green (badge back to passing).
+- [ ] **2.35** Start the `UI tests` workflow once from the Actions tab (`gh workflow run ui-tests.yml`) and confirm it runs; it is informational, not blocking.
 
 ---
 
@@ -868,7 +904,7 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 |---|---|---|---|
 | 0 | — | — | — |
 | 1 | `chore/project-foundations` | chore: add project foundations | 8 |
-| 2 | `ci/github-actions` | ci: add GitHub Actions workflow | 3 |
+| 2 | `ci/github-actions`, `ci/speed-up-tests` | ci: add GitHub Actions workflow; ci: speed up and harden the CI workflow | 5 + 5 |
 | 3 | `feat/widget-target` | feat: add GuldrWidget extension target | 2 |
 | 4 | `chore/build-configuration` | chore: configure signing, app group and build settings | 5 |
 | 5 | `feat/design-system` | feat: add design system foundations | 6 |
