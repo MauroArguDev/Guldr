@@ -10,8 +10,8 @@
 | 0 | Preparation | — | ✅ Done | — |
 | 1 | Foundations and repo | `chore/project-foundations` | ✅ Done | [#1](https://github.com/MauroArguDev/Guldr/pull/1) |
 | 2 | CI | `ci/github-actions` | ✅ Done | [#2](https://github.com/MauroArguDev/Guldr/pull/2), [#3](https://github.com/MauroArguDev/Guldr/pull/3), [#4](https://github.com/MauroArguDev/Guldr/pull/4), [#5](https://github.com/MauroArguDev/Guldr/pull/5) |
-| 3 | Widget target | `feat/widget-target` | 🟡 In progress | — |
-| 4 | Signing, App Group and configuration | `chore/build-configuration` | ⬜ Pending | — |
+| 3 | Widget target | `feat/widget-target` | ✅ Done | [#6](https://github.com/MauroArguDev/Guldr/pull/6) |
+| 4 | Signing, App Group and configuration | `chore/build-configuration` | 🟡 In progress | — |
 | 5 | Structure and design system | `feat/design-system` | ⬜ Pending | — |
 | 6 | App icon | `feat/app-icon` | ⬜ Pending | — |
 | 7 | Privacy and localization | `chore/privacy-and-localization` | ⬜ Pending | — |
@@ -546,11 +546,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **3.13** `git push -u origin feat/widget-target`
-- [ ] **3.14** `gh pr create --base main --title "feat: add GuldrWidget extension target" --fill`
-- [ ] **3.15** `gh pr checks --watch` → CI green.
-- [ ] **3.16** `gh pr merge --rebase --delete-branch`
-- [ ] **3.17** `git switch main && git pull`
+- [x] **3.13** `git push -u origin feat/widget-target`
+- [x] **3.14** `gh pr create --base main --title "feat: add GuldrWidget extension target" --fill`
+- [x] **3.15** `gh pr checks --watch` → CI green.
+- [x] **3.16** `gh pr merge --rebase --delete-branch`
+- [x] **3.17** `git switch main && git pull`
+  Result: [#6](https://github.com/MauroArguDev/Guldr/pull/6) passed in 5 min 18 s and was merged by the author on 2026-10-03; push run on `main` green.
 
 ---
 
@@ -558,67 +559,72 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE**
 
-- [ ] **4.1** `git switch -c chore/build-configuration`
-- [ ] **4.2** Mark the remaining Phase 3 steps and its ✅ status in the **Progress** table.
+- [x] **4.1** `git switch -c chore/build-configuration`
+- [x] **4.2** Mark the remaining Phase 3 steps and its ✅ status in the **Progress** table.
 
 **🧑 YOU — Signing and App Group**
 
-- [ ] **4.3** **Target Guldr ▸ Signing & Capabilities**: *Automatically manage signing* with your team.
-- [ ] **4.4** **Target GuldrWidget ▸ Signing & Capabilities**: *Automatically manage signing* with your team.
-- [ ] **4.5** **Target Guldr ▸ + Capability ▸ App Groups**: `group.com.argudev.guldr`.
-- [ ] **4.6** **Target GuldrWidget ▸ + Capability ▸ App Groups**: `group.com.argudev.guldr`.
+- [x] **4.3** **Target Guldr ▸ Signing & Capabilities**: *Automatically manage signing* with your team.
+- [x] **4.4** **Target GuldrWidget ▸ Signing & Capabilities**: *Automatically manage signing* with your team.
+- [x] **4.5** **Target Guldr ▸ + Capability ▸ App Groups**: `group.com.argudev.guldr`.
+- [x] **4.6** **Target GuldrWidget ▸ + Capability ▸ App Groups**: `group.com.argudev.guldr`.
   > **Do not add iCloud**: SwiftData would turn on CloudKit sync automatically.
-- [ ] **4.7** Run the app on your iPhone to confirm signing works.
+
+  Result: Xcode registered the group with no error. Both Xcode-managed profiles include `group.com.argudev.guldr` and are valid for 365 days (free Personal Team profiles last 7), confirming the paid **Individual** membership on team `XRC983479Z`. Xcode still lists a stale "(Personal Team)" entry for the same team ID; pick the entry without that suffix.
+- [x] **4.7** Run the app on your iPhone to confirm signing works.
+  Result: the app installs and runs on the author's iPhone (2026-10-03).
 
 **🤖 CLAUDE CODE**
 
-- [ ] **4.8** ✅ Two entitlements files contain the App Group:
+- [x] **4.8** ✅ Two entitlements files contain the App Group:
   ```bash
   grep -rl "group.com.argudev.guldr" --include="*.entitlements" .   # 2 files
   ```
-- [ ] **4.9** Commit: `chore: enable app group for app and widget`
+- [x] **4.9** Commit: `chore: enable app group for app and widget`
 
 **🧑 YOU — Info.plist**
 
-- [ ] **4.10** **Target Guldr ▸ Info**: `Privacy - Face ID Usage Description` = `Guldr uses Face ID to keep your financial data private.`
-- [ ] **4.11** **Target Guldr ▸ Info**: `AppGroupID` (String) = `$(APP_GROUP_ID)`.
-- [ ] **4.12** **Target GuldrWidget ▸ Info**: `AppGroupID` (String) = `$(APP_GROUP_ID)`.
+- [x] **4.10** **Target Guldr ▸ Info**: `Privacy - Face ID Usage Description` = `Guldr uses Face ID to keep your financial data private.`
+- [x] **4.11** **Target Guldr ▸ Info**: `AppGroupID` (String) = `$(APP_GROUP_ID)`.
+- [x] **4.12** **Target GuldrWidget ▸ Info**: `AppGroupID` (String) = `$(APP_GROUP_ID)`.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **4.13** Commit: `chore: add face id usage description and app group info key`
+- [x] **4.13** Commit: `chore: add face id usage description and app group info key`
+  Result: Xcode created `Guldr/Info.plist` for the custom key and excluded it from the synchronized folder's resources; the built app contains `NSFaceIDUsageDescription` and an empty `AppGroupID` until the xcconfig defines `APP_GROUP_ID`.
 
 **🤖 CLAUDE CODE — xcconfig**
 
-- [ ] **4.14** Create `Config/Shared.xcconfig`:
+- [x] **4.14** Create `Config/Shared.xcconfig`:
   ```
   MARKETING_VERSION = 1.0.0
   CURRENT_PROJECT_VERSION = 1
   IPHONEOS_DEPLOYMENT_TARGET = 26.0
   APP_GROUP_ID = group.com.argudev.guldr
   ```
-- [ ] **4.15** Create `Config/Debug.xcconfig` and `Config/Release.xcconfig`, each with a single line: `#include "Shared.xcconfig"`.
+- [x] **4.15** Create `Config/Debug.xcconfig` and `Config/Release.xcconfig`, each with a single line: `#include "Shared.xcconfig"`.
 
 **🧑 YOU**
 
-- [ ] **4.16** Drag the `Config/` folder into the project in Xcode **without selecting any target**.
-- [ ] **4.17** **Project Guldr ▸ Info ▸ Configurations**: `Debug.xcconfig` for Debug and `Release.xcconfig` for Release, on the project and both targets.
-- [ ] **4.18** In each target's Build Settings, if `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` or `IPHONEOS_DEPLOYMENT_TARGET` show in bold, select them and press **Delete** so they inherit from the xcconfig.
+- [x] **4.16** Drag the `Config/` folder into the project in Xcode **without selecting any target**.
+- [x] **4.17** **Project Guldr ▸ Info ▸ Configurations**: `Debug.xcconfig` for Debug and `Release.xcconfig` for Release on the **project** row; target rows stay *None* and inherit it.
+- [x] **4.18** In each target's Build Settings, if `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` or `IPHONEOS_DEPLOYMENT_TARGET` show in bold, select them and press **Delete** so they inherit from the xcconfig.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **4.19** ✅ Values come from the xcconfig:
+- [x] **4.19** ✅ Values come from the xcconfig:
   ```bash
   for t in Guldr GuldrWidgetExtension; do
     xcodebuild -project Guldr.xcodeproj -target $t -showBuildSettings 2>/dev/null \
       | grep -E " (MARKETING_VERSION|APP_GROUP_ID|IPHONEOS_DEPLOYMENT_TARGET) ="
   done
   ```
-- [ ] **4.20** Commit: `chore: move version and app group settings to xcconfig`
+- [x] **4.20** Commit: `chore: move version and app group settings to xcconfig`
+  Result: no target or project overrides left; all three targets resolve `MARKETING_VERSION = 1.0.0`, `CURRENT_PROJECT_VERSION = 1`, `IPHONEOS_DEPLOYMENT_TARGET = 26.0` and `APP_GROUP_ID` from `Config/Shared.xcconfig`; the built app and widget contain `AppGroupID = group.com.argudev.guldr`.
 
 **🤖 CLAUDE CODE — First test**
 
-- [ ] **4.21** Replace the sample test in `GuldrTests`:
+- [x] **4.21** Replace the sample test in `GuldrTests`:
   ```swift
   import Testing
   @testable import Guldr
@@ -630,9 +636,10 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
       }
   }
   ```
-- [ ] **4.22** ✅ Run `xcodebuild test` with `$SIM`. If it fails, ask the author to confirm the test target has **Host Application = Guldr**.
-- [ ] **4.23** Commit: `test: verify app group id is configured`
-- [ ] **4.24** Commit: `docs: update bootstrap progress for phase 4`
+- [x] **4.22** ✅ Run `xcodebuild test` with `$SIM`. If it fails, ask the author to confirm the test target has **Host Application = Guldr**.
+- [x] **4.23** Commit: `test: verify app group id is configured`
+  Result: the template file was renamed to `GuldrTests/ConfigurationTests.swift`. The test passes, and fails as expected when the expected value is changed. Building with a command-line `APP_GROUP_ID` override made the hosted app hang at launch on the simulator, so the negative check was done by changing the expectation instead.
+- [x] **4.24** Commit: `docs: update bootstrap progress for phase 4`
 
 **🤖 CLAUDE CODE — PR cycle**
 
