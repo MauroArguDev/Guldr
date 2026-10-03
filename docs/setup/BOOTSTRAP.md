@@ -9,8 +9,8 @@
 |---|---|---|---|---|
 | 0 | Preparation | — | ✅ Done | — |
 | 1 | Foundations and repo | `chore/project-foundations` | ✅ Done | [#1](https://github.com/MauroArguDev/Guldr/pull/1) |
-| 2 | CI | `ci/github-actions` | 🟡 In progress | — |
-| 3 | Widget target | `feat/widget-target` | ⬜ Pending | — |
+| 2 | CI | `ci/github-actions` | ✅ Done | [#2](https://github.com/MauroArguDev/Guldr/pull/2), [#3](https://github.com/MauroArguDev/Guldr/pull/3), [#4](https://github.com/MauroArguDev/Guldr/pull/4), [#5](https://github.com/MauroArguDev/Guldr/pull/5) |
+| 3 | Widget target | `feat/widget-target` | 🟡 In progress | — |
 | 4 | Signing, App Group and configuration | `chore/build-configuration` | ⬜ Pending | — |
 | 5 | Structure and design system | `feat/design-system` | ⬜ Pending | — |
 | 6 | App icon | `feat/app-icon` | ⬜ Pending | — |
@@ -494,23 +494,24 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 - [x] **2.51** Commit: `chore: remove ui test target`
 - [x] **2.52** Commit: `ci: remove ui tests workflow`
 - [x] **2.53** Commit: `docs: update bootstrap progress for phase 2`
-- [ ] **2.54** `git push -u origin chore/remove-ui-tests`
-- [ ] **2.55** `gh pr create --base main --title "chore: remove ui tests" --fill`
-- [ ] **2.56** `gh pr checks --watch` → `test` green.
-- [ ] **2.57** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
-- [ ] **2.58** ✅ The push run on `main` is green.
+- [x] **2.54** `git push -u origin chore/remove-ui-tests`
+- [x] **2.55** `gh pr create --base main --title "chore: remove ui tests" --fill`
+- [x] **2.56** `gh pr checks --watch` → `test` green.
+- [x] **2.57** `gh pr merge --rebase --delete-branch` and `git switch main && git pull`
+- [x] **2.58** ✅ The push run on `main` is green.
+  Result: [#5](https://github.com/MauroArguDev/Guldr/pull/5) passed in 9 min 16 s and was merged by the author on 2026-10-02; push run on `main` green in 6 min 56 s (simulator listed on attempt 1).
 ---
 
 ## Phase 3 — Widget target · branch `feat/widget-target`
 
 **🤖 CLAUDE CODE**
 
-- [ ] **3.1** `git switch -c feat/widget-target`
-- [ ] **3.2** Mark the remaining Phase 2 steps and its ✅ status in the **Progress** table.
+- [x] **3.1** `git switch -c feat/widget-target`
+- [x] **3.2** Mark the remaining Phase 2 steps and its ✅ status in the **Progress** table.
 
 **🧑 YOU**
 
-- [ ] **3.3** **File ▸ New ▸ Target ▸ iOS ▸ Widget Extension**:
+- [x] **3.3** **File ▸ New ▸ Target ▸ iOS ▸ Widget Extension**:
 
   | Field | Value |
   |---|---|
@@ -521,24 +522,27 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
   | Include Configuration App Intent | No |
   | Embed in Application | Guldr |
 
-- [ ] **3.4** Answer **Activate** in the scheme dialog.
-- [ ] **3.5** **GuldrWidget ▸ General ▸ Minimum Deployments**: iOS 26.0.
-- [ ] **3.6** **GuldrWidget ▸ General ▸ Supported Destinations**: iPhone only.
-- [ ] **3.7** **Product ▸ Scheme ▸ Manage Schemes**: check **Shared** on the widget scheme.
+- [x] **3.4** Answer **Activate** in the scheme dialog.
+- [x] **3.5** **GuldrWidget ▸ General ▸ Minimum Deployments**: iOS 26.0.
+- [x] **3.6** **GuldrWidget ▸ General ▸ Supported Destinations**: iPhone only.
+- [x] **3.7** **Product ▸ Scheme ▸ Manage Schemes**: check **Shared** on the widget scheme.
+- [x] **3.7a** **GuldrWidgetExtension ▸ Build Settings**: *Swift Language Version* = **Swift 6** and *Default Actor Isolation* = **MainActor**, matching the app (ADR 003).
+  Result: the template created the widget with Swift 5.0 and no default isolation; it builds cleanly with the app's settings.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **3.8** Confirm the widget scheme name (`GuldrWidgetExtension` or `GuldrWidget`): `xcodebuild -list -project Guldr.xcodeproj`
-- [ ] **3.9** ✅ Build the app:
+- [x] **3.8** Confirm the widget scheme name (`GuldrWidgetExtension` or `GuldrWidget`): `xcodebuild -list -project Guldr.xcodeproj`
+  Result: `GuldrWidgetExtension`; the `.appex` is embedded in `Guldr.app/PlugIns/`; project still at `objectVersion = 77`.
+- [x] **3.9** ✅ Build the app:
   ```bash
   xcodebuild -project Guldr.xcodeproj -scheme Guldr -destination "platform=iOS Simulator,name=$SIM,OS=latest" build | tail -3
   ```
-- [ ] **3.10** ✅ Build the widget:
+- [x] **3.10** ✅ Build the widget:
   ```bash
   xcodebuild -project Guldr.xcodeproj -scheme GuldrWidgetExtension -destination "platform=iOS Simulator,name=$SIM,OS=latest" build | tail -3
   ```
-- [ ] **3.11** Commit: `feat: add widget extension target`
-- [ ] **3.12** Commit: `docs: update bootstrap progress for phase 3`
+- [x] **3.11** Commit: `feat: add widget extension target`
+- [x] **3.12** Commit: `docs: update bootstrap progress for phase 3`
 
 **🤖 CLAUDE CODE — PR cycle**
 
