@@ -60,11 +60,21 @@
 			);
 			target = 6ACFE80E30707FE3008F58E8 /* GuldrWidgetExtension */;
 		};
+		6ACFE838307168C0008F58E8 /* Exceptions for "Guldr" folder in "Guldr" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6AA4F842306CB56A00EAB927 /* Guldr */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6AA4F845306CB56A00EAB927 /* Guldr */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6ACFE838307168C0008F58E8 /* Exceptions for "Guldr" folder in "Guldr" target */,
+			);
 			path = Guldr;
 			sourceTree = "<group>";
 		};
@@ -449,6 +459,8 @@
 				DEVELOPMENT_TEAM = XRC983479Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Guldr/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Guldr uses Face ID to keep your financial data private.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -488,6 +500,8 @@
 				DEVELOPMENT_TEAM = XRC983479Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Guldr/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Guldr uses Face ID to keep your financial data private.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
