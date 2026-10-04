@@ -473,7 +473,7 @@
 		6AA4F863306CB56C00EAB927 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Guldr;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Guldr/Guldr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -511,7 +511,7 @@
 		6AA4F864306CB56C00EAB927 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Guldr;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Guldr/Guldr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
