@@ -12,8 +12,8 @@
 | 2 | CI | `ci/github-actions` | ✅ Done | [#2](https://github.com/MauroArguDev/Guldr/pull/2), [#3](https://github.com/MauroArguDev/Guldr/pull/3), [#4](https://github.com/MauroArguDev/Guldr/pull/4), [#5](https://github.com/MauroArguDev/Guldr/pull/5) |
 | 3 | Widget target | `feat/widget-target` | ✅ Done | [#6](https://github.com/MauroArguDev/Guldr/pull/6) |
 | 4 | Signing, App Group and configuration | `chore/build-configuration` | ✅ Done | [#7](https://github.com/MauroArguDev/Guldr/pull/7) |
-| 5 | Structure and design system | `feat/design-system` | 🟡 In progress | — |
-| 6 | App icon | `feat/app-icon` | ⬜ Pending | — |
+| 5 | Structure and design system | `feat/design-system` | ✅ Done | [#8](https://github.com/MauroArguDev/Guldr/pull/8) |
+| 6 | App icon | `feat/app-icon` | 🟡 In progress | — |
 | 7 | Privacy and localization | `chore/privacy-and-localization` | ⬜ Pending | — |
 | 8 | SwiftLint | `chore/swiftlint` | ⬜ Pending | — |
 
@@ -784,11 +784,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 **🤖 CLAUDE CODE — PR cycle**
 
 - [x] **5.29** Commit: `docs: update bootstrap progress for phase 5`
-- [ ] **5.30** `git push -u origin feat/design-system`
-- [ ] **5.31** `gh pr create --base main --title "feat: add design system foundations" --fill`
-- [ ] **5.32** `gh pr checks --watch` → CI green.
-- [ ] **5.33** `gh pr merge --rebase --delete-branch`
-- [ ] **5.34** `git switch main && git pull`
+- [x] **5.30** `git push -u origin feat/design-system`
+- [x] **5.31** `gh pr create --base main --title "feat: add design system foundations" --fill`
+- [x] **5.32** `gh pr checks --watch` → CI green.
+- [x] **5.33** `gh pr merge --rebase --delete-branch`
+- [x] **5.34** `git switch main && git pull`
+  Result: [#8](https://github.com/MauroArguDev/Guldr/pull/8) passed in 6 min 59 s and was merged by the author on 2026-10-04; push run on `main` green.
 
 ---
 
@@ -796,37 +797,40 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE**
 
-- [ ] **6.1** `git switch -c feat/app-icon`
-- [ ] **6.2** Mark the remaining Phase 5 steps and its ✅ status in the **Progress** table.
+- [x] **6.1** `git switch -c feat/app-icon`
+- [x] **6.2** Mark the remaining Phase 5 steps and its ✅ status in the **Progress** table.
 
 **🧑 YOU — Icon Composer**
 
-- [ ] **6.3** Open **Xcode ▸ Open Developer Tool ▸ Icon Composer ▸ File ▸ New**.
-- [ ] **6.4** Drag `docs/design/icon/guldr-glyph-gold.svg` into the sidebar.
-- [ ] **6.5** Select the icon's root row → **Fill: Solid `#111111`**.
-- [ ] **6.6** Select the group and tune Liquid Glass: specular on, low translucency, neutral shadow.
-- [ ] **6.7** Compare with `docs/design/icon/preview-default-1024.png` until the gold looks matte.
-- [ ] **6.8** **Default** appearance: `#111111` background, gold glyph.
-- [ ] **6.9** **Dark** appearance: same as Default.
-- [ ] **6.10** **Mono** appearance: white layer fill.
-- [ ] **6.11** Save as **`Guldr/Resources/Guldr.icon`** (it joins the app target through the synchronized folder).
-- [ ] **6.12** **Target Guldr ▸ General ▸ App Icons**: `Guldr`.
+- [x] **6.3** Open **Xcode ▸ Open Developer Tool ▸ Icon Composer ▸ File ▸ New**.
+- [x] **6.4** Drag `docs/design/icon/guldr-glyph-gold.svg` into the sidebar.
+- [x] **6.5** Select the icon's root row → **Fill: Solid `#111111`**.
+- [x] **6.6** Select the group and tune Liquid Glass: specular on, low translucency, neutral shadow.
+- [x] **6.7** Compare with `docs/design/icon/preview-default-1024.png` until the gold looks matte.
+- [x] **6.8** **Default** appearance: `#111111` background, gold glyph.
+- [x] **6.9** **Dark** appearance: same as Default.
+- [x] **6.10** **Mono** appearance: white layer fill.
+  Result: not needed in the Xcode 27 Icon Composer: it generates the mono/tinted variant automatically (light glyph). Each inspector section has an **All ⌃** selector to override a value per appearance if ever needed. Liquid Glass ended as Specular *Automatic*, Translucency 10 %, Shadow *Neutral* 50 %, Blur and Refraction off.
+- [x] **6.11** Save as **`Guldr/Resources/Guldr.icon`** (it joins the app target through the synchronized folder).
+- [x] **6.12** **Target Guldr ▸ General ▸ App Icons**: `Guldr`.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **6.13** Delete the template's empty icon: `rm -rf Guldr/Resources/Assets.xcassets/AppIcon.appiconset`
-- [ ] **6.14** ✅ Build.
-- [ ] **6.15** Commit: `feat: add app icon from icon composer`
+- [x] **6.13** Delete the template's empty icon: `rm -rf Guldr/Resources/Assets.xcassets/AppIcon.appiconset`
+- [x] **6.14** ✅ Build.
+  Result: the built app has `CFBundleIconName = Guldr` and the icon layers in `Assets.car`; checked on the iPhone 17 simulator home screen in light and dark.
+- [x] **6.15** Commit: `feat: add app icon from icon composer`
 
 **🧑 YOU**
 
-- [ ] **6.16** Run on your iPhone and check the icon in light mode.
-- [ ] **6.17** Check the icon in dark mode.
-- [ ] **6.18** Check the icon in tinted mode.
+- [x] **6.16** Run on your iPhone and check the icon in light mode.
+- [x] **6.17** Check the icon in dark mode.
+- [x] **6.18** Check the icon in tinted mode.
+  Result: confirmed by the author on device (2026-10-04) in light, dark and tinted.
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **6.19** Commit: `docs: update bootstrap progress for phase 6`
+- [x] **6.19** Commit: `docs: update bootstrap progress for phase 6`
 - [ ] **6.20** `git push -u origin feat/app-icon`
 - [ ] **6.21** `gh pr create --base main --title "feat: add app icon" --fill`
 - [ ] **6.22** `gh pr checks --watch` → CI green.
