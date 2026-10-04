@@ -13,8 +13,8 @@
 | 3 | Widget target | `feat/widget-target` | ✅ Done | [#6](https://github.com/MauroArguDev/Guldr/pull/6) |
 | 4 | Signing, App Group and configuration | `chore/build-configuration` | ✅ Done | [#7](https://github.com/MauroArguDev/Guldr/pull/7) |
 | 5 | Structure and design system | `feat/design-system` | ✅ Done | [#8](https://github.com/MauroArguDev/Guldr/pull/8) |
-| 6 | App icon | `feat/app-icon` | 🟡 In progress | — |
-| 7 | Privacy and localization | `chore/privacy-and-localization` | ⬜ Pending | — |
+| 6 | App icon | `feat/app-icon` | ✅ Done | [#9](https://github.com/MauroArguDev/Guldr/pull/9) |
+| 7 | Privacy and localization | `chore/privacy-and-localization` | 🟡 In progress | — |
 | 8 | SwiftLint | `chore/swiftlint` | ⬜ Pending | — |
 
 ---
@@ -831,11 +831,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 **🤖 CLAUDE CODE — PR cycle**
 
 - [x] **6.19** Commit: `docs: update bootstrap progress for phase 6`
-- [ ] **6.20** `git push -u origin feat/app-icon`
-- [ ] **6.21** `gh pr create --base main --title "feat: add app icon" --fill`
-- [ ] **6.22** `gh pr checks --watch` → CI green.
-- [ ] **6.23** `gh pr merge --rebase --delete-branch`
-- [ ] **6.24** `git switch main && git pull`
+- [x] **6.20** `git push -u origin feat/app-icon`
+- [x] **6.21** `gh pr create --base main --title "feat: add app icon" --fill`
+- [x] **6.22** `gh pr checks --watch` → CI green.
+- [x] **6.23** `gh pr merge --rebase --delete-branch`
+- [x] **6.24** `git switch main && git pull`
+  Result: [#9](https://github.com/MauroArguDev/Guldr/pull/9) passed in 10 min 2 s (Xcode 26.6 on CI compiles the Xcode 27 `Guldr.icon`) and was merged by the author on 2026-10-04; push run on `main` green.
 
 ---
 
@@ -843,12 +844,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE**
 
-- [ ] **7.1** `git switch -c chore/privacy-and-localization`
-- [ ] **7.2** Mark the remaining Phase 6 steps and its ✅ status in the **Progress** table.
+- [x] **7.1** `git switch -c chore/privacy-and-localization`
+- [x] **7.2** Mark the remaining Phase 6 steps and its ✅ status in the **Progress** table.
 
 **🤖 CLAUDE CODE — Privacy manifest**
 
-- [ ] **7.3** Create `Guldr/Resources/PrivacyInfo.xcprivacy`:
+- [x] **7.3** Create `Guldr/Resources/PrivacyInfo.xcprivacy`:
   ```xml
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -876,12 +877,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
   </plist>
   ```
   The widget's manifest is added in the PR that decides how it reads data (widget ADR).
-- [ ] **7.4** ✅ `plutil -lint Guldr/Resources/PrivacyInfo.xcprivacy`
-- [ ] **7.5** Commit: `chore: add privacy manifest`
+- [x] **7.4** ✅ `plutil -lint Guldr/Resources/PrivacyInfo.xcprivacy`
+- [x] **7.5** Commit: `chore: add privacy manifest`
 
 **🤖 CLAUDE CODE — String Catalog**
 
-- [ ] **7.6** Create `Guldr/Resources/Localizable.xcstrings`:
+- [x] **7.6** Create `Guldr/Resources/Localizable.xcstrings`:
   ```json
   {
     "sourceLanguage" : "en",
@@ -892,20 +893,21 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🧑 YOU**
 
-- [ ] **7.7** Open `Localizable.xcstrings` in Xcode and press **+ ▸ Spanish (es)**. This adds Spanish to the project.
-- [ ] **7.8** Build once so Xcode extracts the existing strings.
+- [x] **7.7** Open `Localizable.xcstrings` in Xcode and press **+ ▸ Spanish (es)**. This adds Spanish to the project.
+- [x] **7.8** Build once so Xcode extracts the existing strings.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **7.9** ✅ Spanish is in the project (read-only):
+- [x] **7.9** ✅ Spanish is in the project (read-only):
   ```bash
-  grep -c '"es"' Guldr.xcodeproj/project.pbxproj   # > 0
+  sed -n '/knownRegions = (/,/);/p' Guldr.xcodeproj/project.pbxproj   # en, Base, es
   ```
-- [ ] **7.10** Commit: `feat: add english and spanish string catalog`
+  Result: `es` is in `knownRegions` (the original `grep '"es"'` finds nothing because Xcode writes it unquoted). The catalog has English as source language and the extracted "Hello, world!" key; `es.lproj` only appears in the bundle once a string is translated.
+- [x] **7.10** Commit: `feat: add english and spanish string catalog`
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **7.11** Commit: `docs: update bootstrap progress for phase 7`
+- [x] **7.11** Commit: `docs: update bootstrap progress for phase 7`
 - [ ] **7.12** `git push -u origin chore/privacy-and-localization`
 - [ ] **7.13** `gh pr create --base main --title "chore: add privacy manifest and localization" --fill`
 - [ ] **7.14** `gh pr checks --watch` → CI green.
