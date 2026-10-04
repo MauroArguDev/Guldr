@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guldr — Budget</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#E6E2DA;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif}
+a{color:#8A6A2E}a:hover{color:#6E5424}
+</style>
+</helmet>
+<div style="width: 908px; height: 964px; box-sizing: border-box; padding: 40px; display: flex; gap: 48px; background: #E6E2DA">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="width: 390px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5E5950">{{t.name}}</div>
+<div style="width: 390px; height: 844px; box-sizing: border-box; border-radius: 52px; overflow: hidden; position: relative; background: {{t.bg}}; border: 1px solid {{t.frame}}; color: {{t.text}}">
+<div style="padding: 64px 20px 0; display: flex; flex-direction: column; gap: 10px">
+
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: {{t.text}}">Budget</h1>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid {{t.line}}; background: {{t.surface}}; font: inherit; font-size: 15px; font-weight: 500; color: {{t.gold}}">Edit</button>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 28px">
+<button aria-label="Previous month" style="width: 44px; height: 28px; border: none; background: transparent; color: {{t.text2}}; padding: 0; display: flex; align-items: center; justify-content: flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<div style="font-size: 15px; font-weight: 600">September 2026</div>
+<button aria-label="Next month" style="width: 44px; height: 28px; border: none; background: transparent; color: {{t.text2}}; padding: 0; display: flex; align-items: center; justify-content: flex-end"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+</div>
+
+<div style="border-radius: 28px; padding: 20px; background: {{t.surface}}; border: 1px solid {{t.line}}; box-shadow: {{t.shadow}}; display: flex; align-items: center; gap: 20px">
+<div style="position: relative; width: 168px; height: 168px; flex-shrink: 0">
+<svg width="168" height="168" viewBox="0 0 168 168" aria-hidden="true"><circle cx="84" cy="84" r="74" fill="none" stroke="{{t.track}}" stroke-width="12"></circle><circle cx="84" cy="84" r="74" fill="none" stroke="{{t.goldFill}}" stroke-width="12" stroke-linecap="round" stroke-dasharray="330.6 464.96" transform="rotate(-90 84 84)"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<div style="font-family: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif; font-size: 30px; font-variant-numeric: tabular-nums; color: {{t.text}}">$587</div>
+<div style="font-size: 12px; color: {{t.text2}}">available</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 13px; color: {{t.text2}}">Spent</div>
+<div style="font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums">$1,443.00</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 13px; color: {{t.text2}}">Total limit</div>
+<div style="font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums">$2,030.00</div>
+</div>
+<div style="font-size: 13px; font-weight: 600; color: {{t.gold}}">71% used · 2 days left</div>
+</div>
+</div>
+
+<div role="status" style="border-radius: 18px; padding: 12px 14px; background: {{t.negSoft}}; display: flex; align-items: center; gap: 10px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.neg}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 16.5h.01M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+<div style="font-size: 14px; line-height: 1.35; color: {{t.text}}"><strong style="font-weight: 600">Entertainment</strong> went over its limit by $16.00</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{t.cats}}" as="k" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 12px; padding: 7px 2px">
+<div style="width: 38px; height: 38px; border-radius: 12px; background: {{k.c.surface2}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{k.c.text}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{k.icon}}"></path></svg></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 15px; font-weight: 600; color: {{k.c.text}}">{{k.name}}</span>
+<span style="font-size: 13px; font-variant-numeric: tabular-nums; color: {{k.c.text2}}"><span style="font-weight: 600; color: {{k.amountColor}}">{{k.spent}}</span> of {{k.limit}}</span>
+</div>
+<div style="height: 5px; border-radius: 3px; background: {{k.c.track}}; overflow: hidden"><div style="height: 5px; border-radius: 3px; width: {{k.width}}; background: {{k.barColor}}"></div></div>
+</div>
+</div>
+</sc-for>
+</div>
+
+</div>
+
+<div style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; align-items: center">
+<nav aria-label="Main" style="flex-grow: 1; height: 64px; box-sizing: border-box; border-radius: 32px; background: {{t.glass}}; border: 1px solid {{t.glassLine}}; box-shadow: {{t.shadow}}; display: flex; justify-content: space-between; align-items: center; padding: 0 6px">
+<sc-for list="{{t.tabs}}" as="tab" hint-placeholder-count="4">
+<a href="{{tab.href}}" style="flex-grow: 1; height: 52px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{tab.color}}; background: {{tab.bg}}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{tab.icon}}"></path></svg>
+<span style="font-size: 10px; font-weight: 600">{{tab.label}}</span>
+</a>
+</sc-for>
+</nav>
+<a href="AddTransaction.dc.html" aria-label="Add transaction" style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 32px; background: {{t.goldFill}}; color: #111111; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</a>
+</div>
+
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":908,"height":964}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const icons = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      list: 'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01',
+      budget: 'M12 3a9 9 0 1 0 9 9M12 3v9h9',
+      charts: 'M5 20V11M12 20V5M19 20v-6M3 20h18',
+      food: 'M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 1-3 3-3 6v4h3',
+      car: 'M5 16h14M6 16l1.5-5h9L18 16M7 16v2M17 16v2',
+      health: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+      play: 'M8 5v14l11-7z',
+      house: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM10 21v-6h4v6'
+    };
+    const TH = [
+      { name: 'Light', bg: '#F7F4EE', surface: '#FFFFFF', surface2: '#EFEAE0', text: '#141312', text2: '#6B665E', line: '#E3DDD1', gold: '#8A6A2E', goldFill: '#C8A96A', pos: '#2F7D5B', neg: '#B4443C', negSoft: '#F6E4E0', glass: 'rgba(255,255,255,0.82)', glassLine: 'rgba(20,19,18,0.08)', frame: '#D8D3C9', shadow: '0 1px 2px rgba(20,19,18,0.04), 0 10px 30px rgba(20,19,18,0.06)', track: '#EFEAE0', tabOn: 'rgba(20,19,18,0.06)' },
+      { name: 'Dark', bg: '#111111', surface: '#1B1A18', surface2: '#242220', text: '#F2EEE6', text2: '#9C968C', line: '#2C2A27', gold: '#C8A96A', goldFill: '#C8A96A', pos: '#5FB38A', neg: '#E07A6E', negSoft: '#2B1C1A', glass: 'rgba(40,38,36,0.82)', glassLine: 'rgba(242,238,230,0.10)', frame: '#2A2826', shadow: 'none', track: '#2C2A27', tabOn: 'rgba(242,238,230,0.08)' }
+    ];
+    const tabDefs = [
+      ['Home', icons.home, 'Dashboard.dc.html'], ['Transactions', icons.list, 'Transactions.dc.html'],
+      ['Budget', icons.budget, 'Budget.dc.html'], ['Analytics', icons.charts, 'Charts.dc.html']
+    ];
+    const active = 2;
+    const fmt = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const cats = [
+      ['Entertainment', icons.play, 96, 80], ['Food', icons.food, 312, 400], ['Transport', icons.car, 145, 200],
+      ['Housing', icons.house, 850, 1200], ['Health', icons.health, 40, 150]
+    ];
+    const themes = TH.map((t) => ({
+      ...t,
+      tabs: tabDefs.map(([label, icon, href], i) => ({ label, icon, href, color: i === active ? t.gold : t.text2, bg: i === active ? t.tabOn : 'transparent' })),
+      cats: cats.map(([name, icon, spent, limit]) => {
+        const over = spent > limit;
+        return { name, icon, c: t, spent: fmt(spent), limit: fmt(limit), width: Math.min(100, spent / limit * 100).toFixed(1) + '%', barColor: over ? t.neg : t.goldFill, amountColor: over ? t.neg : t.text };
+      })
+    }));
+    return { themes };
+  }
+}
+</script>
+</body>
+</html>

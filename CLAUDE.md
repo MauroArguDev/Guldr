@@ -22,3 +22,11 @@ Targets: Guldr (app), GuldrWidget (widget extension). App Group: `group.com.argu
 - Architecture, UX and Xcode configuration decisions belong to the author: propose, don't decide.
 - Explain the reasoning behind non-trivial code so the author can defend it in an interview.
 - Follow the Definition of Done in `docs/WORKFLOW.md`.
+
+## Design system
+- Visual source of truth: `docs/design/DESIGN.md` (values in `docs/design/tokens.json`).
+- Before building or changing a screen, read DESIGN.md and its mockup in `docs/design/mockups/`.
+- Colors only from the `GuldrColors` asset catalog (`Color(.goldFill)` etc.). Never hard-coded hex.
+- Do not invent colors, sizes or radii. If something is missing, ask, then document it in DESIGN.md.
+- Native components first (TabView, NavigationStack, sheets, segmented Picker).
+- Every view gets previews in light and dark.

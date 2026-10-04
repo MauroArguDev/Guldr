@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guldr — Analytics</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#E6E2DA;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif}
+a{color:#8A6A2E}a:hover{color:#6E5424}
+</style>
+</helmet>
+<div style="width: 908px; height: 964px; box-sizing: border-box; padding: 40px; display: flex; gap: 48px; background: #E6E2DA">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="width: 390px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5E5950">{{t.name}}</div>
+<div style="width: 390px; height: 844px; box-sizing: border-box; border-radius: 52px; overflow: hidden; position: relative; background: {{t.bg}}; border: 1px solid {{t.frame}}; color: {{t.text}}">
+<div style="padding: 64px 20px 0; display: flex; flex-direction: column; gap: 10px">
+
+<h1 style="margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: {{t.text}}">Analytics</h1>
+
+<div role="group" aria-label="Period" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 3px; border-radius: 12px; background: {{t.segBg}}">
+<sc-for list="{{t.periods}}" as="p" hint-placeholder-count="4">
+<button style="height: 32px; border: none; border-radius: 9px; background: {{p.bg}}; box-shadow: {{p.shadow}}; font: inherit; font-size: 14px; font-weight: 600; color: {{p.color}}">{{p.label}}</button>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 4px 2px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{t.text2}}">Income</span><span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">$31,050</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{t.text2}}">Expenses</span><span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">$12,875</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: {{t.text2}}">Saved</span><span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: {{t.gold}}">$18,176</span></div>
+</div>
+
+<div style="border-radius: 24px; padding: 18px; background: {{t.surface}}; border: 1px solid {{t.line}}; box-shadow: {{t.shadow}}; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 15px; font-weight: 600">Income vs. expenses</span>
+<div style="display: flex; gap: 12px; font-size: 12px; color: {{t.text2}}">
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{t.goldFill}}"></span>Income</span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{t.barAlt}}"></span>Expenses</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; align-items: end; height: 150px; border-bottom: 1px solid {{t.line}}">
+<sc-for list="{{t.bars}}" as="b" hint-placeholder-count="6">
+<div style="display: flex; justify-content: center; align-items: flex-end; gap: 4px; height: 150px">
+<div style="width: 14px; height: {{b.inc}}; border-radius: 4px 4px 0 0; background: {{b.c.goldFill}}"></div>
+<div style="width: 14px; height: {{b.exp}}; border-radius: 4px 4px 0 0; background: {{b.c.barAlt}}"></div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{t.bars}}" as="b" hint-placeholder-count="6">
+<div style="text-align: center; font-size: 12px; color: {{b.labelColor}}; font-weight: {{b.weight}}">{{b.m}}</div>
+</sc-for>
+</div>
+</div>
+
+<div style="border-radius: 24px; padding: 18px; background: {{t.surface}}; border: 1px solid {{t.line}}; box-shadow: {{t.shadow}}; display: flex; gap: 16px; align-items: center">
+<div style="position: relative; width: 136px; height: 136px; flex-shrink: 0">
+<div aria-hidden="true" style="width: 136px; height: 136px; border-radius: 68px; background: {{t.conic}}"></div>
+<div style="position: absolute; left: 18px; top: 18px; width: 100px; height: 100px; border-radius: 50px; background: {{t.surface}}; display: flex; flex-direction: column; align-items: center; justify-content: center">
+<div style="font-size: 11px; color: {{t.text2}}">September</div>
+<div style="font-family: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums">$1,760</div>
+</div>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px">
+<sc-for list="{{t.slices}}" as="s" hint-placeholder-count="7">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+<span style="width: 8px; height: 8px; border-radius: 2px; background: {{s.color}}; flex-shrink: 0"></span>
+<span style="flex-grow: 1; color: {{s.c.text}}">{{s.name}}</span>
+<span style="font-variant-numeric: tabular-nums; color: {{s.c.text2}}">{{s.pct}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+
+<div style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; align-items: center">
+<nav aria-label="Main" style="flex-grow: 1; height: 64px; box-sizing: border-box; border-radius: 32px; background: {{t.glass}}; border: 1px solid {{t.glassLine}}; box-shadow: {{t.shadow}}; display: flex; justify-content: space-between; align-items: center; padding: 0 6px">
+<sc-for list="{{t.tabs}}" as="tab" hint-placeholder-count="4">
+<a href="{{tab.href}}" style="flex-grow: 1; height: 52px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{tab.color}}; background: {{tab.bg}}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{tab.icon}}"></path></svg>
+<span style="font-size: 10px; font-weight: 600">{{tab.label}}</span>
+</a>
+</sc-for>
+</nav>
+<a href="AddTransaction.dc.html" aria-label="Add transaction" style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 32px; background: {{t.goldFill}}; color: #111111; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</a>
+</div>
+
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":908,"height":964}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const icons = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      list: 'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01',
+      budget: 'M12 3a9 9 0 1 0 9 9M12 3v9h9',
+      charts: 'M5 20V11M12 20V5M19 20v-6M3 20h18'
+    };
+    const TH = [
+      { name: 'Light', bg: '#F7F4EE', surface: '#FFFFFF', surface2: '#EFEAE0', segBg: '#EFEAE0', segOn: '#FFFFFF', text: '#141312', text2: '#6B665E', line: '#E3DDD1', gold: '#8A6A2E', goldFill: '#C8A96A', barAlt: '#6B665E', glass: 'rgba(255,255,255,0.82)', glassLine: 'rgba(20,19,18,0.08)', frame: '#D8D3C9', shadow: '0 1px 2px rgba(20,19,18,0.04), 0 10px 30px rgba(20,19,18,0.06)', segShadow: '0 1px 2px rgba(20,19,18,0.08)', tabOn: 'rgba(20,19,18,0.06)',
+        ramp: ['#8A6A2E', '#B08D4E', '#C8A96A', '#DCC59A', '#4A4640', '#8A847A', '#C4BEB3'] },
+      { name: 'Dark', bg: '#111111', surface: '#1B1A18', surface2: '#242220', segBg: '#1F1E1C', segOn: '#35322E', text: '#F2EEE6', text2: '#9C968C', line: '#2C2A27', gold: '#C8A96A', goldFill: '#C8A96A', barAlt: '#6E6962', glass: 'rgba(40,38,36,0.82)', glassLine: 'rgba(242,238,230,0.10)', frame: '#2A2826', shadow: 'none', segShadow: 'none', tabOn: 'rgba(242,238,230,0.08)',
+        ramp: ['#E2CB97', '#C8A96A', '#A08650', '#76623C', '#E8E3DA', '#A8A298', '#5E5A54'] }
+    ];
+    const tabDefs = [
+      ['Home', icons.home, 'Dashboard.dc.html'], ['Transactions', icons.list, 'Transactions.dc.html'],
+      ['Budget', icons.budget, 'Budget.dc.html'], ['Analytics', icons.charts, 'Charts.dc.html']
+    ];
+    const active = 3;
+    const months = [['Apr', 5000, 2310], ['May', 5400, 2140], ['Jun', 5000, 2480], ['Jul', 5650, 1980], ['Aug', 5000, 2205], ['Sep', 5000, 1759.5]];
+    const max = 6000;
+    const cats = [['Housing', 850], ['Food', 312], ['Shopping', 216.5], ['Transport', 145], ['Other', 100], ['Entertainment', 96], ['Health', 40]];
+    const total = cats.reduce((a, c) => a + c[1], 0);
+    const C = 2 * Math.PI * 56;
+    const themes = TH.map((t) => {
+      let cum = 0;
+      const stops = [];
+      const slices = cats.map(([name, v], i) => {
+        const p = v / total * 100;
+        stops.push(t.ramp[i] + ' ' + cum.toFixed(2) + '% ' + (cum + p).toFixed(2) + '%');
+        cum += p;
+        return { name, c: t, color: t.ramp[i], pct: p.toFixed(1) + '%' };
+      });
+      return {
+        ...t,
+        conic: 'conic-gradient(' + stops.join(', ') + ')',
+        tabs: tabDefs.map(([label, icon, href], i) => ({ label, icon, href, color: i === active ? t.gold : t.text2, bg: i === active ? t.tabOn : 'transparent' })),
+        periods: ['1M', '3M', '6M', '1A'].map((label) => ({ label, bg: label === '6M' ? t.segOn : 'transparent', shadow: label === '6M' ? t.segShadow : 'none', color: label === '6M' ? t.text : t.text2 })),
+        bars: months.map(([m, inc, exp], i) => ({ m, c: t, inc: Math.round(inc / max * 150) + 'px', exp: Math.round(exp / max * 150) + 'px', labelColor: i === 5 ? t.text : t.text2, weight: i === 5 ? '600' : '400' })),
+        slices
+      };
+    });
+    return { themes };
+  }
+}
+</script>
+</body>
+</html>

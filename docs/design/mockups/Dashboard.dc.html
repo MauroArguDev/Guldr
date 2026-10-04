@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guldr — Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600&amp;display=swap">
+<style>
+body{margin:0;background:#E6E2DA;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif}
+a{color:#8A6A2E}a:hover{color:#6E5424}
+</style>
+</helmet>
+<div style="width: 908px; height: 964px; box-sizing: border-box; padding: 40px; display: flex; gap: 48px; background: #E6E2DA">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="width: 390px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5E5950">{{t.name}}</div>
+<div style="width: 390px; height: 844px; box-sizing: border-box; border-radius: 52px; overflow: hidden; position: relative; background: {{t.bg}}; border: 1px solid {{t.frame}}; color: {{t.text}}">
+<div style="padding: 64px 20px 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-family: Manrope, -apple-system, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.04em; color: {{t.text}}">guldr</div>
+<div style="font-size: 13px; color: {{t.text2}}">September 2026</div>
+</div>
+<button aria-label="Settings" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center; padding: 0">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="{{t.ic.sliders}}"></path></svg>
+</button>
+</div>
+
+<div style="border-radius: 28px; padding: 22px; background: {{t.surface}}; border: 1px solid {{t.line}}; box-shadow: {{t.shadow}}; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 13px; color: {{t.text2}}">Total balance</div>
+<div style="font-family: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif; font-size: 46px; line-height: 1; font-variant-numeric: tabular-nums; color: {{t.text}}">$12,480<span style="font-size: 26px; color: {{t.text2}}">.25</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 5px">
+<div style="height: 1px; background: {{t.goldFill}}"></div>
+<div style="height: 1px; width: 78%; background: {{t.goldFill}}; opacity: 0.5"></div>
+<div style="height: 1px; width: 56%; background: {{t.goldFill}}; opacity: 0.25"></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{t.text2}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{t.pos}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.ic.up}}"></path></svg>Monthly income</div>
+<div style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums">$5,000.00</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{t.text2}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{t.neg}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.ic.down}}"></path></svg>Monthly expenses</div>
+<div style="font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums">$1,759.50</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid {{t.line}}">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: {{t.text2}}">Savings rate</span><span style="font-weight: 600; font-variant-numeric: tabular-nums; color: {{t.gold}}">64.8%</span></div>
+<div style="height: 6px; border-radius: 3px; background: {{t.track}}; overflow: hidden"><div style="width: 64.8%; height: 6px; border-radius: 3px; background: {{t.goldFill}}"></div></div>
+</div>
+</div>
+
+<a href="Budget.dc.html" style="text-decoration: none; color: {{t.text}}; border-radius: 22px; padding: 16px 18px; background: {{t.surface}}; border: 1px solid {{t.line}}; display: flex; align-items: center; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" fill="none" stroke="{{t.track}}" stroke-width="5"></circle><circle cx="22" cy="22" r="18" fill="none" stroke="{{t.goldFill}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="80.4 113.1" transform="rotate(-90 22 22)"></circle></svg>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 15px; font-weight: 600">September budget</div>
+<div style="font-size: 13px; color: {{t.text2}}; font-variant-numeric: tabular-nums">$1,443.00 of $2,030.00 · 1 category over budget</div>
+</div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.text2}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.ic.chevron}}"></path></svg>
+</a>
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 4px 2px 6px">
+<div style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Recent</div>
+<a href="Transactions.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: {{t.gold}}">See all</a>
+</div>
+<sc-for list="{{t.recent}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 2px">
+<div style="width: 42px; height: 42px; border-radius: 13px; background: {{r.c.surface2}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{r.c.text}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.icon}}"></path></svg></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<div style="font-size: 16px; font-weight: 600; color: {{r.c.text}}">{{r.title}}</div>
+<div style="font-size: 13px; color: {{r.c.text2}}">{{r.meta}}</div>
+</div>
+<div style="font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: {{r.amountColor}}">{{r.amount}}</div>
+</div>
+</sc-for>
+</div>
+
+</div>
+
+<div style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; align-items: center">
+<nav aria-label="Main" style="flex-grow: 1; height: 64px; box-sizing: border-box; border-radius: 32px; background: {{t.glass}}; border: 1px solid {{t.glassLine}}; box-shadow: {{t.shadow}}; display: flex; justify-content: space-between; align-items: center; padding: 0 6px">
+<sc-for list="{{t.tabs}}" as="tab" hint-placeholder-count="4">
+<a href="{{tab.href}}" style="flex-grow: 1; height: 52px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{tab.color}}; background: {{tab.bg}}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{tab.icon}}"></path></svg>
+<span style="font-size: 10px; font-weight: 600">{{tab.label}}</span>
+</a>
+</sc-for>
+</nav>
+<a href="AddTransaction.dc.html" aria-label="Add transaction" style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 32px; background: {{t.goldFill}}; color: #111111; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="{{t.ic.plus}}"></path></svg>
+</a>
+</div>
+
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":908,"height":964}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const icons = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      list: 'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01',
+      budget: 'M12 3a9 9 0 1 0 9 9M12 3v9h9',
+      charts: 'M5 20V11M12 20V5M19 20v-6M3 20h18',
+      plus: 'M12 5v14M5 12h14',
+      up: 'M12 19V5M6 11l6-6 6 6',
+      down: 'M12 5v14M6 13l6 6 6-6',
+      chevron: 'M9 6l6 6-6 6',
+      sliders: 'M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4',
+      food: 'M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 1-3 3-3 6v4h3',
+      salary: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16',
+      car: 'M5 16h14M6 16l1.5-5h9L18 16M7 16v2M17 16v2'
+    };
+    const TH = [
+      { name: 'Light', dark: false, bg: '#F7F4EE', surface: '#FFFFFF', surface2: '#EFEAE0', text: '#141312', text2: '#6B665E', line: '#E3DDD1', gold: '#8A6A2E', goldFill: '#C8A96A', pos: '#2F7D5B', neg: '#B4443C', glass: 'rgba(255,255,255,0.82)', glassLine: 'rgba(20,19,18,0.08)', frame: '#D8D3C9', shadow: '0 1px 2px rgba(20,19,18,0.04), 0 10px 30px rgba(20,19,18,0.06)', track: '#EFEAE0', tabOn: 'rgba(20,19,18,0.06)' },
+      { name: 'Dark', dark: true, bg: '#111111', surface: '#1B1A18', surface2: '#242220', text: '#F2EEE6', text2: '#9C968C', line: '#2C2A27', gold: '#C8A96A', goldFill: '#C8A96A', pos: '#5FB38A', neg: '#E07A6E', glass: 'rgba(40,38,36,0.82)', glassLine: 'rgba(242,238,230,0.10)', frame: '#2A2826', shadow: 'none', track: '#2C2A27', tabOn: 'rgba(242,238,230,0.08)' }
+    ];
+    const tabDefs = [
+      ['Home', icons.home, 'Dashboard.dc.html'], ['Transactions', icons.list, 'Transactions.dc.html'],
+      ['Budget', icons.budget, 'Budget.dc.html'], ['Analytics', icons.charts, 'Charts.dc.html']
+    ];
+    const active = 0;
+    const recent = [
+      { title: 'Groceries', meta: 'Food · Today', amount: '−$42.80', icon: icons.food, income: false },
+      { title: 'Salary', meta: 'Salary · Sep 25', amount: '+$5,000.00', icon: icons.salary, income: true },
+      { title: 'Gas', meta: 'Transport · Sep 24', amount: '−$35.00', icon: icons.car, income: false }
+    ];
+    const themes = TH.map((t) => ({
+      ...t, ic: icons,
+      tabs: tabDefs.map(([label, icon, href], i) => ({ label, icon, href, color: i === active ? t.gold : t.text2, bg: i === active ? t.tabOn : 'transparent' })),
+      recent: recent.map((r) => ({ ...r, c: t, amountColor: r.income ? t.pos : t.text }))
+    }));
+    return { themes, icons };
+  }
+}
+</script>
+</body>
+</html>
