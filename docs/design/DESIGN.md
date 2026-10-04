@@ -87,8 +87,8 @@ Three 1 pt horizontal lines in `GoldFill`, 5 pt apart, widths 100% / 78% / 56% w
 - **BalanceCard**: `Surface`, radius 28, border `Hairline`, padding 22. Label, serif balance, ledger lines, 2-column income/expense with arrow icons (`Positive`/`Negative`), divider, savings rate (13 pt label, % in `Gold`, 6 pt bar `GoldFill` on `Track`).
 - **BudgetSummaryRow**: 44 pt mini ring (stroke 5, `GoldFill` on `Track`, round caps), title 15 semibold, meta 13, chevron.
 - **TransactionRow**: icon chip + title/meta + trailing amount. Income amount `Positive` with "+", expense `TextPrimary` with "−".
-- **BudgetRing**: 168 pt, stroke 12, starts at 12 o'clock, center shows remaining in serif 30 + "disponibles".
-- **CategoryBudgetRow**: icon chip 38, name 15 semibold, "spent de limit" 13 (spent semibold), 5 pt bar; over budget turns bar and spent value `Negative`.
+- **BudgetRing**: 168 pt, stroke 12, starts at 12 o'clock, center shows remaining in serif 30 + "available".
+- **CategoryBudgetRow**: icon chip 38, name 15 semibold, "spent of limit" 13 (spent semibold), 5 pt bar; over budget turns bar and spent value `Negative`.
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
 - **AddButton**: 64 pt circle, `GoldFill`, plus icon `OnGold`. In the app, place it next to the native tab bar per iOS 26 conventions.
 - **CategoryChip** (add sheet): 62 pt tall, radius 14; selected = `GoldSoft` fill + 1.5 pt `GoldFill` border + `Gold` content.
@@ -108,4 +108,4 @@ Backgrounds: default `#111111`, light variant `#FFFFFF`, tinted variant `#2A2826
 
 ## Voice
 
-Short, second person, calm. "Tu mes, en claro." · "Tus finanzas, solo para ti." Subtle gold references ("Tu reserva") without overdoing it. No hype, no investing jargon.
+Short, second person, calm. "Your month, made clear." · "Your finances, just for you." Subtle gold references ("Your reserve") without overdoing it. No hype, no investing jargon. Spanish copy keeps the same tone in the String Catalog.

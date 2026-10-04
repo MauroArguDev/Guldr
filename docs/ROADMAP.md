@@ -4,8 +4,10 @@ What Guldr ships, in what order, and what it deliberately does not do.
 
 ## v1.0 — Local-first MVP
 
+Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](plan/v1.0.md).
+
 ### Foundations
-- [ ] Project bootstrap: CI, widget target, App Group, design system, icon, privacy manifest, localization, SwiftLint ([runbook](setup/BOOTSTRAP.md))
+- [x] Project bootstrap: CI, widget target, App Group, design system, icon, privacy manifest, localization, SwiftLint ([runbook](setup/BOOTSTRAP.md))
 
 ### Data
 - [ ] SwiftData models for transactions, categories and budgets, CloudKit-compatible, with `currencyCode` on every transaction
