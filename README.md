@@ -20,6 +20,8 @@
 Transactions, dashboard, budgets, charts, home screen widgets, Face ID lock, local budget notifications, CSV export, English and Spanish. See the [roadmap](docs/ROADMAP.md).
 
 ## Documentation
+- Architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Design system: [`docs/design/DESIGN.md`](docs/design/DESIGN.md)
 - Workflow and Definition of Done: [`docs/WORKFLOW.md`](docs/WORKFLOW.md)
 - Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - Architecture decisions: [`docs/decisions/`](docs/decisions/)

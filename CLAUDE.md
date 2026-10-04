@@ -3,6 +3,7 @@
 ## Project
 Local-first personal finance app. iOS 26+, iPhone only, SwiftUI, SwiftData, MVVM with @Observable.
 Targets: Guldr (app), GuldrWidget (widget extension). App Group: `group.com.argudev.guldr`, read from Info.plist key `AppGroupID`.
+Architecture overview: `docs/ARCHITECTURE.md`.
 
 ## Rules
 - English only, everywhere in the project: code, identifiers, comments, docs, ADRs, commit messages, PRs, error and alert strings, logs. Spanish exists only as translations in the String Catalog (source language: English). This applies even when the conversation is in another language.
