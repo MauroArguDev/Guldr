@@ -273,6 +273,7 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = 6AA4F83A306CB56A00EAB927;
 			preferredProjectObjectVersion = 77;
