@@ -10,6 +10,8 @@
 		6ACFE81230707FE3008F58E8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ACFE81130707FE3008F58E8 /* WidgetKit.framework */; };
 		6ACFE81430707FE3008F58E8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ACFE81330707FE3008F58E8 /* SwiftUI.framework */; };
 		6ACFE81F30707FE5008F58E8 /* GuldrWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6ACFE80F30707FE3008F58E8 /* GuldrWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6ACFE8EB3072E1D8008F58E8 /* GuldrCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6ACFE8EA3072E1D8008F58E8 /* GuldrCore */; };
+		6ACFE8ED3072E206008F58E8 /* GuldrCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6ACFE8EC3072E206008F58E8 /* GuldrCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6ACFE8EB3072E1D8008F58E8 /* GuldrCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ACFE81430707FE3008F58E8 /* SwiftUI.framework in Frameworks */,
+				6ACFE8ED3072E206008F58E8 /* GuldrCore in Frameworks */,
 				6ACFE81230707FE3008F58E8 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -196,6 +200,7 @@
 			);
 			name = Guldr;
 			packageProductDependencies = (
+				6ACFE8EA3072E1D8008F58E8 /* GuldrCore */,
 			);
 			productName = Guldr;
 			productReference = 6AA4F843306CB56A00EAB927 /* Guldr.app */;
@@ -243,6 +248,7 @@
 			);
 			name = GuldrWidgetExtension;
 			packageProductDependencies = (
+				6ACFE8EC3072E206008F58E8 /* GuldrCore */,
 			);
 			productName = GuldrWidgetExtension;
 			productReference = 6ACFE80F30707FE3008F58E8 /* GuldrWidgetExtension.appex */;
@@ -281,6 +287,7 @@
 			mainGroup = 6AA4F83A306CB56A00EAB927;
 			packageReferences = (
 				6ACFE8C430723C0F008F58E8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				6ACFE8E93072E1D8008F58E8 /* XCLocalSwiftPackageReference "Packages/GuldrCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6AA4F844306CB56A00EAB927 /* Products */;
@@ -724,6 +731,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		6ACFE8E93072E1D8008F58E8 /* XCLocalSwiftPackageReference "Packages/GuldrCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/GuldrCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		6ACFE8C430723C0F008F58E8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -750,6 +764,15 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6ACFE8C430723C0F008F58E8 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		6ACFE8EA3072E1D8008F58E8 /* GuldrCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GuldrCore;
+		};
+		6ACFE8EC3072E206008F58E8 /* GuldrCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6ACFE8E93072E1D8008F58E8 /* XCLocalSwiftPackageReference "Packages/GuldrCore" */;
+			productName = GuldrCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
