@@ -8,7 +8,7 @@ build/
 *.dSYM
 *.dSYM.zip
 
-# SPM (root only; Package.resolved inside the project is committed)
+# SPM (Package.resolved files are committed)
 .build/
 /.swiftpm/
 
@@ -22,3 +22,6 @@ Config/Secrets.xcconfig
 # Claude Code (local only)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Local package build state
+Packages/*/.swiftpm/
