@@ -70,6 +70,13 @@
 			);
 			target = 6AA4F842306CB56A00EAB927 /* Guldr */;
 		};
+		6ACFE8683071F9F8008F58E8 /* Exceptions for "Guldr" folder in "GuldrWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/GuldrColors.xcassets,
+			);
+			target = 6ACFE80E30707FE3008F58E8 /* GuldrWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -77,6 +84,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				6ACFE838307168C0008F58E8 /* Exceptions for "Guldr" folder in "Guldr" target */,
+				6ACFE8683071F9F8008F58E8 /* Exceptions for "Guldr" folder in "GuldrWidgetExtension" target */,
 			);
 			path = Guldr;
 			sourceTree = "<group>";
