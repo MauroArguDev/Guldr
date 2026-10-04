@@ -14,8 +14,8 @@
 | 4 | Signing, App Group and configuration | `chore/build-configuration` | ✅ Done | [#7](https://github.com/MauroArguDev/Guldr/pull/7) |
 | 5 | Structure and design system | `feat/design-system` | ✅ Done | [#8](https://github.com/MauroArguDev/Guldr/pull/8) |
 | 6 | App icon | `feat/app-icon` | ✅ Done | [#9](https://github.com/MauroArguDev/Guldr/pull/9) |
-| 7 | Privacy and localization | `chore/privacy-and-localization` | 🟡 In progress | — |
-| 8 | SwiftLint | `chore/swiftlint` | ⬜ Pending | — |
+| 7 | Privacy and localization | `chore/privacy-and-localization` | ✅ Done | [#10](https://github.com/MauroArguDev/Guldr/pull/10) |
+| 8 | SwiftLint | `chore/swiftlint` | 🟡 In progress | — |
 
 ---
 
@@ -908,11 +908,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 **🤖 CLAUDE CODE — PR cycle**
 
 - [x] **7.11** Commit: `docs: update bootstrap progress for phase 7`
-- [ ] **7.12** `git push -u origin chore/privacy-and-localization`
-- [ ] **7.13** `gh pr create --base main --title "chore: add privacy manifest and localization" --fill`
-- [ ] **7.14** `gh pr checks --watch` → CI green.
-- [ ] **7.15** `gh pr merge --rebase --delete-branch`
-- [ ] **7.16** `git switch main && git pull`
+- [x] **7.12** `git push -u origin chore/privacy-and-localization`
+- [x] **7.13** `gh pr create --base main --title "chore: add privacy manifest and localization" --fill`
+- [x] **7.14** `gh pr checks --watch` → CI green.
+- [x] **7.15** `gh pr merge --rebase --delete-branch`
+- [x] **7.16** `git switch main && git pull`
+  Result: [#10](https://github.com/MauroArguDev/Guldr/pull/10) passed in 9 min 32 s and was merged by the author on 2026-10-04; push run on `main` green.
 
 ---
 
@@ -920,9 +921,9 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE**
 
-- [ ] **8.1** `git switch -c chore/swiftlint`
-- [ ] **8.2** Mark the remaining Phase 7 steps and its ✅ status in the **Progress** table.
-- [ ] **8.3** Create `.swiftlint.yml`:
+- [x] **8.1** `git switch -c chore/swiftlint`
+- [x] **8.2** Mark the remaining Phase 7 steps and its ✅ status in the **Progress** table.
+- [x] **8.3** Create `.swiftlint.yml`:
   ```yaml
   included:
     - Guldr
@@ -946,23 +947,25 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🧑 YOU**
 
-- [ ] **8.4** **File ▸ Add Package Dependencies** → `https://github.com/SimplyDanny/SwiftLintPlugins`, **without** linking it to any target.
-- [ ] **8.5** **Target Guldr ▸ Build Phases ▸ Run Build Tool Plug-ins ▸ +** ▸ `SwiftLintBuildToolPlugin`.
-- [ ] **8.6** Same on **GuldrWidgetExtension**.
-- [ ] **8.7** Same on **GuldrTests**.
-- [ ] **8.8** Accept **Trust & Enable**.
+- [x] **8.4** **File ▸ Add Package Dependencies** → `https://github.com/SimplyDanny/SwiftLintPlugins`, **without** linking it to any target.
+- [x] **8.5** **Target Guldr ▸ Build Phases ▸ Run Build Tool Plug-ins ▸ +** ▸ `SwiftLintBuildToolPlugin`.
+- [x] **8.6** Same on **GuldrWidgetExtension**.
+- [x] **8.7** Same on **GuldrTests**.
+- [x] **8.8** Accept **Trust & Enable**.
+  Result: in the package products dialog `SwiftLintBinary` was linked to `Guldr` by mistake and then removed from the target (no references left). The plugin runs on all three targets and `Package.resolved` pins SwiftLintPlugins 0.65.1.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **8.9** Add a **Linting** section to `docs/WORKFLOW.md`.
-- [ ] **8.10** Add the "zero SwiftLint warnings" rule to `CLAUDE.md`.
-- [ ] **8.11** Commit: `chore: add swiftlint build plugin and configuration`
-- [ ] **8.12** ✅ Build with `-skipPackagePluginValidation` and list the warnings.
-- [ ] **8.13** Fix the warnings in template code. If anything changed, commit: `style: fix swiftlint warnings in template code`
+- [x] **8.9** Add a **Linting** section to `docs/WORKFLOW.md`.
+- [x] **8.10** Add the "zero SwiftLint warnings" rule to `CLAUDE.md`.
+- [x] **8.11** Commit: `chore: add swiftlint build plugin and configuration`
+- [x] **8.12** ✅ Build with `-skipPackagePluginValidation` and list the warnings.
+- [x] **8.13** Fix the warnings in template code. If anything changed, commit: `style: fix swiftlint warnings in template code`
+  Result: 3 warnings in `GuldrWidget/GuldrWidget.swift` (`void_return` ×2, `colon`) fixed; 0 left, unit tests pass.
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **8.14** Commit: `docs: update bootstrap progress for phase 8`
+- [x] **8.14** Commit: `docs: update bootstrap progress for phase 8`
 - [ ] **8.15** `git push -u origin chore/swiftlint`
 - [ ] **8.16** `gh pr create --base main --title "chore: add SwiftLint" --fill`
 - [ ] **8.17** `gh pr checks --watch` → CI green with the plugin active.
@@ -979,11 +982,11 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 | 1 | `chore/project-foundations` | chore: add project foundations | 8 |
 | 2 | `ci/github-actions`, `ci/speed-up-tests`, `ci/wait-for-simulator`, `chore/remove-ui-tests` | #2, #3, #4 and the UI test removal | 5 + 5 + 3 + 3 |
 | 3 | `feat/widget-target` | feat: add GuldrWidget extension target | 2 |
-| 4 | `chore/build-configuration` | chore: configure signing, app group and build settings | 5 |
-| 5 | `feat/design-system` | feat: add design system foundations | 6 |
+| 4 | `chore/build-configuration` | chore: configure signing, app group and build settings | 6 |
+| 5 | `feat/design-system` | feat: add design system foundations | 7 |
 | 6 | `feat/app-icon` | feat: add app icon | 2 |
 | 7 | `chore/privacy-and-localization` | chore: add privacy manifest and localization | 3 |
-| 8 | `chore/swiftlint` | chore: add SwiftLint | 2–3 |
+| 8 | `chore/swiftlint` | chore: add SwiftLint | 3 |
 
 ## Final verification (🤖 CLAUDE CODE)
 
