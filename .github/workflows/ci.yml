@@ -57,6 +57,52 @@ jobs:
             echo "code=false" >> "$GITHUB_OUTPUT"
           fi
 
+  # Domain package tests on macOS, no simulator (ADR 006), plus SwiftLint in strict mode over
+  # the whole repository. The job id is a required status check in the main ruleset.
+  core-tests:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Select Xcode
+        run: |
+          set -euo pipefail
+          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
+          xcodebuild -version
+
+      - name: Run GuldrCore tests
+        run: |
+          set -o pipefail
+          swift test --package-path Packages/GuldrCore 2>&1 | tee core-tests.log
+
+      # Guards against a green check that ran nothing.
+      - name: Verify tests ran
+        run: |
+          set -euo pipefail
+          total="$(grep -oE 'Test run with [0-9]+ tests?' core-tests.log | tail -1 | grep -oE '[0-9]+' || echo 0)"
+          {
+            echo "### GuldrCore tests"
+            echo "Tests run: $total"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$total" -eq 0 ]; then
+            echo "::error::No GuldrCore tests were executed."
+            exit 1
+          fi
+
+      # Uses the SwiftLint binary pinned by the package (same version as the Xcode plugin).
+      # --strict turns every warning into an error, enforcing zero warnings in CI.
+      - name: SwiftLint (strict)
+        run: |
+          set -euo pipefail
+          swiftlint="Packages/GuldrCore/.build/artifacts/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/macos/swiftlint"
+          "$swiftlint" version
+          "$swiftlint" lint --strict --quiet --reporter github-actions-logging
+
   # The job id is the required status check in the main ruleset. Do not rename it.
   test:
     needs: changes

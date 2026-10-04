@@ -11,18 +11,22 @@ flowchart LR
     subgraph Device["iPhone"]
         subgraph App["Guldr.app"]
             Views["Views (SwiftUI)"] --> VMs["View models (@Observable)"]
-            VMs --> Data["Data layer (SwiftData)"]
         end
         subgraph Widget["GuldrWidgetExtension.appex"]
-            Timeline["Timeline provider"] --> WData["Read-only data access"]
+            Timeline["Timeline provider"]
+        end
+        subgraph Core["GuldrCore (Swift package)"]
+            Domain["Models, money, calculations"] --> Persistence["Persistence factory"]
         end
         Store[("SwiftData store<br/>App Group container")]
-        Data --> Store
-        WData --> Store
+        VMs --> Domain
+        Timeline --> Domain
+        Persistence -->|read-write| Store
+        Persistence -.->|read-only, widget| Store
     end
 ```
 
-Guldr is local-first: all data lives on the device, in a SwiftData store inside the shared App Group container so the widget can read it. There is no backend. iCloud sync is planned for v1.1 and the models are already CloudKit-compatible ([roadmap](ROADMAP.md)).
+Guldr is local-first: all data lives on the device, in a SwiftData store inside the shared App Group container so the widget can read it ([ADR 007](decisions/007-persistence-and-widget-data.md)). The domain — models, money, calculations — lives in the `GuldrCore` package shared by the app and the widget ([ADR 006](decisions/006-guldr-core-package.md)). There is no backend. iCloud sync is planned for v1.1 and the models are already CloudKit-compatible ([roadmap](ROADMAP.md)).
 
 ## Targets
 
@@ -30,9 +34,13 @@ Guldr is local-first: all data lives on the device, in a SwiftData store inside 
 |---|---|---|---|
 | `Guldr` | `Guldr.app` | `com.argudev.guldr` | The app |
 | `GuldrWidgetExtension` | `GuldrWidgetExtension.appex` (embedded in the app) | `com.argudev.guldr.widget` | Home screen widgets |
-| `GuldrTests` | `GuldrTests.xctest` (hosted in the app) | `com.argudev.GuldrTests` | Unit tests (Swift Testing) |
+| `GuldrTests` | `GuldrTests.xctest` (hosted in the app) | `com.argudev.GuldrTests` | App-hosted tests (Swift Testing) |
 
-All targets: iOS 26.0, iPhone only, Swift 6 language mode, `MainActor` default isolation and Approachable Concurrency ([ADR 001](decisions/001-ios-26-minimum.md), [ADR 003](decisions/003-concurrency-defaults.md)). There is no UI test target; UI is verified with previews and on device.
+| Package | Products | Linked to | Role |
+|---|---|---|---|
+| `Packages/GuldrCore` | `GuldrCore` library, `GuldrCoreTests` | `Guldr`, `GuldrWidgetExtension` | Domain layer; iOS 26 and macOS 26 (macOS only to run `swift test` without a simulator); Swift 6 with default `nonisolated` isolation |
+
+All app targets: iOS 26.0, iPhone only, Swift 6 language mode, `MainActor` default isolation and Approachable Concurrency ([ADR 001](decisions/001-ios-26-minimum.md), [ADR 003](decisions/003-concurrency-defaults.md)). There is no UI test target; UI is verified with previews and on device.
 
 ## Configuration
 
@@ -68,7 +76,8 @@ Guldr/
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
 └── Guldr.entitlements   Stays at the root: referenced by CODE_SIGN_ENTITLEMENTS
 GuldrWidget/             Widget extension sources and its Info.plist
-GuldrTests/              Unit tests, mirroring the app's folders
+GuldrTests/              App-hosted tests (only what needs the app bundle)
+Packages/GuldrCore/      Domain package: Sources/GuldrCore and Tests/GuldrCoreTests
 Config/                  xcconfig files
 docs/                    Design, decisions, workflow, roadmap and setup runbook
 ```
@@ -91,8 +100,8 @@ The widget opens the same store read-only through the App Group and builds its t
 
 ## Concurrency
 
-Code is main-actor isolated unless it opts out. Work that must leave the main actor is explicit: `nonisolated` for value types and helpers callable from anywhere, `@concurrent` for functions that run in the background (CSV export, heavy aggregation). `@unchecked Sendable` is never used without a comment explaining why. See [ADR 003](decisions/003-concurrency-defaults.md).
+In the app and the widget, code is main-actor isolated unless it opts out. `GuldrCore` keeps Swift's default `nonisolated` isolation: its value types are `Sendable` and callable from any context. Work that must leave the main actor is explicit: `nonisolated` for value types and helpers callable from anywhere, `@concurrent` for functions that run in the background (CSV export, heavy aggregation). `@unchecked Sendable` is never used without a comment explaining why. See [ADR 003](decisions/003-concurrency-defaults.md).
 
 ## Testing and CI
 
-Unit tests use Swift Testing and in-memory SwiftData containers. CI builds once and runs them on a pre-booted simulator for every pull request that touches code, and fails if no test ran. Details in [WORKFLOW.md](WORKFLOW.md#testing) and [WORKFLOW.md](WORKFLOW.md#continuous-integration).
+Tests use Swift Testing and in-memory SwiftData containers. Domain tests live in `GuldrCore` and run with `swift test` on macOS (`core-tests` CI job, no simulator, plus strict SwiftLint). The few app-hosted tests run on a pre-booted simulator (`test` job). Both jobs are required and fail if no test ran. Details in [WORKFLOW.md](WORKFLOW.md#testing) and [WORKFLOW.md](WORKFLOW.md#continuous-integration).
