@@ -17,3 +17,7 @@ Each file records one decision that shapes the project: the context, what was ch
 | [002](002-identifiers.md) | App identifiers | Accepted |
 | [003](003-concurrency-defaults.md) | Swift concurrency defaults | Accepted |
 | [004](004-rewrite-from-fintrack-pro.md) | Rewrite instead of evolving FinTrack Pro | Accepted |
+| [005](005-money-representation.md) | Money as integer minor units with a currency code | Accepted |
+| [006](006-guldr-core-package.md) | GuldrCore local package tested without a simulator | Accepted |
+| [007](007-persistence-and-widget-data.md) | One SwiftData store in the App Group, read-only for the widget | Accepted |
+| [008](008-categories-and-month-keys.md) | Categories with SF Symbols and color tokens; year-month keys | Accepted |
