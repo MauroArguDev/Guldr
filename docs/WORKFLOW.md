@@ -115,6 +115,15 @@ xcodebuild test-without-building -project Guldr.xcodeproj -scheme Guldr \
 - The pinned version lives in `XCODE_VERSION` in the workflow and must exist on the `macos-26` runner image. Bump it when GitHub ships a newer Xcode.
 - The project file must stay in a format the CI Xcode can open (currently `objectVersion = 77`). In Xcode, keep **Minimize Project References** and **Strictly Validate** unchecked in the project's File Inspector.
 
+## Linting
+
+[SwiftLint](https://github.com/realm/SwiftLint) runs on every build through the `SwiftLintBuildToolPlugin` from [SwiftLintPlugins](https://github.com/SimplyDanny/SwiftLintPlugins), attached to the `Guldr`, `GuldrWidgetExtension` and `GuldrTests` targets. The version is pinned in `Package.resolved`, so Xcode, every developer and CI use the same one.
+
+- Rules live in [`.swiftlint.yml`](../.swiftlint.yml): the default rules plus a few opt-ins (`empty_count`, `first_where`, `toggle_bool`…), lines up to 140 characters (error at 200).
+- **Zero warnings** is the bar: a pull request does not add SwiftLint warnings.
+- The first build after cloning asks to **Trust & Enable** the plugin in Xcode. CI skips that prompt with `-skipPackagePluginValidation`.
+- Disable a rule inline only with a comment explaining why: `// swiftlint:disable:next rule_name — reason`.
+
 ## Definition of Done
 
 ### Feature
