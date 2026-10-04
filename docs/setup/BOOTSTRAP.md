@@ -11,8 +11,8 @@
 | 1 | Foundations and repo | `chore/project-foundations` | ✅ Done | [#1](https://github.com/MauroArguDev/Guldr/pull/1) |
 | 2 | CI | `ci/github-actions` | ✅ Done | [#2](https://github.com/MauroArguDev/Guldr/pull/2), [#3](https://github.com/MauroArguDev/Guldr/pull/3), [#4](https://github.com/MauroArguDev/Guldr/pull/4), [#5](https://github.com/MauroArguDev/Guldr/pull/5) |
 | 3 | Widget target | `feat/widget-target` | ✅ Done | [#6](https://github.com/MauroArguDev/Guldr/pull/6) |
-| 4 | Signing, App Group and configuration | `chore/build-configuration` | 🟡 In progress | — |
-| 5 | Structure and design system | `feat/design-system` | ⬜ Pending | — |
+| 4 | Signing, App Group and configuration | `chore/build-configuration` | ✅ Done | [#7](https://github.com/MauroArguDev/Guldr/pull/7) |
+| 5 | Structure and design system | `feat/design-system` | 🟡 In progress | — |
 | 6 | App icon | `feat/app-icon` | ⬜ Pending | — |
 | 7 | Privacy and localization | `chore/privacy-and-localization` | ⬜ Pending | — |
 | 8 | SwiftLint | `chore/swiftlint` | ⬜ Pending | — |
@@ -643,11 +643,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **4.25** `git push -u origin chore/build-configuration`
-- [ ] **4.26** `gh pr create --base main --title "chore: configure signing, app group and build settings" --fill`
-- [ ] **4.27** `gh pr checks --watch` → CI green.
-- [ ] **4.28** `gh pr merge --rebase --delete-branch`
-- [ ] **4.29** `git switch main && git pull`
+- [x] **4.25** `git push -u origin chore/build-configuration`
+- [x] **4.26** `gh pr create --base main --title "chore: configure signing, app group and build settings" --fill`
+- [x] **4.27** `gh pr checks --watch` → CI green.
+- [x] **4.28** `gh pr merge --rebase --delete-branch`
+- [x] **4.29** `git switch main && git pull`
+  Result: [#7](https://github.com/MauroArguDev/Guldr/pull/7) passed in 7 min 51 s (first real test green on CI) and was merged by the author on 2026-10-04; push run on `main` green.
 
 ---
 
@@ -655,12 +656,17 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 **🤖 CLAUDE CODE**
 
-- [ ] **5.1** `git switch -c feat/design-system`
-- [ ] **5.2** Mark the remaining Phase 4 steps and its ✅ status in the **Progress** table.
+- [x] **5.1** `git switch -c feat/design-system`
+- [x] **5.2** Mark the remaining Phase 4 steps and its ✅ status in the **Progress** table.
+
+**🧑 YOU — Test target isolation**
+
+- [x] **5.2a** **GuldrTests ▸ Build Settings ▸ Default Actor Isolation** = **MainActor**, so tests follow the same rules as the code they test (ADR 003).
+- [x] **5.2b** 🤖 ✅ Unit tests still pass. Commit: `chore: default test target to main actor isolation`
 
 **🤖 CLAUDE CODE — Folder structure**
 
-- [ ] **5.3** Create the structure:
+- [x] **5.3** Create the structure:
   ```
   Guldr/
   ├── App/
@@ -675,15 +681,16 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
   ├── Features/Settings/
   └── Resources/
   ```
-- [ ] **5.4** Move `GuldrApp.swift` and `ContentView.swift` to `Guldr/App/`.
-- [ ] **5.5** Move `Guldr/Assets.xcassets` to `Guldr/Resources/`.
-- [ ] **5.6** Add a `.gitkeep` to every folder left empty.
-- [ ] **5.7** ✅ Build.
-- [ ] **5.8** Commit: `refactor: organize project into feature-based folders`
+- [x] **5.4** Move `GuldrApp.swift` and `ContentView.swift` to `Guldr/App/`.
+- [x] **5.5** Move `Guldr/Assets.xcassets` to `Guldr/Resources/`.
+  Result: `Guldr/Info.plist` and `Guldr/Guldr.entitlements` stay at the folder root because their paths are fixed in build settings (`INFOPLIST_FILE`, `CODE_SIGN_ENTITLEMENTS`).
+- [x] **5.6** Add a `.gitkeep` to every folder left empty. — ⏭️ skipped: in a synchronized folder Xcode copies every file into the app bundle, so the `.gitkeep` files collided (`Multiple commands produce Guldr.app/.gitkeep`). Folders are created with their first file instead; the full structure is documented in `docs/ARCHITECTURE.md`.
+- [x] **5.7** ✅ Build.
+- [x] **5.8** Commit: `refactor: organize project into feature-based folders`
 
 **🤖 CLAUDE CODE — Design specification**
 
-- [ ] **5.9** Copy the design package, without the `xcode/` folder:
+- [x] **5.9** Copy the design package, without the `xcode/` folder:
   ```bash
   SRC=~/Downloads/Guldr/GuldrDesign
   [ -d "$SRC" ] || unzip -q ~/Downloads/Guldr/GuldrDesign.zip -d ~/Downloads/Guldr
@@ -691,8 +698,10 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
   rsync -a --exclude xcode "$SRC"/ docs/design/
   ```
   Expected in `docs/design/`: `DESIGN.md`, `tokens.json`, `mockups/`, `icon/`, `wordmark/`, `fonts/`.
-- [ ] **5.10** In `docs/design/DESIGN.md`, in the *Folder map* table, replace `xcode/GuldrColors.xcassets` with `Guldr/Resources/GuldrColors.xcassets`.
-- [ ] **5.11** Append to `CLAUDE.md`:
+
+  Result: the source package has its mockup copy in Spanish (`lang="es"`, labels such as *Presupuesto*, *Recientes*). Per the English-only rule, the copy in `docs/design/` was translated (labels, categories, dates, `lang="en"`) and DESIGN.md's "Recientes" example became "Recent". The original package in `~/Downloads/Guldr/GuldrDesign` is untouched.
+- [x] **5.10** In `docs/design/DESIGN.md`, in the *Folder map* table, replace `xcode/GuldrColors.xcassets` with `Guldr/Resources/GuldrColors.xcassets`.
+- [x] **5.11** Append to `CLAUDE.md`:
   ```markdown
   ## Design system
   - Visual source of truth: `docs/design/DESIGN.md` (values in `docs/design/tokens.json`).
@@ -702,43 +711,45 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
   - Native components first (TabView, NavigationStack, sheets, segmented Picker).
   - Every view gets previews in light and dark.
   ```
-- [ ] **5.12** Commit: `docs: add guldr design system specification`
+- [x] **5.12** Commit: `docs: add guldr design system specification`
 
 **🤖 CLAUDE CODE — Architecture**
 
-- [ ] **5.13** Create `docs/ARCHITECTURE.md`: targets (app and widget), App Group and `Config/*.xcconfig`, folder structure and each layer's responsibility, MVVM with `@Observable`, and a Mermaid diagram. Persistence and widget sections are completed in their phases.
-- [ ] **5.14** Link `docs/ARCHITECTURE.md` from `README.md` and `CLAUDE.md`.
-- [ ] **5.15** Commit: `docs: add architecture overview`
+- [x] **5.13** Create `docs/ARCHITECTURE.md`: targets (app and widget), App Group and `Config/*.xcconfig`, folder structure and each layer's responsibility, MVVM with `@Observable`, and a Mermaid diagram. Persistence and widget sections are completed in their phases.
+- [x] **5.14** Link `docs/ARCHITECTURE.md` from `README.md` and `CLAUDE.md`.
+- [x] **5.15** Commit: `docs: add architecture overview`
 
 **🤖 CLAUDE CODE — Colors**
 
-- [ ] **5.16** Copy the color catalog into the target:
+- [x] **5.16** Copy the color catalog into the target:
   ```bash
   cp -R ~/Downloads/Guldr/GuldrDesign/xcode/GuldrColors.xcassets Guldr/Resources/
   ```
 
 **🧑 YOU**
 
-- [ ] **5.17** Select `Guldr/Resources/GuldrColors.xcassets` and in **File Inspector ▸ Target Membership** also check **GuldrWidgetExtension**.
-- [ ] **5.18** Confirm in Build Settings that `Generate Swift Asset Symbol Extensions` = Yes.
+- [x] **5.17** Select `Guldr/Resources/GuldrColors.xcassets` and in **File Inspector ▸ Target Membership** also check **GuldrWidgetExtension**.
+- [x] **5.18** Confirm in Build Settings that `Generate Swift Asset Symbol Extensions` = Yes.
+  Result: Xcode 27 lists it only by its raw name under **User-Defined**: `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES`, set at project level and inherited by both targets.
 
 **🤖 CLAUDE CODE**
 
-- [ ] **5.19** ✅ 21 colors + `Contents.json`:
+- [x] **5.19** ✅ 21 colors + `Contents.json`:
   ```bash
   ls Guldr/Resources/GuldrColors.xcassets | wc -l    # 22
   ```
-- [ ] **5.20** Commit: `feat: add guldr color asset catalog`
+- [x] **5.20** Commit: `feat: add guldr color asset catalog`
+  Result: both `Guldr.app` and `GuldrWidgetExtension.appex` compile the 21 colors into `Assets.car` and generate `Color(.goldFill)`-style symbols; the widget membership is a synchronized-folder exception in the project file.
 
 **🤖 CLAUDE CODE — Wordmark**
 
-- [ ] **5.21** Copy the SVGs into the app catalog:
+- [x] **5.21** Copy the SVGs into the app catalog:
   ```bash
   D=Guldr/Resources/Assets.xcassets/Wordmark.imageset
   mkdir -p $D
   cp docs/design/wordmark/guldr-wordmark-dark.svg docs/design/wordmark/guldr-wordmark-light.svg $D/
   ```
-- [ ] **5.22** Create `Wordmark.imageset/Contents.json`:
+- [x] **5.22** Create `Wordmark.imageset/Contents.json`:
   ```json
   {
     "images" : [
@@ -753,25 +764,26 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
     "properties" : { "preserves-vector-representation" : true }
   }
   ```
-- [ ] **5.23** ✅ Build.
-- [ ] **5.24** Commit: `feat: add vector wordmark asset`
+- [x] **5.23** ✅ Build.
+- [x] **5.24** Commit: `feat: add vector wordmark asset`
 
 **Visual check** (not committed)
 
-- [ ] **5.25** 🤖 In `ContentView`, add temporary light and dark previews with `Image(.wordmark)` and a text in `Color(.goldFill)`, and build.
-- [ ] **5.26** 🧑 Review the previews in Xcode and confirm they look right.
-- [ ] **5.27** 🤖 Revert the change: `git restore Guldr/App/ContentView.swift`
+- [x] **5.25** 🤖 In `ContentView`, add temporary light and dark previews with `Image(.wordmark)` and a text in `Color(.goldFill)`, and build.
+  Result: also run on the iPhone 17 simulator in light and dark: wordmark switches variant, `Gold`/`GoldFill`/`OnGold`, surfaces, `Positive`/`Negative` and chart colors render from the catalog.
+- [x] **5.26** 🧑 Review the previews in Xcode and confirm they look right.
+- [x] **5.27** 🤖 Revert the change: `git restore Guldr/App/ContentView.swift`
 
 **✅ VERIFY**
 
-- [ ] **5.28** No raw hex values in Swift:
+- [x] **5.28** No raw hex values in Swift:
   ```bash
   grep -rn "#[0-9A-Fa-f]\{6\}" Guldr --include="*.swift" | wc -l   # 0
   ```
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **5.29** Commit: `docs: update bootstrap progress for phase 5`
+- [x] **5.29** Commit: `docs: update bootstrap progress for phase 5`
 - [ ] **5.30** `git push -u origin feat/design-system`
 - [ ] **5.31** `gh pr create --base main --title "feat: add design system foundations" --fill`
 - [ ] **5.32** `gh pr checks --watch` → CI green.
