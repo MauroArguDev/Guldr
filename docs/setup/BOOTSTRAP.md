@@ -15,7 +15,7 @@
 | 5 | Structure and design system | `feat/design-system` | ✅ Done | [#8](https://github.com/MauroArguDev/Guldr/pull/8) |
 | 6 | App icon | `feat/app-icon` | ✅ Done | [#9](https://github.com/MauroArguDev/Guldr/pull/9) |
 | 7 | Privacy and localization | `chore/privacy-and-localization` | ✅ Done | [#10](https://github.com/MauroArguDev/Guldr/pull/10) |
-| 8 | SwiftLint | `chore/swiftlint` | 🟡 In progress | — |
+| 8 | SwiftLint | `chore/swiftlint` | ✅ Done | [#11](https://github.com/MauroArguDev/Guldr/pull/11) |
 
 ---
 
@@ -401,8 +401,8 @@ The repo already has the `Initial commit` Xcode generated on `main`. Everything 
 
 **🤖 CLAUDE CODE — PR cycle**
 
-- [ ] **2.9** `git push -u origin ci/github-actions`
-- [ ] **2.10** `gh pr create --base main --title "ci: add GitHub Actions workflow" --fill`
+- [x] **2.9** `git push -u origin ci/github-actions`
+- [x] **2.10** `gh pr create --base main --title "ci: add GitHub Actions workflow" --fill`
 - [x] **2.11** `gh pr checks --watch` → CI green.
   Result: first run failed in 3 s (project format 110, fixed in `chore: lower project format for xcode 26 compatibility`); second run passed in 19 min 33 s.
 - [x] **2.12** `gh pr merge --rebase --delete-branch`
@@ -966,11 +966,12 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 **🤖 CLAUDE CODE — PR cycle**
 
 - [x] **8.14** Commit: `docs: update bootstrap progress for phase 8`
-- [ ] **8.15** `git push -u origin chore/swiftlint`
-- [ ] **8.16** `gh pr create --base main --title "chore: add SwiftLint" --fill`
-- [ ] **8.17** `gh pr checks --watch` → CI green with the plugin active.
-- [ ] **8.18** `gh pr merge --rebase --delete-branch`
-- [ ] **8.19** `git switch main && git pull`
+- [x] **8.15** `git push -u origin chore/swiftlint`
+- [x] **8.16** `gh pr create --base main --title "chore: add SwiftLint" --fill`
+- [x] **8.17** `gh pr checks --watch` → CI green with the plugin active.
+- [x] **8.18** `gh pr merge --rebase --delete-branch`
+- [x] **8.19** `git switch main && git pull`
+  Result: [#11](https://github.com/MauroArguDev/Guldr/pull/11) passed in 11 min 3 s (SwiftLintPlugins 0.65.1 fetched and run on CI without the Trust prompt) and was merged by the author on 2026-10-04; push run on `main` green.
 
 ---
 
@@ -990,7 +991,7 @@ UI tests cost minutes on every run and were flaky on shared runners. Decision (2
 
 ## Final verification (🤖 CLAUDE CODE)
 
-Done on the data layer branch, together with the remaining Phase 8 marks.
+Done on 2026-10-04 after PR #11, recorded on the `docs/v1-plan` branch: 48 commits on `main`, no merge commits, PRs #1–#11, ruleset and hooks active, CI green, no Spanish text, no hex colors in Swift.
 
 ```bash
 git log --oneline | head -40
@@ -999,18 +1000,20 @@ xcodebuild test -project Guldr.xcodeproj -scheme Guldr -destination "platform=iO
 ls docs docs/design docs/decisions
 ```
 
-- [ ] `main` protected (ruleset + local hooks) and CI green; no direct commits on `main`
-- [ ] App and widget run on the iPhone
-- [ ] App Group shared; iCloud **not** added
-- [ ] Version and App Group come from `Config/*.xcconfig`; the `AppGroupID` test passes
-- [ ] `GuldrColors` in both targets; vector wordmark with a dark variant
-- [ ] `Guldr.icon` assigned and checked in light, dark and tinted
-- [ ] Privacy manifest and EN/ES String Catalog
-- [ ] SwiftLint active on the targets
-- [ ] README, CLAUDE.md, WORKFLOW, ROADMAP, ARCHITECTURE, DESIGN, ADR 000–004
-- [ ] Everything in the repository is in English
+- [x] `main` protected (ruleset + local hooks) and CI green; no direct commits on `main`
+- [x] App and widget run on the iPhone
+- [x] App Group shared; iCloud **not** added
+- [x] Version and App Group come from `Config/*.xcconfig`; the `AppGroupID` test passes
+- [x] `GuldrColors` in both targets; vector wordmark with a dark variant
+- [x] `Guldr.icon` assigned and checked in light, dark and tinted
+- [x] Privacy manifest and EN/ES String Catalog
+- [x] SwiftLint active on the targets
+- [x] README, CLAUDE.md, WORKFLOW, ROADMAP, ARCHITECTURE, DESIGN, ADR 000–004
+- [x] Everything in the repository is in English
 
 ## Next: data layer · branch `feat/data-layer`
+
+> Superseded by [`docs/plan/v1.0.md`](../plan/v1.0.md), which splits this work into phases 9–14.
 
 - [ ] `Transaction`, `Category` and `Budget` models, CloudKit-compatible, with `currencyCode`.
 - [ ] A `ModelContainer` shared through the App Group, without `fatalError`.
@@ -1021,6 +1024,8 @@ ls docs docs/design docs/decisions
 `Old_FinTrackPro` is reference only: explain the old code, note what changes and why, write it, test it and open the PR.
 
 ## When v1.0 ships · branch `docs/release-1.0`
+
+> Superseded by [`docs/plan/v1.0.md`](../plan/v1.0.md), phases 29–31.
 
 - [ ] Final `README.md`: badges, 10-second GIF, screenshots (dashboard, charts, widget, add transaction), stack and diagram.
 - [ ] `docs/PRIVACY.md`: privacy policy (data stays on device), for the URL App Store Connect requires.

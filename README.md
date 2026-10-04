@@ -24,6 +24,7 @@ Transactions, dashboard, budgets, charts, home screen widgets, Face ID lock, loc
 - Design system: [`docs/design/DESIGN.md`](docs/design/DESIGN.md)
 - Workflow and Definition of Done: [`docs/WORKFLOW.md`](docs/WORKFLOW.md)
 - Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- v1.0 delivery plan: [`docs/plan/v1.0.md`](docs/plan/v1.0.md)
 - Architecture decisions: [`docs/decisions/`](docs/decisions/)
 - Project bootstrap: [`docs/setup/BOOTSTRAP.md`](docs/setup/BOOTSTRAP.md)
 
