@@ -1,0 +1,18 @@
+included:
+  - Guldr
+  - GuldrWidget
+  - GuldrTests
+excluded:
+  - docs
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - sorted_first_last
+  - toggle_bool
+  - unused_optional_binding
+line_length:
+  warning: 140
+  error: 200
+identifier_name:
+  excluded: [id, x, y]

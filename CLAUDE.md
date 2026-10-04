@@ -15,6 +15,7 @@ Architecture overview: `docs/ARCHITECTURE.md`.
 - No Siri / AppShortcutsProvider. App Intents are allowed for widgets.
 - No secrets in the repo. Future keys go in `Config/Secrets.xcconfig` (gitignored).
 - Swift 6 strict concurrency; never silence warnings with `@unchecked Sendable` without a comment explaining why.
+- Zero SwiftLint warnings (`.swiftlint.yml`). Disable a rule inline only with a comment explaining why.
 - Never hand-edit `Guldr.xcodeproj/project.pbxproj`. Targets, capabilities, signing and build configuration changes are done by the user in Xcode; ask for them.
 - The project uses synchronized folders: files created under `Guldr/` join the app target automatically.
 
