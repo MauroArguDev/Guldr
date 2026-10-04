@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guldr — New transaction</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#E6E2DA;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif}
+a{color:#8A6A2E}a:hover{color:#6E5424}
+</style>
+</helmet>
+<div style="width: 908px; height: 964px; box-sizing: border-box; padding: 40px; display: flex; gap: 48px; background: #E6E2DA">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="width: 390px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #5E5950">{{t.name}}</div>
+<div style="width: 390px; height: 844px; box-sizing: border-box; border-radius: 52px; overflow: hidden; position: relative; background: {{t.dim}}; border: 1px solid {{t.frame}}; color: {{t.text}}">
+<div style="position: absolute; left: 0; right: 0; top: 54px; bottom: 0; border-radius: 34px 34px 0 0; background: {{t.sheet}}; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 12px">
+
+<div style="width: 36px; height: 5px; border-radius: 3px; background: {{t.line}}; align-self: center"></div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; height: 44px">
+<a href="Dashboard.dc.html" style="justify-self: start; font-size: 17px; text-decoration: none; color: {{t.text2}}">Cancel</a>
+<div style="justify-self: center; font-size: 17px; font-weight: 600">New expense</div>
+<a href="Transactions.dc.html" style="justify-self: end; font-size: 17px; font-weight: 600; text-decoration: none; color: {{t.gold}}">Save</a>
+</div>
+
+<div role="group" aria-label="Type" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; border-radius: 12px; background: {{t.segBg}}">
+<button style="height: 32px; border: none; border-radius: 9px; background: {{t.segOn}}; box-shadow: {{t.segShadow}}; font: inherit; font-size: 14px; font-weight: 600; color: {{t.text}}">Expense</button>
+<button style="height: 32px; border: none; border-radius: 9px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: {{t.text2}}">Income</button>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: center; gap: 4px; height: 72px">
+<div style="font-family: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif; font-size: 58px; line-height: 1; font-variant-numeric: tabular-nums; color: {{t.text}}">$42.80</div>
+<div style="width: 2px; height: 48px; border-radius: 1px; background: {{t.goldFill}}"></div>
+</div>
+
+<div style="border-radius: 16px; background: {{t.field}}; display: flex; flex-direction: column">
+<label style="display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 14px; border-bottom: 1px solid {{t.line}}">
+<span style="font-size: 16px; color: {{t.text2}}">Description</span>
+<input type="text" value="Groceries" style="border: none; outline: none; background: transparent; font: inherit; font-size: 16px; text-align: right; color: {{t.text}}; width: 180px">
+</label>
+<div style="display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 14px">
+<span style="font-size: 16px; color: {{t.text2}}">Date</span>
+<button style="border: none; background: {{t.chip}}; border-radius: 8px; padding: 5px 10px; font: inherit; font-size: 15px; color: {{t.text}}">Today, Sep 28</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 600; color: {{t.text2}}; padding: 0 2px">Category</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{t.cats}}" as="k" hint-placeholder-count="8">
+<button style="height: 62px; border-radius: 14px; border: 1.5px solid {{k.border}}; background: {{k.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 2px; font: inherit; color: {{k.color}}">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{k.icon}}"></path></svg>
+<span style="font-size: 10.5px; font-weight: 600; letter-spacing: -0.01em">{{k.name}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 2px">
+<sc-for list="{{t.keys}}" as="key" hint-placeholder-count="12">
+<button aria-label="{{key.aria}}" style="height: 50px; border: none; border-radius: 14px; background: {{key.bg}}; font: inherit; font-size: 24px; font-weight: 400; color: {{key.color}}; display: flex; align-items: center; justify-content: center">{{key.label}}</button>
+</sc-for>
+</div>
+
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":908,"height":964}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const icons = {
+      food: 'M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 1-3 3-3 6v4h3',
+      car: 'M5 16h14M6 16l1.5-5h9L18 16M7 16v2M17 16v2',
+      house: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM10 21v-6h4v6',
+      health: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+      bag: 'M6 8h12l-1 12H7zM9 8V6a3 3 0 0 1 6 0v2',
+      play: 'M8 5v14l11-7z',
+      book: 'M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z',
+      pin: 'M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'
+    };
+    const TH = [
+      { name: 'Light', dim: '#9C978F', sheet: '#F7F4EE', field: '#FFFFFF', chip: '#EFEAE0', segBg: '#EFEAE0', segOn: '#FFFFFF', segShadow: '0 1px 2px rgba(20,19,18,0.08)', text: '#141312', text2: '#6B665E', line: '#E3DDD1', gold: '#8A6A2E', goldFill: '#C8A96A', goldSoft: '#F3EAD7', key: '#FFFFFF', frame: '#D8D3C9' },
+      { name: 'Dark', dim: '#050505', sheet: '#1B1A18', field: '#242220', chip: '#35322E', segBg: '#242220', segOn: '#3A3733', segShadow: 'none', text: '#F2EEE6', text2: '#9C968C', line: '#35322E', gold: '#C8A96A', goldFill: '#C8A96A', goldSoft: '#2E271A', key: '#2A2826', frame: '#2A2826' }
+    ];
+    const cats = [['Food', icons.food], ['Transport', icons.car], ['Housing', icons.house], ['Health', icons.health], ['Shopping', icons.bag], ['Entertain.', icons.play], ['Education', icons.book], ['Other', icons.pin]];
+    const keyLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
+    const themes = TH.map((t) => ({
+      ...t,
+      cats: cats.map(([name, icon], i) => ({ name, icon, bg: i === 0 ? t.goldSoft : t.field, border: i === 0 ? t.goldFill : 'transparent', color: i === 0 ? t.gold : t.text })),
+      keys: keyLabels.map((label) => ({ label, aria: label === '⌫' ? 'Delete' : label === '.' ? 'Decimal point' : label, bg: t.key, color: t.text }))
+    }));
+    return { themes };
+  }
+}
+</script>
+</body>
+</html>
