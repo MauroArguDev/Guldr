@@ -1,6 +1,6 @@
 # 008 — Categories and month keys
 
-- **Status:** Accepted
+- **Status:** Accepted; category colors superseded by [009](009-category-color-palette.md)
 - **Date:** 2026-10-04
 
 ## Context

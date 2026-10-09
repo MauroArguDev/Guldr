@@ -47,7 +47,25 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 | `Positive` | `#2F7D5B` | `#5FB38A` | Income amounts and arrows |
 | `Negative` | `#B4443C` | `#E07A6E` | Over-budget values, alerts |
 | `NegativeSoft` | `#F6E4E0` | `#2B1C1A` | Over-budget alert background |
-| `Chart1`–`Chart7` | see `tokens.json` | | Category series, largest first |
+| `Chart1`–`Chart7` | see `tokens.json` | | Legacy rank ramp; not used for categories (ADR 009), removed in Phase 21 if unused |
+
+### Category palette
+
+Each category has a base color chosen from this palette (ADR 009). Asset names are `Category` + the key (`CategoryTeal`); the model stores the key (`teal`). Every value has at least 3:1 contrast against `Surface`.
+
+| Key | Light | Dark | Default categories |
+|---|---|---|---|
+| `gold` | `#A88442` | `#D2B373` | Housing, Salary |
+| `amber` | `#B8742A` | `#E2A25C` | Food |
+| `terracotta` | `#B0583E` | `#E08A6E` | Entertainment |
+| `rose` | `#AE5470` | `#E38FA6` | Health |
+| `plum` | `#7E5A8E` | `#B896C8` | Shopping |
+| `slate` | `#4F6F9A` | `#8DABD6` | Transport |
+| `teal` | `#2F7F7A` | `#6FBDB5` | Education, Other income |
+| `olive` | `#6E7D3A` | `#A9B86E` | Freelance |
+| `graphite` | `#6B665E` | `#ADA79C` | Other (also the fallback for unknown keys) |
+
+Category colors appear only in the analytics donut and its legend; icon chips stay neutral. The color picker in Settings shows these nine swatches, never a free color picker.
 
 Expenses are shown in `TextPrimary` with a leading minus (−$42.80); only income uses `Positive` (+$5,000.00). `Negative` is reserved for "over budget".
 
@@ -92,7 +110,7 @@ Three 1 pt horizontal lines in `GoldFill`, 5 pt apart, widths 100% / 78% / 56% w
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
 - **AddButton**: 64 pt circle, `GoldFill`, plus icon `OnGold`. In the app, place it next to the native tab bar per iOS 26 conventions.
 - **CategoryChip** (add sheet): 62 pt tall, radius 14; selected = `GoldSoft` fill + 1.5 pt `GoldFill` border + `Gold` content.
-- **Charts** (Swift Charts): income bars `GoldFill`, expense bars `TextSecondary`-toned (`#6B665E` light / `#6E6962` dark); category donut uses `Chart1…7` in order.
+- **Charts** (Swift Charts): income bars `GoldFill`, expense bars `TextSecondary`-toned (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a gradient from its category's base color to that color mixed 40% with `Surface`, with a small gap between slices.
 - **Primary button**: capsule, 54 pt tall, `GoldFill` with `OnGold` 17 pt semibold text.
 
 ## App icon
