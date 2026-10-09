@@ -1,0 +1,3 @@
+# Xcode runs the SwiftLint build plugin from the package directory, where the root config is not
+# found and defaults apply. Inherit the root config so Xcode, CI and the command line agree.
+parent_config: ../../.swiftlint.yml
