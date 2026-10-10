@@ -16,8 +16,8 @@ struct GuldrApp: App {
     var body: some Scene {
         WindowGroup {
             switch loader.state {
-            case .ready(let container):
-                RootView()
+            case .ready(let container, let settings):
+                LaunchGate(preferences: Preferences(settings: settings))
                     .modelContainer(container)
             case .failed(let error):
                 StoreErrorView(error: error, retry: loader.retry)
