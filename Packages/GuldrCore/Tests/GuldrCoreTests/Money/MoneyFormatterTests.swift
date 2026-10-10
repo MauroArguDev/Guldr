@@ -68,6 +68,25 @@ struct MoneyFormatterTests {
         #expect(enUS.parts(from: try money(150_000, "JPY")) == .init(main: "¥150,000", fraction: nil))
     }
 
+    @Test func wholeUnitsRoundHalfAwayFromZeroLikeTheMockups() throws {
+        #expect(enUS.string(from: try money(1_287_450), precision: .wholeUnits) == "$12,875")   // Charts "Expenses"
+        #expect(enUS.string(from: try money(175_950), precision: .wholeUnits) == "$1,760")      // donut center
+        #expect(enUS.string(from: try money(1_248_025), precision: .wholeUnits) == "$12,480")   // widget
+        #expect(enUS.string(from: try money(58_700), precision: .wholeUnits) == "$587")         // budget ring
+        #expect(enUS.string(from: try money(-175_950), precision: .wholeUnits) == "\(minus)$1,760")
+        #expect(normalized(esES.string(from: try money(1_234_567, "EUR"), precision: .wholeUnits)) == "12.346 €")
+    }
+
+    @Test func wholeUnitsThatRoundToZeroHaveNoSign() throws {
+        #expect(enUS.string(from: try money(-40), precision: .wholeUnits) == "$0")
+        #expect(enUS.string(from: try money(40), sign: .plus, precision: .wholeUnits) == "$0")
+        #expect(enUS.string(from: try money(50), sign: .plus, precision: .wholeUnits) == "+$1")
+    }
+
+    @Test func wholeUnitsLeaveCurrenciesWithoutMinorUnitsAlone() throws {
+        #expect(enUS.string(from: try money(150_000, "JPY"), precision: .wholeUnits) == "¥150,000")
+    }
+
     @Test func threeDecimalCurrencies() throws {
         #expect(normalized(enUS.string(from: try money(1234, "KWD"))).hasSuffix("1.234"))
     }
