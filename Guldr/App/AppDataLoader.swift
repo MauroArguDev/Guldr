@@ -10,13 +10,13 @@ import GuldrCore
 import Observation
 import SwiftData
 
-/// Opens the shared store at launch and keeps the result, so the root view can show either the app
-/// or the error screen (ADR 007). Opening is synchronous: it is a local SQLite open, done once.
+/// Opens the shared store and settings at launch and keeps the result, so the root view can show either
+/// the app or the error screen (ADR 007). Opening is synchronous: it is a local SQLite open, done once.
 @Observable
 final class AppDataLoader {
 
     enum State {
-        case ready(ModelContainer)
+        case ready(ModelContainer, AppSettings)
         case failed(PersistenceError)
     }
 
@@ -39,7 +39,8 @@ final class AppDataLoader {
     private static func open(infoDictionary: [String: Any]?) -> State {
         do {
             let appGroupID = try PersistenceController.appGroupID(from: infoDictionary)
-            return .ready(try PersistenceController(mode: .app(appGroupID: appGroupID)).container)
+            let container = try PersistenceController(mode: .app(appGroupID: appGroupID)).container
+            return .ready(container, try AppSettings.shared(appGroupID: appGroupID))
         } catch {
             return .failed(error)
         }
