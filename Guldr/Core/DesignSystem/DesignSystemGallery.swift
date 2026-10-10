@@ -10,8 +10,9 @@ import GuldrCore
 import SwiftUI
 
 /// Every design-system component and its animated states on one screen, for review on a device
-/// (v1 plan, step 15.12). Debug builds only. The controls override appearance, text size and
-/// Reduce Motion for this screen; "Replay" restarts the entrance animations.
+/// (v1 plan, step 15.12). Debug builds only. The top controls override appearance and text size;
+/// the bar pinned to the bottom simulates Reduce Motion and replays the entrance animations, so it
+/// stays reachable next to whatever component is on screen.
 struct DesignSystemGallery: View {
 
     enum Appearance: String, CaseIterable, Identifiable {
@@ -54,12 +55,13 @@ struct DesignSystemGallery: View {
             VStack(alignment: .leading, spacing: 28) {
                 controls
                 GallerySections()
-                    .id(replay)
+                    .environment(\.entranceReplay, replay)
                     .environment(\.simulatesReduceMotion, reduceMotion)
                     .dynamicTypeSize(textSize.size)
             }
             .padding(Spacing.screenHorizontal)
         }
+        .safeAreaInset(edge: .bottom) { motionBar }
         .background(Color(.appBackground))
         .navigationTitle(Text(verbatim: "Design system"))
         .navigationBarTitleDisplayMode(.inline)
@@ -74,16 +76,30 @@ struct DesignSystemGallery: View {
             Picker(selection: $textSize) {
                 ForEach(TextSize.allCases) { Text(verbatim: $0.rawValue).tag($0) }
             } label: { Text(verbatim: "Text size") }
-            Toggle(isOn: $reduceMotion) { Text(verbatim: "Simulate Reduce Motion") }
-                .tint(Color(.goldFill))
-            Button { replay += 1 } label: {
-                Label { Text(verbatim: "Replay entrance animations") } icon: { Image(systemName: "arrow.counterclockwise") }
-            }
-            .foregroundStyle(Color(.gold))
         }
         .pickerStyle(.segmented)
         .padding(Spacing.cardPaddingCompact)
         .card(.compact)
+    }
+
+    /// Pinned to the bottom: replaying an entrance only makes sense while the component is visible.
+    private var motionBar: some View {
+        HStack(spacing: 16) {
+            Toggle(isOn: $reduceMotion) { Text(verbatim: "Reduce Motion") }
+                .tint(Color(.goldFill))
+                .fixedSize()
+            Spacer(minLength: 0)
+            Button { replay += 1 } label: {
+                Label { Text(verbatim: "Replay") } icon: { Image(systemName: "arrow.counterclockwise") }
+            }
+            .buttonStyle(.primary)
+            .fixedSize()
+        }
+        .padding(.horizontal, Spacing.cardPaddingCompact)
+        .padding(.vertical, 10)
+        .card(.compact)
+        .padding(.horizontal, Spacing.screenHorizontal)
+        .padding(.bottom, 8)
     }
 }
 
@@ -241,11 +257,14 @@ private struct GallerySections: View {
 
     private var molecules: some View {
         VStack(alignment: .leading, spacing: 16) {
+            // Exact cents, as in the Budget mockup: $1,443 of $2,030, $587 available.
+            let limit: Int64 = 203_000
+            let spent: Int64 = usage > 0.5 ? 144_300 : 64_960
             HStack(spacing: 18) {
-                BudgetRing(remaining: .previewUSD(Int64((1 - min(usage, 1)) * 203_000)), usage: usage)
+                BudgetRing(remaining: .previewUSD(limit - spent), usage: Double(spent) / Double(limit))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(verbatim: "Spent").textRole(.meta).foregroundStyle(Color(.textSecondary))
-                    AmountText(.previewUSD(Int64(usage * 203_000)), style: .summary)
+                    AmountText(.previewUSD(spent), style: .summary)
                 }
             }
             .padding(20)
