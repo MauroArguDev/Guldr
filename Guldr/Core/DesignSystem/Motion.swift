@@ -59,9 +59,10 @@ func withMotion<Result>(_ motion: Motion, _ body: () throws -> Result) rethrows 
 }
 
 extension View {
-    /// `.animation(_:value:)` through a Motion token.
-    func motion(_ motion: Motion, value: some Equatable) -> some View {
-        modifier(MotionModifier(motion: motion, value: value))
+    /// `.animation(_:value:)` through a Motion token. `delay` staggers entrances; use
+    /// `Motion.staggerDelay(index:reduceMotion:)` for it.
+    func motion(_ motion: Motion, value: some Equatable, delay: Double = 0) -> some View {
+        modifier(MotionModifier(motion: motion, value: value, delay: delay))
     }
 
     /// A transition that becomes a plain cross-fade with Reduce Motion.
@@ -89,10 +90,12 @@ private struct MotionModifier<Value: Equatable>: ViewModifier {
 
     let motion: Motion
     let value: Value
+    let delay: Double
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        content.animation(motion.resolved(reduceMotion: reduceMotion), value: value)
+        let animation = motion.resolved(reduceMotion: reduceMotion)
+        content.animation(delay > 0 && !reduceMotion ? animation?.delay(delay) : animation, value: value)
     }
 }
 
