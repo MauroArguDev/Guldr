@@ -51,21 +51,25 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 
 ### Category palette
 
-Each category has a base color chosen from this palette (ADR 009). Asset names are `Category` + the key (`CategoryTeal`); the model stores the key (`teal`). Every value has at least 3:1 contrast against `Surface`.
+Each category has a base color chosen from this palette (ADR 009). Asset names are `Category` + the key (`CategoryTeal`); the model stores the key (`teal`). Twelve hues in color-wheel order plus a neutral, all with the same restrained chroma; every value has at least 3.3:1 contrast against `Surface`.
 
 | Key | Light | Dark | Default categories |
 |---|---|---|---|
-| `gold` | `#A88442` | `#D2B373` | Housing, Salary |
-| `amber` | `#B8742A` | `#E2A25C` | Food |
-| `terracotta` | `#B0583E` | `#E08A6E` | Entertainment |
-| `rose` | `#AE5470` | `#E38FA6` | Health |
-| `plum` | `#7E5A8E` | `#B896C8` | Shopping |
-| `slate` | `#4F6F9A` | `#8DABD6` | Transport |
-| `teal` | `#2F7F7A` | `#6FBDB5` | Education, Other income |
-| `olive` | `#6E7D3A` | `#A9B86E` | Freelance |
-| `graphite` | `#6B665E` | `#ADA79C` | Other (also the fallback for unknown keys) |
+| `gold` | `#A9872A` | `#BB9A46` | Housing, Salary |
+| `amber` | `#B26417` | `#C87E41` | |
+| `terracotta` | `#A64832` | `#C2644F` | Food |
+| `wine` | `#873046` | `#AB5064` | Entertainment |
+| `rose` | `#BA678D` | `#CD80A2` | |
+| `plum` | `#794880` | `#97649F` | Shopping |
+| `indigo` | `#6F6DB9` | `#8383CD` | Education |
+| `blue` | `#295D94` | `#497DB7` | |
+| `sky` | `#3A95B9` | `#58AACD` | Transport |
+| `teal` | `#017976` | `#349794` | Freelance |
+| `green` | `#4A925C` | `#66A774` | Health |
+| `olive` | `#65690F` | `#82863A` | Other income |
+| `graphite` | `#6F6B65` | `#8F8C85` | Other (also the fallback for unknown keys) |
 
-Category colors appear only in the analytics donut and its legend; icon chips stay neutral. The color picker in Settings shows these nine swatches, never a free color picker.
+Category colors appear only in the analytics donut and its legend; icon chips stay neutral. The color picker in Settings shows these thirteen swatches, never a free color picker. Not every pair is distinct (gold/amber/terracotta and teal/graphite are close), so charts never rely on color alone.
 
 Expenses are shown in `TextPrimary` with a leading minus (−$42.80); only income uses `Positive` (+$5,000.00). `Negative` is reserved for "over budget".
 
@@ -110,7 +114,7 @@ Three 1 pt horizontal lines in `GoldFill`, 5 pt apart, widths 100% / 78% / 56% w
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
 - **AddButton**: 64 pt circle, `GoldFill`, plus icon `OnGold`. In the app, place it next to the native tab bar per iOS 26 conventions.
 - **CategoryChip** (add sheet): 62 pt tall, radius 14; selected = `GoldSoft` fill + 1.5 pt `GoldFill` border + `Gold` content.
-- **Charts** (Swift Charts): income bars `GoldFill`, expense bars `TextSecondary`-toned (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a gradient from its category's base color to that color mixed 40% with `Surface`, with a small gap between slices.
+- **Charts** (Swift Charts): income bars `GoldFill`, expense bars `TextSecondary`-toned (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a subtle gradient from its category's base color to that color mixed 12% with `Surface`; slices are separated by a 2 pt gap, the legend names every slice, and large slices carry a direct label.
 - **Primary button**: capsule, 54 pt tall, `GoldFill` with `OnGold` 17 pt semibold text.
 
 ## App icon
