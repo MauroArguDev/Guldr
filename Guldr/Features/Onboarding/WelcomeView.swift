@@ -14,7 +14,7 @@ import SwiftUI
 struct WelcomeView: View {
 
     @Environment(Preferences.self) private var preferences
-    @State private var currencyCode = WelcomeView.suggestedCurrencyCode()
+    @State private var currencyCode = Currency.defaultCode(for: .autoupdatingCurrent)
     @State private var failedToSave = false
 
     var body: some View {
@@ -83,11 +83,6 @@ struct WelcomeView: View {
         } catch {
             failedToSave = true
         }
-    }
-
-    /// The device region's currency, or US dollars if the region has none the system knows.
-    private static func suggestedCurrencyCode() -> String {
-        (try? Currency.validatedCode(Currency.defaultCode(for: .autoupdatingCurrent))) ?? "USD"
     }
 }
 

@@ -34,9 +34,12 @@ public enum Currency {
         return uppercased
     }
 
-    /// The currency of a locale, used as the default active currency at first launch.
+    /// The currency of a locale, used as the default active currency at first launch. US dollars when the
+    /// locale has no region (`en`, `es_419`) or its currency is not one the system lists.
     public static func defaultCode(for locale: Locale) -> String {
-        locale.currency?.identifier ?? "USD"
+        guard let identifier = locale.currency?.identifier,
+              let code = try? validatedCode(identifier) else { return "USD" }
+        return code
     }
 
     private static let knownCodes = Set(Locale.commonISOCurrencyCodes)

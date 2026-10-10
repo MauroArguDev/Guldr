@@ -30,6 +30,15 @@ struct CurrencyTests {
         #expect(Currency.defaultCode(for: Locale(identifier: "es_MX")) == "MXN")
         #expect(Currency.defaultCode(for: Locale(identifier: "en_US")) == "USD")
     }
+
+    @Test func defaultCodeFollowsACurrencyOverride() {
+        #expect(Currency.defaultCode(for: Locale(identifier: "en_US@currency=EUR")) == "EUR")
+    }
+
+    @Test(arguments: ["en", "es_419"])
+    func defaultCodeFallsBackToDollarsWithoutARegion(identifier: String) {
+        #expect(Currency.defaultCode(for: Locale(identifier: identifier)) == "USD")
+    }
 }
 
 struct MoneyTests {
