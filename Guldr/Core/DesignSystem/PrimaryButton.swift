@@ -40,13 +40,13 @@ private struct PrimaryButtonSpecimen: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Button("Save") { saves += 1 }
+            Button { saves += 1 } label: { Text(verbatim: "Save") }
                 .buttonStyle(.primary)
                 // The success haptic belongs to the save itself; a screen triggers it after a real save.
                 .sensoryFeedback(Haptics.saved, trigger: saves)
-            Button("Unlock with Face ID") {}
+            Button {} label: { Text(verbatim: "Unlock with Face ID") }
                 .buttonStyle(.primary)
-            Button("Save") {}
+            Button {} label: { Text(verbatim: "Save") }
                 .buttonStyle(.primary)
                 .disabled(true)
         }

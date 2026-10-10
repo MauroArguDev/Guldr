@@ -111,7 +111,7 @@ private struct AmountTextSpecimen: View {
             AmountText(Money.previewUSD(58_700), style: .display(.budgetRingCenter), precision: .wholeUnits)
             AmountText(Money.previewUSD(9_600), style: .summary, tone: .negative)
             AmountText(Money.previewUSD(4_280), kind: .expense).environment(\.locale, Locale(identifier: "es_ES"))
-            Button("Add $42.80") { balance += 4_280 }
+            Button { balance += 4_280 } label: { Text(verbatim: "Add $42.80") }
         }
         .padding(Spacing.screenHorizontal)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
