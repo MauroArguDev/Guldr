@@ -79,7 +79,8 @@ Packages/GuldrCore/      Domain package (ADR 006)
 │   ├── Money/           Money, currencies, keypad input, formatting
 │   ├── Dates/           YearMonth, day labels
 │   ├── Models/          SchemaV1, the @Model types, default categories and their seeder
-│   └── Persistence/     PersistenceController, PersistenceError, PreviewData
+│   ├── Persistence/     PersistenceController, PersistenceError, PreviewData
+│   └── Calculations/    MonthSummary, BudgetStatus, CategoryBreakdown, CashFlowSeries, TransactionQuery
 └── Tests/GuldrCoreTests/ Mirrors Sources
 Config/                  xcconfig files
 docs/                    Design, decisions, workflow, roadmap and setup runbook
