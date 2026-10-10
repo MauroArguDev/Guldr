@@ -91,7 +91,7 @@ Present today: `App/`, `Resources/`, `Info.plist`, `Guldr.entitlements`. The res
 ## Layers
 
 ### Views
-SwiftUI only. Views render state and forward user intent; they hold no business logic. Native components first (`NavigationStack`, `TabView`, sheets, segmented `Picker`), styled with the design system ([DESIGN.md](design/DESIGN.md)). Every view has light and dark previews.
+SwiftUI only. Views render state and forward user intent; they hold no business logic. Native components first (`NavigationStack`, `TabView`, sheets, segmented `Picker`), styled with the design system ([DESIGN.md](design/DESIGN.md)). Every view has light and dark previews. Reusable components live in `Guldr/Core/DesignSystem/` (tokens, typography, cards, rows, rings, chips); every animation goes through `Motion` and every haptic through `Haptics`, which handle Reduce Motion (enforced by SwiftLint custom rules). Debug builds include a design system gallery for review on a device.
 
 ### View models
 One `@Observable` final class per screen, owned by the view with `@State`. They expose display-ready values and actions, and depend on the data layer through protocols so they can be tested with in-memory stores or fakes. Main-actor isolated by default.
