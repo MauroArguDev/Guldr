@@ -135,7 +135,7 @@ class Component extends DCLogic {
         ...t,
         conic: 'conic-gradient(' + stops.join(', ') + ')',
         tabs: tabDefs.map(([label, icon, href], i) => ({ label, icon, href, color: i === active ? t.gold : t.text2, bg: i === active ? t.tabOn : 'transparent' })),
-        periods: ['1M', '3M', '6M', '1A'].map((label) => ({ label, bg: label === '6M' ? t.segOn : 'transparent', shadow: label === '6M' ? t.segShadow : 'none', color: label === '6M' ? t.text : t.text2 })),
+        periods: ['1M', '3M', '6M', '1Y'].map((label) => ({ label, bg: label === '6M' ? t.segOn : 'transparent', shadow: label === '6M' ? t.segShadow : 'none', color: label === '6M' ? t.text : t.text2 })),
         bars: months.map(([m, inc, exp], i) => ({ m, c: t, inc: Math.round(inc / max * 150) + 'px', exp: Math.round(exp / max * 150) + 'px', labelColor: i === 5 ? t.text : t.text2, weight: i === 5 ? '600' : '400' })),
         slices
       };
