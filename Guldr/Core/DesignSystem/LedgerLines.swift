@@ -37,7 +37,7 @@ struct LedgerLines: View {
     var drawsIn = false
 
     @State private var drawn = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ReduceMotion private var reduceMotion
 
     var body: some View {
         // GeometryReader measures the space the lines were given (a card, a widget), not the screen.

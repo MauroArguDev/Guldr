@@ -71,6 +71,23 @@ extension View {
     }
 }
 
+/// Whether motion should be reduced: the system's Reduce Motion setting, or the design system
+/// gallery's simulation of it. Components read this instead of `accessibilityReduceMotion`, which
+/// SwiftUI does not let a view override.
+@propertyWrapper
+struct ReduceMotion: DynamicProperty {
+
+    @Environment(\.accessibilityReduceMotion) private var system
+    @Environment(\.simulatesReduceMotion) private var simulated
+
+    var wrappedValue: Bool { system || simulated }
+}
+
+extension EnvironmentValues {
+    /// Set by the design system gallery to preview Reduce Motion without changing the device setting.
+    @Entry var simulatesReduceMotion = false
+}
+
 /// The haptics from DESIGN.md › Motion, for `.sensoryFeedback(_:trigger:)`. They stay on with
 /// Reduce Motion: they do not move anything on screen.
 enum Haptics {
@@ -91,7 +108,7 @@ private struct MotionModifier<Value: Equatable>: ViewModifier {
     let motion: Motion
     let value: Value
     let delay: Double
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ReduceMotion private var reduceMotion
 
     func body(content: Content) -> some View {
         let animation = motion.resolved(reduceMotion: reduceMotion)
@@ -102,7 +119,7 @@ private struct MotionModifier<Value: Equatable>: ViewModifier {
 private struct MotionTransitionModifier: ViewModifier {
 
     let transition: AnyTransition
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ReduceMotion private var reduceMotion
 
     func body(content: Content) -> some View {
         content.transition(reduceMotion ? .opacity : transition)
