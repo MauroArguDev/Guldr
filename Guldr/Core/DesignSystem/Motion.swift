@@ -86,6 +86,35 @@ struct ReduceMotion: DynamicProperty {
 extension EnvironmentValues {
     /// Set by the design system gallery to preview Reduce Motion without changing the device setting.
     @Entry var simulatesReduceMotion = false
+    /// Changing it replays every `Entrance` below it (the design system gallery's "Replay").
+    @Entry var entranceReplay = 0
+}
+
+/// Runs an entrance: `content` first renders with `revealed == false`, then with `true` once it
+/// appears; the content animates that change with `.motion(.reveal, value:)`.
+///
+/// When `entranceReplay` changes, only this content is recreated, so it starts over from `false`.
+/// Resetting a flag and setting it again would land in the same frame and never show the empty state.
+/// The content must sit in a fixed-size frame (a bar's height, a ring's frame), so recreating it never
+/// changes the layout around it.
+struct Entrance<Content: View>: View {
+
+    @ViewBuilder let content: (_ revealed: Bool) -> Content
+    @Environment(\.entranceReplay) private var replay
+
+    var body: some View {
+        EntranceInstance(content: content).id(replay)
+    }
+}
+
+private struct EntranceInstance<Content: View>: View {
+
+    let content: (Bool) -> Content
+    @State private var revealed = false
+
+    var body: some View {
+        content(revealed).onAppear { revealed = true }
+    }
 }
 
 /// The haptics from DESIGN.md › Motion, for `.sensoryFeedback(_:trigger:)`. They stay on with

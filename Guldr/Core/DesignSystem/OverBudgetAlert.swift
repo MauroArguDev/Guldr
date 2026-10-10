@@ -18,7 +18,6 @@ struct OverBudgetAlert: View {
     let categoryName: String
     let overAmount: Money
 
-    @State private var appeared = false
     @ScaledMetric(relativeTo: .subheadline) private var textSize: CGFloat = 14
     @Environment(\.locale) private var locale
     @ReduceMotion private var reduceMotion
@@ -26,12 +25,14 @@ struct OverBudgetAlert: View {
     var body: some View {
         let amount = MoneyFormatter(locale: locale).string(from: overAmount)
         HStack(spacing: 10) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: Size.iconGlyph))
-                .foregroundStyle(Color(.negative))
-                .symbolEffect(.pulse, options: .nonRepeating, value: appeared)
-                .symbolEffectsRemoved(reduceMotion)
-                .accessibilityHidden(true)
+            Entrance { appeared in
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: Size.iconGlyph))
+                    .foregroundStyle(Color(.negative))
+                    .symbolEffect(.pulse, options: .nonRepeating, value: appeared)
+                    .symbolEffectsRemoved(reduceMotion)
+            }
+            .accessibilityHidden(true)
             Text("\(Text(categoryName).fontWeight(.semibold)) went over its limit by \(amount)")
                 .font(.system(size: textSize))
                 .foregroundStyle(Color(.textPrimary))
@@ -41,7 +42,6 @@ struct OverBudgetAlert: View {
         .padding(.horizontal, 14)
         .background(Color(.negativeSoft), in: RoundedRectangle(cornerRadius: Radius.alert, style: .continuous))
         .accessibilityElement(children: .combine)
-        .onAppear { appeared = true }
     }
 }
 

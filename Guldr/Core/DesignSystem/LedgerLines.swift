@@ -36,28 +36,29 @@ struct LedgerLines: View {
     /// Only the Dashboard does this, once per launch; elsewhere the lines are static.
     var drawsIn = false
 
-    @State private var drawn = false
     @ReduceMotion private var reduceMotion
 
     var body: some View {
         // GeometryReader measures the space the lines were given (a card, a widget), not the screen.
         GeometryReader { proxy in
-            VStack(alignment: variant == .centered ? .center : .leading, spacing: variant.gap) {
-                ForEach(Array(variant.lines.enumerated()), id: \.offset) { index, line in
-                    Rectangle()
-                        .fill(Color(.goldFill))
-                        .opacity(line.opacity)
-                        .frame(width: proxy.size.width * line.width, height: 1)
-                        .scaleEffect(x: isVisible ? 1 : 0, anchor: variant.anchor)
-                        .motion(.reveal, value: drawn,
-                                delay: Motion.staggerDelay(index: index, reduceMotion: reduceMotion))
+            Entrance { drawn in
+                VStack(alignment: variant == .centered ? .center : .leading, spacing: variant.gap) {
+                    ForEach(Array(variant.lines.enumerated()), id: \.offset) { index, line in
+                        Rectangle()
+                            .fill(Color(.goldFill))
+                            .opacity(line.opacity)
+                            .frame(width: proxy.size.width * line.width, height: 1)
+                            // Static lines are always visible; drawn-in lines wait for the entrance.
+                            .scaleEffect(x: !drawsIn || drawn ? 1 : 0, anchor: variant.anchor)
+                            .motion(.reveal, value: drawn,
+                                    delay: Motion.staggerDelay(index: index, reduceMotion: reduceMotion))
+                    }
                 }
+                .frame(width: proxy.size.width, alignment: variant == .centered ? .center : .leading)
             }
-            .frame(width: proxy.size.width, alignment: variant == .centered ? .center : .leading)
         }
         .frame(height: height)
         .accessibilityHidden(true)
-        .onAppear { drawn = true }
     }
 
     /// 1 pt per line plus the gaps between them.
@@ -66,8 +67,6 @@ struct LedgerLines: View {
         return count + (count - 1) * variant.gap
     }
 
-    /// Static lines are always visible; drawn-in lines wait for the first appearance.
-    private var isVisible: Bool { !drawsIn || drawn }
 }
 
 // MARK: - Previews
@@ -79,16 +78,16 @@ private struct LedgerLinesSpecimen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("$12,450").displayFont(.balance)
+                Text(verbatim: "$12,450").displayFont(.balance)
                 LedgerLines(variant: .leading, drawsIn: true).id(replay)
             }
             LedgerLines(variant: .centered)
             VStack(alignment: .leading, spacing: 8) {
-                Text("$12,480").displayFont(.widgetSmall)
+                Text(verbatim: "$12,480").displayFont(.widgetSmall)
                 LedgerLines(variant: .compact)
             }
             .frame(width: 140)
-            Button("Replay") { replay += 1 }
+            Button { replay += 1 } label: { Text(verbatim: "Replay") }
         }
         .foregroundStyle(Color(.textPrimary))
         .padding(Spacing.screenHorizontal)

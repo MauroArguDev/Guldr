@@ -33,22 +33,21 @@ struct ProgressBar: View {
     var height: Height = .regular
     var tone: ProgressTone = .standard
 
-    @State private var revealed = false
-
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: Radius.progressBar, style: .continuous)
-        GeometryReader { proxy in
-            shape
-                .fill(tone.fill)
-                .frame(width: proxy.size.width * (revealed ? clamped : 0))
-                .frame(maxWidth: .infinity, alignment: .leading)
+        Entrance { revealed in
+            GeometryReader { proxy in
+                shape
+                    .fill(tone.fill)
+                    .frame(width: proxy.size.width * (revealed ? clamped : 0))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .motion(.reveal, value: revealed)
+            .motion(.standard, value: clamped)
         }
         .frame(height: height.points)
         .background(Color(.track), in: shape)
         .clipShape(shape)
-        .motion(.reveal, value: revealed)
-        .motion(.standard, value: clamped)
-        .onAppear { revealed = true }
         .accessibilityElement()
         .accessibilityValue(Text(value, format: .percent.precision(.fractionLength(0))))
     }
@@ -76,23 +75,22 @@ struct RingShape: View {
     let lineWidth: CGFloat
     var tone: ProgressTone = .standard
 
-    @State private var revealed = false
-
     var body: some View {
         let inset = lineWidth / 2
         ZStack {
             Circle()
                 .inset(by: inset)
                 .stroke(Color(.track), lineWidth: lineWidth)
-            Circle()
-                .inset(by: inset)
-                .trim(from: 0, to: revealed ? clamped : 0)
-                .stroke(tone.fill, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                .rotationEffect(.degrees(-90))
+            Entrance { revealed in
+                Circle()
+                    .inset(by: inset)
+                    .trim(from: 0, to: revealed ? clamped : 0)
+                    .stroke(tone.fill, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .motion(.reveal, value: revealed)
+                    .motion(.standard, value: clamped)
+            }
         }
-        .motion(.reveal, value: revealed)
-        .motion(.standard, value: clamped)
-        .onAppear { revealed = true }
         .accessibilityElement()
         .accessibilityValue(Text(value, format: .percent.precision(.fractionLength(0))))
     }
@@ -119,8 +117,8 @@ private struct ProgressSpecimen: View {
             }
             .id(replay)
             HStack {
-                Button("Change") { value = value > 0.5 ? 0.3 : 0.71 }
-                Button("Replay") { replay += 1 }
+                Button { value = value > 0.5 ? 0.3 : 0.71 } label: { Text(verbatim: "Change") }
+                Button { replay += 1 } label: { Text(verbatim: "Replay") }
             }
         }
         .padding(Spacing.screenHorizontal)
