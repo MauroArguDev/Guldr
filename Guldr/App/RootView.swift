@@ -9,8 +9,8 @@ import SwiftUI
 
 /// The app shell: the native iOS 26 tab bar with one `NavigationStack` per tab.
 ///
-/// The Add button is a tab with the `.search` role, which iOS 26 draws as a separate circle next to the
-/// tab bar, where DESIGN.md › Components places it. Selecting it never switches tabs: the selection
+/// The Add button is a tab that the system draws as a separate circle next to the tab bar, where
+/// DESIGN.md › Components places it (see `addTabRole`). Selecting it never switches tabs: the selection
 /// binding routes through `AppRouter.select(_:)`, which opens the add sheet instead.
 struct RootView: View {
 
@@ -38,7 +38,7 @@ struct RootView: View {
             } label: {
                 label(for: .analytics)
             }
-            Tab(value: AppTab.add, role: .search) {
+            Tab(value: AppTab.add, role: Self.addTabRole) {
                 // Never shown: selecting this tab opens the sheet instead.
                 Color(.appBackground)
             } label: {
@@ -57,6 +57,18 @@ struct RootView: View {
             router.open(url)
         }
         .environment(router)
+    }
+
+    /// iOS 27 adds `.prominent`, the role meant for a primary action beside the tab bar; from iOS 27 on,
+    /// only that role is drawn separately (a `.search` tab moves into the bar). iOS 26 draws `.search`
+    /// separately. The compiler check lets Xcode 26 (CI) build without the iOS 27 SDK.
+    private static var addTabRole: TabRole {
+        #if compiler(>=6.4)
+        if #available(iOS 27, *) {
+            return .prominent
+        }
+        #endif
+        return .search
     }
 
     private var tabSelection: Binding<AppTab> {
