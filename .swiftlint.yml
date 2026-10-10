@@ -18,3 +18,22 @@ line_length:
   error: 200
 identifier_name:
   excluded: [id, x, y]
+custom_rules:
+  # DESIGN.md › Motion: every animation and haptic goes through Motion.swift, which handles
+  # Reduce Motion. Motion.swift itself and the domain package are exempt.
+  raw_animation:
+    name: "Animation outside Motion"
+    regex: '(\bwithAnimation\b|\.animation\s*\()'
+    excluded:
+      - ".*/Packages/.*"
+      - ".*/Core/DesignSystem/Motion\\.swift"
+    message: "Animate through Motion (withMotion(_:_:) or .motion(_:value:)) so Reduce Motion is handled. See DESIGN.md › Motion."
+    severity: warning
+  raw_haptic:
+    name: "Haptic outside Haptics"
+    regex: '\.sensoryFeedback\s*\(\s*\.'
+    excluded:
+      - ".*/Packages/.*"
+      - ".*/Core/DesignSystem/Motion\\.swift"
+    message: "Use a Haptics token (.sensoryFeedback(Haptics.saved, trigger:)). See DESIGN.md › Motion."
+    severity: warning
