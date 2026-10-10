@@ -36,6 +36,7 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 | `AppBackground` | `#F7F4EE` | `#111111` | Screen background |
 | `Surface` | `#FFFFFF` | `#1B1A18` | Cards, circular buttons |
 | `SurfaceSecondary` | `#EFEAE0` | `#242220` | Icon chips, search field, segmented track |
+| `Field` | `#FFFFFF` | `#242220` | Unselected category chips and the add sheet's field group |
 | `TextPrimary` | `#141312` | `#F2EEE6` | Primary text, amounts |
 | `TextSecondary` | `#6B665E` | `#9C968C` | Metadata, captions, inactive tabs |
 | `Hairline` | `#E3DDD1` | `#2C2A27` | 1 pt card borders and separators |

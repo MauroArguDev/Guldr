@@ -6,6 +6,7 @@
 //
 
 #if DEBUG
+import Foundation
 import GuldrCore
 
 extension Money {
@@ -13,6 +14,13 @@ extension Money {
     static func previewUSD(_ cents: Int64) -> Money {
         // swiftlint:disable:next force_try
         try! Money(minorUnits: cents, currencyCode: "USD") // Valid code, debug-only previews.
+    }
+}
+
+extension BudgetStatus.Line {
+    /// Previews only: a USD budget line with `spent` of `limit` cents.
+    static func preview(_ spent: Int64, of limit: Int64) -> BudgetStatus.Line {
+        BudgetStatus.Line(budgetID: UUID(), categoryID: UUID(), spent: .previewUSD(spent), limit: .previewUSD(limit))
     }
 }
 #endif

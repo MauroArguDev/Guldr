@@ -22,6 +22,13 @@ public struct BudgetStatus: Equatable, Sendable {
 
         public var id: UUID { budgetID }
 
+        public init(budgetID: UUID, categoryID: UUID, spent: Money, limit: Money) {
+            self.budgetID = budgetID
+            self.categoryID = categoryID
+            self.spent = spent
+            self.limit = limit
+        }
+
         /// `spent / limit`; above 1 when over budget. A zero limit counts as fully used once anything
         /// is spent.
         public var usage: Double { BudgetStatus.usage(spent: spent.minorUnits, limit: limit.minorUnits) }
