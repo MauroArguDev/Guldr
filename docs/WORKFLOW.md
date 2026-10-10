@@ -17,6 +17,8 @@ The hooks in `.githooks/` reject commits on `main` and pushes to `main`. They ar
 
 Everything in the repository is written in English: code, identifiers, comments, documentation, ADRs, commit messages, pull requests, error and alert strings, and logs. User-facing text is written in English in code and translated to Spanish in the String Catalog; no other file contains Spanish.
 
+Text in previews, the design system gallery and other debug-only code uses `Text(verbatim:)` (and `Button { … } label: { Text(verbatim: …) }`). A plain string literal is a localization key, so Xcode would add it to the String Catalog and it would wait for a translation that never ships.
+
 When checking a change for Spanish, scan for common Spanish words (`de`, `para`, `tu`, `mes`…) as well as accented characters: Spanish without accents is easy to miss.
 
 ## Branches

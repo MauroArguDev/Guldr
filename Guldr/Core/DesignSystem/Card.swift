@@ -66,24 +66,24 @@ private struct CardSpecimen: View {
     var body: some View {
         VStack(spacing: Spacing.stackDefault) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Hero").textRole(.cardTitle)
-                Text("Balance and budget ring cards").textRole(.meta).foregroundStyle(Color(.textSecondary))
+                Text(verbatim: "Hero").textRole(.cardTitle)
+                Text(verbatim: "Balance and budget ring cards").textRole(.meta).foregroundStyle(Color(.textSecondary))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Spacing.cardPadding)
             .card(.hero)
 
-            Text("Standard").textRole(.cardTitle)
+            Text(verbatim: "Standard").textRole(.cardTitle)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Spacing.cardPaddingCompact)
                 .card(.standard)
 
             HStack(spacing: 12) {
-                Text("Compact").textRole(.cardTitle)
+                Text(verbatim: "Compact").textRole(.cardTitle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(Spacing.cardPaddingCompact)
                     .card(.compact)
-                Text("Compact").textRole(.cardTitle)
+                Text(verbatim: "Compact").textRole(.cardTitle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(Spacing.cardPaddingCompact)
                     .card(.compact)

@@ -109,23 +109,23 @@ private struct TypographySpecimen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.stackDefault) {
-                Text("September budget").textRole(.overline).foregroundStyle(Color(.textSecondary))
+                Text(verbatim: "September budget").textRole(.overline).foregroundStyle(Color(.textSecondary))
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
-                    Text("$12,450").displayFont(.balance)
-                    Text(".80").displayFont(.balanceCents).foregroundStyle(Color(.textSecondary))
+                    Text(verbatim: "$12,450").displayFont(.balance)
+                    Text(verbatim: ".80").displayFont(.balanceCents).foregroundStyle(Color(.textSecondary))
                 }
-                Text("$42.80").displayFont(.addAmount)
-                Text("$587").displayFont(.budgetRingCenter)
-                Text("Transactions").textRole(.largeTitle)
-                Text("Recent").textRole(.sectionTitle)
-                Text("$5,000.00").textRole(.summaryValue)
+                Text(verbatim: "$42.80").displayFont(.addAmount)
+                Text(verbatim: "$587").displayFont(.budgetRingCenter)
+                Text(verbatim: "Transactions").textRole(.largeTitle)
+                Text(verbatim: "Recent").textRole(.sectionTitle)
+                Text(verbatim: "$5,000.00").textRole(.summaryValue)
                 HStack {
-                    Text("Groceries").textRole(.rowTitle)
+                    Text(verbatim: "Groceries").textRole(.rowTitle)
                     Spacer()
-                    Text("−$42.80").textRole(.rowAmount)
+                    Text(verbatim: "−$42.80").textRole(.rowAmount)
                 }
-                Text("September budget").textRole(.cardTitle)
-                Text("Food · Today").textRole(.meta).foregroundStyle(Color(.textSecondary))
+                Text(verbatim: "September budget").textRole(.cardTitle)
+                Text(verbatim: "Food · Today").textRole(.meta).foregroundStyle(Color(.textSecondary))
             }
             .foregroundStyle(Color(.textPrimary))
             .padding(.horizontal, Spacing.screenHorizontal)
