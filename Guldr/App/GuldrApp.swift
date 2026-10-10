@@ -17,7 +17,7 @@ struct GuldrApp: App {
         WindowGroup {
             switch loader.state {
             case .ready(let container):
-                ContentView()
+                RootView()
                     .modelContainer(container)
             case .failed(let error):
                 StoreErrorView(error: error, retry: loader.retry)
