@@ -59,13 +59,10 @@ The app target uses a synchronized folder: every file under `Guldr/` belongs to 
 
 ```
 Guldr/
-├── App/                 Entry point (GuldrApp) and the root view
+├── App/                 Entry point, store loading and its error screen, app-wide services
 ├── Core/
 │   ├── DesignSystem/    Typography, spacing and reusable components built on GuldrColors
 │   └── Extensions/      Small, generic extensions (formatting, dates)
-├── Data/
-│   ├── Models/          SwiftData @Model types
-│   └── Persistence/     ModelContainer setup in the App Group, typed errors
 ├── Features/
 │   ├── Dashboard/       One folder per feature: views, view model, components
 │   ├── Transactions/
@@ -77,12 +74,18 @@ Guldr/
 └── Guldr.entitlements   Stays at the root: referenced by CODE_SIGN_ENTITLEMENTS
 GuldrWidget/             Widget extension sources and its Info.plist
 GuldrTests/              App-hosted tests (only what needs the app bundle)
-Packages/GuldrCore/      Domain package: Sources/GuldrCore and Tests/GuldrCoreTests
+Packages/GuldrCore/      Domain package (ADR 006)
+├── Sources/GuldrCore/
+│   ├── Money/           Money, currencies, keypad input, formatting
+│   ├── Dates/           YearMonth, day labels
+│   ├── Models/          SchemaV1, the @Model types, default categories and their seeder
+│   └── Persistence/     PersistenceController, PersistenceError, PreviewData
+└── Tests/GuldrCoreTests/ Mirrors Sources
 Config/                  xcconfig files
 docs/                    Design, decisions, workflow, roadmap and setup runbook
 ```
 
-Present today: `App/`, `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built.
+Present today: `App/`, `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built. Models and persistence live in `GuldrCore`, not in the app target, so the widget and `swift test` share them.
 
 ## Layers
 
@@ -92,11 +95,19 @@ SwiftUI only. Views render state and forward user intent; they hold no business 
 ### View models
 One `@Observable` final class per screen, owned by the view with `@State`. They expose display-ready values and actions, and depend on the data layer through protocols so they can be tested with in-memory stores or fakes. Main-actor isolated by default.
 
-### Data — **Planned**
-SwiftData models (`Transaction`, `Category`, `Budget`) that stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships, a default value for every property, and a `currencyCode` on every transaction. A single `ModelContainer` lives in the App Group container and is created without `fatalError`; failures surface as typed errors. The decisions get their own ADRs in the data layer phase.
+### Data
+Everything about the store lives in `GuldrCore` ([ADR 007](decisions/007-persistence-and-widget-data.md)).
 
-### Widget — **Planned**
-The widget opens the same store read-only through the App Group and builds its timeline from it. The app asks WidgetKit to reload timelines after changes that affect what the widget shows.
+- **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`) with a `GuldrMigrationPlan` that is empty until the first change. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
+- **Container:** `PersistenceController(mode:)` opens `<App Group>/Library/Application Support/Guldr.store` read-write for the app (`.app`), read-only for the widget (`.widget`), or in memory for tests and previews (`.inMemory`). CloudKit is off (`cloudKitDatabase: .none`). The app and in-memory modes seed the default categories on every open; seeding matches `systemKey`s, so it never duplicates.
+- **Errors:** opening throws `PersistenceError`: `appGroupUnavailable`, `storeCreationFailed(underlying:)`, or `storeNotFound` (widget only, before the app's first launch). In the app, `AppDataLoader` turns the result into the app or `StoreErrorView`, a calm screen with a retry and a prefilled support mail. There is no `fatalError` and no silent fallback to an empty store.
+- **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: widget timelines, and budget notifications from Phase 25.
+- **Previews:** `PreviewData.makeController()` returns an in-memory store with April–September 2026 that reproduces the mockups' numbers, with "now" fixed at `PreviewData.referenceDate` (Sept 28, 9:41).
+
+Names: outside `GuldrCore`, `Transaction` collides with SwiftUI's and `Category` with the Objective-C runtime typedef re-exported by Foundation. Client modules declare module-level aliases (`typealias Category = GuldrCore.Category`), which win over imported names.
+
+### Widget — **Planned** (UI in Phase 24)
+The plumbing exists: `WidgetStore.open()` calls `PersistenceController.widgetAccess(infoDictionary:)` with the extension's own Info.plist and gets `.ready(container)`, `.noDataYet` or `.unavailable(error)`. The widget shows its empty state for the last two and never writes; SwiftData rejects a save on the read-only store. Timelines will be built with the same `GuldrCore` calculations as the app.
 
 ## Concurrency
 
@@ -104,4 +115,4 @@ In the app and the widget, code is main-actor isolated unless it opts out. `Guld
 
 ## Testing and CI
 
-Tests use Swift Testing and in-memory SwiftData containers. Domain tests live in `GuldrCore` and run with `swift test` on macOS (`core-tests` CI job, no simulator, plus strict SwiftLint). The few app-hosted tests run on a pre-booted simulator (`test` job). Both jobs are required and fail if no test ran. Details in [WORKFLOW.md](WORKFLOW.md#testing) and [WORKFLOW.md](WORKFLOW.md#continuous-integration).
+Tests use Swift Testing and in-memory SwiftData containers; persistence tests use a temporary folder as the App Group. Domain tests live in `GuldrCore` and run with `swift test` on macOS (`core-tests` CI job, no simulator, plus strict SwiftLint). The few app-hosted tests run on a pre-booted simulator (`test` job). Both jobs are required and fail if no test ran. Details in [WORKFLOW.md](WORKFLOW.md#testing) and [WORKFLOW.md](WORKFLOW.md#continuous-integration).
