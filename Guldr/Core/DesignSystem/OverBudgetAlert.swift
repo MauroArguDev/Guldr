@@ -21,7 +21,7 @@ struct OverBudgetAlert: View {
     @State private var appeared = false
     @ScaledMetric(relativeTo: .subheadline) private var textSize: CGFloat = 14
     @Environment(\.locale) private var locale
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ReduceMotion private var reduceMotion
 
     var body: some View {
         let amount = MoneyFormatter(locale: locale).string(from: overAmount)
