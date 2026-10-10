@@ -23,6 +23,15 @@ public struct MoneyFormatter: Sendable {
         case never
     }
 
+    /// How many decimals are shown.
+    public enum Precision: Sendable {
+        /// Every minor unit: "$1,759.50". Rows, forms, anything the user reconciles.
+        case full
+        /// Rounded to whole units, halves away from zero: "$1,760". Large summary figures where cents
+        /// are noise: the budget ring, chart totals, the donut center, widgets.
+        case wholeUnits
+    }
+
     /// A formatted amount split around the decimal separator, for the serif balance where cents are smaller.
     public struct Parts: Equatable, Sendable {
         /// Sign, symbol and integer part, e.g. "$12,450" or "−12.450".
@@ -39,14 +48,17 @@ public struct MoneyFormatter: Sendable {
         self.locale = locale
     }
 
-    /// The full amount, e.g. "$1,234.50", "+$5,000.00", "−$42.80", "12.345,67 €".
-    public func string(from money: Money, sign: SignDisplay = .automatic) -> String {
-        signPrefix(for: money, sign: sign) + formattedMagnitude(of: money)
+    /// The amount, e.g. "$1,234.50", "+$5,000.00", "−$42.80", "12.345,67 €", or "$1,235" in whole units.
+    public func string(from money: Money, sign: SignDisplay = .automatic, precision: Precision = .full) -> String {
+        let magnitude = formattedMagnitude(of: money, precision: precision)
+        // An amount that rounds to zero shows no sign: "$0", never "−$0".
+        let showsZero = precision == .wholeUnits && wholeUnits(of: money) == 0
+        return (showsZero ? "" : signPrefix(for: money, sign: sign)) + magnitude
     }
 
     /// The amount split for the large balance: main "$12,450" and fraction ".80".
     public func parts(from money: Money, sign: SignDisplay = .automatic) -> Parts {
-        let magnitude = formattedMagnitude(of: money)
+        let magnitude = formattedMagnitude(of: money, precision: .full)
         let prefix = signPrefix(for: money, sign: sign)
         let digits = (try? Currency.minorUnitDigits(for: money.currencyCode)) ?? 2
         guard digits > 0,
@@ -72,13 +84,25 @@ public struct MoneyFormatter: Sendable {
     }
 
     /// Formats the absolute value; the sign is added separately so every locale uses the same signs.
-    private func formattedMagnitude(of money: Money) -> String {
+    private func formattedMagnitude(of money: Money, precision: Precision) -> String {
         let digits = (try? Currency.minorUnitDigits(for: money.currencyCode)) ?? 2
         let magnitude = Decimal(sign: .plus, exponent: -digits, significand: Decimal(money.minorUnits.magnitude))
-        return magnitude.formatted(
-            .currency(code: money.currencyCode)
-                .locale(locale)
-                .precision(.fractionLength(digits))
-        )
+        let style = Decimal.FormatStyle.Currency(code: money.currencyCode).locale(locale)
+        switch precision {
+        case .full:
+            return magnitude.formatted(style.precision(.fractionLength(digits)))
+        case .wholeUnits:
+            // The default rounding is half-to-even ($12,874.50 → $12,874); money reads half-up.
+            return magnitude.formatted(style.precision(.fractionLength(0)).rounded(rule: .toNearestOrAwayFromZero))
+        }
+    }
+
+    /// The magnitude rounded to whole units, halves away from zero.
+    private func wholeUnits(of money: Money) -> Decimal {
+        let digits = (try? Currency.minorUnitDigits(for: money.currencyCode)) ?? 2
+        var value = Decimal(sign: .plus, exponent: -digits, significand: Decimal(money.minorUnits.magnitude))
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &value, 0, .plain)
+        return rounded
     }
 }
