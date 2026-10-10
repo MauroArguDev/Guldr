@@ -53,7 +53,7 @@ struct CategorySeederTests {
 
     @Test func onlyMissingDefaultsAreInserted() throws {
         let context = try makeInMemoryContext()
-        context.insert(Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense, systemKey: "food"))
+        context.insert(Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense, systemKey: "food"))
         context.insert(Category(name: "Pets", symbolName: "pawprint", color: .olive, kind: .expense))
         try context.save()
 
@@ -68,7 +68,7 @@ struct CategorySeederTests {
     }
 
     @Test func customCategoriesNeverUseTheDefaultName() {
-        let custom = Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense)
+        let custom = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense)
         #expect(!custom.usesDefaultName)
     }
 

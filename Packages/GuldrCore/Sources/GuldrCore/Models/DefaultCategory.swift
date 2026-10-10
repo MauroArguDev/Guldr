@@ -17,27 +17,27 @@ public struct DefaultCategory: Equatable, Sendable {
     public let kind: TransactionKind
 
     public static let all: [DefaultCategory] = [
-        DefaultCategory(systemKey: "food", name: "Food", symbolName: "fork.knife", color: .amber,
+        DefaultCategory(systemKey: "food", name: "Food", symbolName: "fork.knife", color: .terracotta,
                         kind: .expense),
-        DefaultCategory(systemKey: "transport", name: "Transport", symbolName: "car", color: .slate,
+        DefaultCategory(systemKey: "transport", name: "Transport", symbolName: "car", color: .sky,
                         kind: .expense),
         DefaultCategory(systemKey: "housing", name: "Housing", symbolName: "house", color: .gold,
                         kind: .expense),
-        DefaultCategory(systemKey: "health", name: "Health", symbolName: "heart", color: .rose,
+        DefaultCategory(systemKey: "health", name: "Health", symbolName: "heart", color: .green,
                         kind: .expense),
         DefaultCategory(systemKey: "shopping", name: "Shopping", symbolName: "bag", color: .plum,
                         kind: .expense),
-        DefaultCategory(systemKey: "entertainment", name: "Entertainment", symbolName: "play", color: .terracotta,
+        DefaultCategory(systemKey: "entertainment", name: "Entertainment", symbolName: "play", color: .wine,
                         kind: .expense),
-        DefaultCategory(systemKey: "education", name: "Education", symbolName: "book", color: .teal,
+        DefaultCategory(systemKey: "education", name: "Education", symbolName: "book", color: .indigo,
                         kind: .expense),
         DefaultCategory(systemKey: "other_expense", name: "Other", symbolName: "ellipsis.circle", color: .graphite,
                         kind: .expense),
         DefaultCategory(systemKey: "salary", name: "Salary", symbolName: "briefcase", color: .gold,
                         kind: .income),
-        DefaultCategory(systemKey: "freelance", name: "Freelance", symbolName: "laptopcomputer", color: .olive,
+        DefaultCategory(systemKey: "freelance", name: "Freelance", symbolName: "laptopcomputer", color: .teal,
                         kind: .income),
-        DefaultCategory(systemKey: "other_income", name: "Other income", symbolName: "banknote", color: .teal,
+        DefaultCategory(systemKey: "other_income", name: "Other income", symbolName: "banknote", color: .olive,
                         kind: .income)
     ]
 

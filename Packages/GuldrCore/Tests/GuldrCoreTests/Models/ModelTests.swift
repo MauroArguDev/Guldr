@@ -38,10 +38,18 @@ struct ModelTests {
         transaction.kind = .expense
         #expect(transaction.kindRawValue == "expense")
 
-        let category = Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense)
-        #expect(category.colorKey == "amber")
+        let category = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense)
+        #expect(category.colorKey == "terracotta")
         category.color = .teal
         #expect(category.colorKey == "teal")
+    }
+
+    @Test func paletteKeysAreStable() {
+        // Raw values are stored; renaming one would silently turn existing categories graphite.
+        #expect(CategoryColor.allCases.map(\.rawValue) == [
+            "gold", "amber", "terracotta", "wine", "rose", "plum", "indigo",
+            "blue", "sky", "teal", "green", "olive", "graphite"
+        ])
     }
 
     @Test func unknownRawValuesFallBack() throws {
@@ -79,7 +87,7 @@ struct ModelTests {
 
     @Test func relationshipsHaveInverses() throws {
         let context = try makeInMemoryContext()
-        let food = Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense)
+        let food = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense)
         let transaction = Transaction(amount: try usd(4280), kind: .expense, category: food)
         let budget = Budget(month: try #require(YearMonth(year: 2026, month: 10)), limit: try usd(40_000), category: food)
         context.insert(transaction)
@@ -92,7 +100,7 @@ struct ModelTests {
 
     @Test func deletingACategoryKeepsTransactionsAndDeletesBudgets() throws {
         let context = try makeInMemoryContext()
-        let food = Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense)
+        let food = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense)
         let transaction = Transaction(amount: try usd(4280), kind: .expense, category: food)
         context.insert(transaction)
         context.insert(Budget(month: try #require(YearMonth(year: 2026, month: 10)), limit: try usd(40_000), category: food))
@@ -108,7 +116,7 @@ struct ModelTests {
 
     @Test func deletingATransactionKeepsItsCategory() throws {
         let context = try makeInMemoryContext()
-        let food = Category(name: "Food", symbolName: "fork.knife", color: .amber, kind: .expense)
+        let food = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense)
         let transaction = Transaction(amount: try usd(4280), kind: .expense, category: food)
         context.insert(transaction)
         try context.save()
