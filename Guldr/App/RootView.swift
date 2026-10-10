@@ -11,11 +11,10 @@ import SwiftUI
 ///
 /// The Add button is a tab with the `.search` role, which iOS 26 draws as a separate circle next to the
 /// tab bar, where DESIGN.md › Components places it. Selecting it never switches tabs: the selection
-/// binding swallows `.add` and opens the add sheet, so the user stays where they were.
+/// binding routes through `AppRouter.select(_:)`, which opens the add sheet instead.
 struct RootView: View {
 
-    @State private var selectedTab: AppTab = .home
-    @State private var isAddPresented = false
+    @State private var router = AppRouter()
 
     var body: some View {
         TabView(selection: tabSelection) {
@@ -51,26 +50,20 @@ struct RootView: View {
             }
         }
         .tint(Color(.gold))
-        .sheet(isPresented: $isAddPresented) {
-            // Placeholder until the add sheet (v1 plan, Phase 17).
-            NavigationStack {
-                Color(.appBackground)
-                    .ignoresSafeArea()
-                    .navigationTitle(Text(AppTab.add.title))
-                    .navigationBarTitleDisplayMode(.inline)
-            }
+        .sheet(item: $router.sheet) { sheet in
+            SheetPlaceholder(sheet: sheet)
         }
+        .onOpenURL { url in
+            router.open(url)
+        }
+        .environment(router)
     }
 
     private var tabSelection: Binding<AppTab> {
         Binding {
-            selectedTab
+            router.selectedTab
         } set: { newValue in
-            if newValue == .add {
-                isAddPresented = true
-            } else {
-                selectedTab = newValue
-            }
+            router.select(newValue)
         }
     }
 
@@ -88,6 +81,30 @@ struct RootView: View {
             Text(tab.title)
         } icon: {
             Image(systemName: tab.symbol)
+        }
+    }
+}
+
+/// Stands in for the real sheets until their phases build them (add and edit transaction in Phase 17,
+/// edit budget in Phase 20).
+private struct SheetPlaceholder: View {
+
+    let sheet: AppSheet
+
+    var body: some View {
+        NavigationStack {
+            Color(.appBackground)
+                .ignoresSafeArea()
+                .navigationTitle(Text(verbatim: title))
+                .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private var title: String {
+        switch sheet {
+        case .addTransaction: "Add transaction"
+        case .editTransaction: "Edit transaction"
+        case .editBudget: "Edit budget"
         }
     }
 }
