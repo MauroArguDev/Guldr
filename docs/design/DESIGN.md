@@ -104,6 +104,66 @@ Three 1 pt horizontal lines in `GoldFill`, 5 pt apart, widths 100% / 78% / 56% w
 - Screen padding 20 pt horizontal; vertical stack spacing 16 pt (home) / 10–12 pt (lists); card padding 22 pt (18 compact); row vertical padding 8 pt, row gap 12 pt.
 - Icon chip 42×42 (40 in lists, 38 in budget) with a 20 pt stroke icon (1.6 pt line). Use SF Symbols in code; the mockup icons are stand-ins for their closest SF Symbol.
 
+## Motion
+
+Implemented in `Guldr/Core/DesignSystem/Motion.swift`; every animation and haptic in the app goes through it.
+
+### Principles
+
+1. **Motion explains a change of state.** Something was saved, a value updated, a limit was crossed. It is never decoration and never loops.
+2. **Native springs only.** SwiftUI's `.smooth`, `.snappy` and `.spring` curves; no custom easing or keyframe choreography.
+3. **Short and calm,** like the voice. Nothing longer than 0.6 s; nothing that bounces more than a hint.
+4. **The system's transitions stay the system's.** Sheets, navigation pushes, tab switches and the keyboard are never replaced or restyled.
+
+### Tokens
+
+| Token | SwiftUI | Use |
+|---|---|---|
+| `standard` | `.smooth(duration: 0.35)` | Layout and value changes: a row appears, a total updates, a filter applies |
+| `snappy` | `.snappy(duration: 0.25)` | Direct manipulation: category chips, keypad keys, segmented controls, toggles |
+| `emphasized` | `.spring(duration: 0.45, bounce: 0.15)` | Success moments only: a transaction saved, a budget created |
+| `reveal` | `.smooth(duration: 0.6)` | First appearance of fills: progress bars, rings, the ledger lines drawing in |
+| `stagger` | 0.04 s per item, 0.25 s total at most | Entrance of list rows and chart marks; items past the cap appear together |
+
+### Patterns
+
+| Element | Behavior | Token |
+|---|---|---|
+| Amounts (balance, totals, ring center) | `.contentTransition(.numericText(value:))`: digits roll to the new value | `standard` |
+| Progress bars, mini rings, budget ring | Fill from 0 on first appearance; later changes animate from the current value | `reveal`, then `standard` |
+| Ledger lines | Draw in left to right, once per launch on the Dashboard; static elsewhere | `reveal` + `stagger` |
+| Charts | Marks grow on first appearance and morph on period change | `standard` + `stagger` |
+| Category chip | Selection fill and border | `snappy` |
+| Save | The saved row appears in place; the checkmark bounces (`.symbolEffect(.bounce)`) | `emphasized` |
+| Over-budget alert | Slides in with the list; its warning symbol pulses once (`.symbolEffect(.pulse)`) | `standard` |
+| Sheets, navigation, tabs | Native transitions, untouched | — |
+
+### Haptics
+
+Through `.sensoryFeedback`, tied to the state change, never to a timer.
+
+| Event | Feedback |
+|---|---|
+| Category chip or segmented control changes | `.selection` |
+| Keypad key | `.impact(weight: .light)` |
+| Transaction or budget saved | `.success` |
+| A save pushes a budget over its limit | `.warning` |
+| Face ID unlock fails | `.error` |
+
+### Reduce Motion
+
+When `accessibilityReduceMotion` is on:
+
+| Element | Behavior |
+|---|---|
+| Fills (bars, rings, ledger lines) | Appear at their final value, no fill animation |
+| Layout and list changes | Opacity cross-fade (`.easeInOut(duration: 0.2)`) instead of movement |
+| Stagger | Off: everything appears together |
+| Chart marks | Appear at their final value |
+| Symbol effects | Off (the pulse and the bounce) |
+| Numeric text transitions | Kept: they do not move content around the screen |
+| Haptics | Kept |
+
 ## Components
 
 - **BalanceCard**: `Surface`, radius 28, border `Hairline`, padding 22. Label, serif balance, ledger lines, 2-column income/expense with arrow icons (`Positive`/`Negative`), divider, savings rate (13 pt label, % in `Gold`, 6 pt bar `GoldFill` on `Track`).
