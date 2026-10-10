@@ -7,21 +7,34 @@
 
 import SwiftUI
 
-/// The Budget tab's root. Placeholder until its phase builds the screen.
+/// The Budget tab's root. Until the budget screen (v1 plan, Phase 20) is built, it shows the empty state
+/// a new user sees.
 struct BudgetView: View {
+
+    @Environment(AppRouter.self) private var router
+
     var body: some View {
         NavigationStack {
-            Color(.appBackground)
-                .ignoresSafeArea()
-                .navigationTitle(Text(AppTab.budget.title))
+            EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
+                           message: "Set a monthly limit for a category to see what is left to spend.",
+                           actionTitle: "Set a budget") {
+                router.present(.editBudget)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.appBackground))
+            .navigationTitle(Text(AppTab.budget.title))
         }
     }
 }
 
 #Preview("Light") {
-    BudgetView().preferredColorScheme(.light)
+    BudgetView()
+        .environment(AppRouter())
+        .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    BudgetView().preferredColorScheme(.dark)
+    BudgetView()
+        .environment(AppRouter())
+        .preferredColorScheme(.dark)
 }
