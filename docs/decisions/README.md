@@ -22,3 +22,4 @@ Each file records one decision that shapes the project: the context, what was ch
 | [007](007-persistence-and-widget-data.md) | One SwiftData store in the App Group, read-only for the widget | Accepted |
 | [008](008-categories-and-month-keys.md) | Categories with SF Symbols and color tokens; year-month keys | Accepted; colors superseded by 009 |
 | [009](009-category-color-palette.md) | Category colors from a curated palette, gradient donut slices | Accepted |
+| [010](010-app-settings-storage.md) | App settings in the App Group's UserDefaults | Accepted |
