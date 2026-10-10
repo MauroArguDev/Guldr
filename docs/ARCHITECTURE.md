@@ -59,7 +59,7 @@ The app target uses a synchronized folder: every file under `Guldr/` belongs to 
 
 ```
 Guldr/
-├── App/                 Entry point, store loading and its error screen, app-wide services
+├── App/                 Entry point, store and settings loading, first-launch gate, tab bar, router, app-wide services
 ├── Core/
 │   ├── DesignSystem/    Typography, spacing and reusable components built on GuldrColors
 │   └── Extensions/      Small, generic extensions (formatting, dates)
@@ -68,6 +68,7 @@ Guldr/
 │   ├── Transactions/
 │   ├── Budget/
 │   ├── Charts/
+│   ├── Onboarding/      First launch: welcome and currency picker
 │   └── Settings/
 ├── Resources/           Asset catalogs, String Catalog, privacy manifest
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
@@ -76,22 +77,29 @@ GuldrWidget/             Widget extension sources and its Info.plist
 GuldrTests/              App-hosted tests (only what needs the app bundle)
 Packages/GuldrCore/      Domain package (ADR 006)
 ├── Sources/GuldrCore/
-│   ├── Money/           Money, currencies, keypad input, formatting
+│   ├── Money/           Money, currencies and the currency picker's options, keypad input, formatting
 │   ├── Dates/           YearMonth, day labels
 │   ├── Models/          SchemaV1, the @Model types, default categories and their seeder
 │   ├── Persistence/     PersistenceController, PersistenceError, PreviewData
+│   ├── Settings/        AppSettings: active currency and first-launch flag (ADR 010)
+│   ├── Navigation/      DeepLink: the guldr:// URLs shared with the widget
 │   └── Calculations/    MonthSummary, BudgetStatus, CategoryBreakdown, CashFlowSeries, TransactionQuery
 └── Tests/GuldrCoreTests/ Mirrors Sources
 Config/                  xcconfig files
 docs/                    Design, decisions, workflow, roadmap and setup runbook
 ```
 
-Present today: `App/`, `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built. Models and persistence live in `GuldrCore`, not in the app target, so the widget and `swift test` share them.
+Present today: `App/`, `Core/DesignSystem/`, `Features/` (Onboarding and a placeholder root per tab), `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built. Models and persistence live in `GuldrCore`, not in the app target, so the widget and `swift test` share them.
 
 ## Layers
 
 ### Views
 SwiftUI only. Views render state and forward user intent; they hold no business logic. Native components first (`NavigationStack`, `TabView`, sheets, segmented `Picker`), styled with the design system ([DESIGN.md](design/DESIGN.md)). Every view has light and dark previews. Reusable components live in `Guldr/Core/DesignSystem/` (tokens, typography, cards, rows, rings, chips); every animation goes through `Motion` and every haptic through `Haptics`, which handle Reduce Motion (enforced by SwiftLint custom rules). Debug builds include a design system gallery for review on a device.
+
+### Navigation and first launch
+`GuldrApp` opens the store and the settings through `AppDataLoader`. `LaunchGate` shows the welcome screen until first launch is completed (currency chosen), then `RootView`: the native tab bar with Home, Transactions, Budget and Analytics, one `NavigationStack` each, and the Add button as the separated tab next to the bar (a `.search`-role tab whose selection opens the add sheet instead of switching tabs).
+
+`AppRouter` (`@Observable`, in the environment) owns the selected tab and the presented `AppSheet` (add or edit a transaction, edit a budget), so any screen can open a sheet. Deep links arrive through `.onOpenURL` and are parsed by `DeepLink` in `GuldrCore`, which the widget also uses to build them: `guldr://add` opens the add sheet over the current tab, `guldr://budget` closes any sheet and selects Budget. The `guldr` scheme is registered in `Info.plist`.
 
 ### View models
 One `@Observable` final class per screen, owned by the view with `@State`. They expose display-ready values and actions, and depend on the data layer through protocols so they can be tested with in-memory stores or fakes. Main-actor isolated by default.
@@ -102,6 +110,7 @@ Everything about the store lives in `GuldrCore` ([ADR 007](decisions/007-persist
 - **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`) with a `GuldrMigrationPlan` that is empty until the first change. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
 - **Container:** `PersistenceController(mode:)` opens `<App Group>/Library/Application Support/Guldr.store` read-write for the app (`.app`), read-only for the widget (`.widget`), or in memory for tests and previews (`.inMemory`). CloudKit is off (`cloudKitDatabase: .none`). The app and in-memory modes seed the default categories on every open; seeding matches `systemKey`s, so it never duplicates.
 - **Errors:** opening throws `PersistenceError`: `appGroupUnavailable`, `storeCreationFailed(underlying:)`, or `storeNotFound` (widget only, before the app's first launch). In the app, `AppDataLoader` turns the result into the app or `StoreErrorView`, a calm screen with a retry and a prefilled support mail. There is no `fatalError` and no silent fallback to an empty store.
+- **Settings:** the active currency and the first-launch flag live in the App Group's `UserDefaults` through `AppSettings`, so the widget reads them too ([ADR 010](decisions/010-app-settings-storage.md)). The app observes them through `Preferences`.
 - **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: widget timelines, and budget notifications from Phase 25.
 - **Previews:** `PreviewData.makeController()` returns an in-memory store with April–September 2026 that reproduces the mockups' numbers, with "now" fixed at `PreviewData.referenceDate` (Sept 28, 9:41).
 
