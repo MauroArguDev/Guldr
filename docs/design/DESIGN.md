@@ -73,7 +73,9 @@ Category colors appear only in the analytics donut and its legend; icon chips st
 
 Expenses are shown in `TextPrimary` with a leading minus (−$42.80); only income uses `Positive` (+$5,000.00). `Negative` is reserved for "over budget".
 
-Shadows: light mode cards use `0 1 2 rgba(20,19,18,.04)` + `0 10 30 rgba(20,19,18,.06)`; dark mode uses no shadow, only the `Hairline` border.
+Amounts show cents in rows, forms and the balance. Large summary figures (budget ring center, chart totals, donut center, widgets) show whole units, rounded half away from zero ($1,759.50 → $1,760), as in the mockups; `MoneyFormatter`'s `.wholeUnits` precision does this.
+
+Cards: every card has a 1 pt `Hairline` border in both modes. Elevated cards (radius 28 and 24: balance, budget ring, charts) also cast a shadow in light mode only: `0 1 2 rgba(20,19,18,.04)` + `0 10 30 rgba(20,19,18,.06)`, drawn in `TextPrimary` at those opacities. Compact cards (radius 22: income and expense summaries) have no shadow.
 
 ## Typography
 
@@ -96,7 +98,15 @@ Prefer semantic text styles with `design: .serif` / default and `@ScaledMetric` 
 
 ## Brand motif: ledger lines
 
-Three 1 pt horizontal lines in `GoldFill`, 5 pt apart, widths 100% / 78% / 56% with opacity 1.0 / 0.5 / 0.25, left-aligned. Used under the balance, above the Face ID button (centered variant: 100/70/40%, opacity .6/.35/.18) and in the small widget. Never as a full-screen texture.
+1 pt horizontal lines in `GoldFill`, as wide as their container. Never as a full-screen texture.
+
+| Variant | Where | Lines | Gap | Widths | Opacity |
+|---|---|---|---|---|---|
+| Leading | Under the balance | 3, left-aligned | 5 pt | 100 / 78 / 56 % | 1.0 / 0.5 / 0.25 |
+| Centered | Above the Face ID button | 3, centered | 5 pt | 100 / 70 / 40 % | 0.6 / 0.35 / 0.18 |
+| Compact | Small widget, under the balance | 2, left-aligned | 3 pt | 100 / 70 % | 1.0 / 0.45 |
+
+On the Dashboard the lines draw in once per launch (DESIGN.md › Motion); everywhere else they are static.
 
 ## Shape and spacing
 

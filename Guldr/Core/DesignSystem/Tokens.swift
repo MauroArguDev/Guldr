@@ -52,6 +52,8 @@ enum Size {
     /// Budget category rows.
     static let iconChipBudget: CGFloat = 38
     static let iconGlyph: CGFloat = 20
+    static let iconGlyphCompact: CGFloat = 19
+    static let iconGlyphBudget: CGFloat = 18
     static let tabBarHeight: CGFloat = 64
     static let addButton: CGFloat = 64
     static let touchTargetMin: CGFloat = 44
