@@ -180,7 +180,7 @@ When `accessibilityReduceMotion` is on:
 
 ## Components
 
-- **BalanceCard**: `Surface`, radius 28, border `Hairline`, padding 22. Label, serif balance, ledger lines, 2-column income/expense with arrow icons (`Positive`/`Negative`), divider, savings rate (13 pt label, % in `Gold`, 6 pt bar `GoldFill` on `Track`).
+- **BalanceCard**: `Surface`, radius 28, border `Hairline`, padding 22. Label, serif balance, ledger lines, 2-column income/expense with arrow icons (`Positive`/`Negative`), divider, savings rate (13 pt label, % in `Gold`, 6 pt bar `GoldFill` on `Track`). The balance is the all-time net; income, expenses and the savings rate cover the current month. A month without income shows the rate as "—" in `TextSecondary` with an empty bar; a month that spent more than it earned shows 0% (decided by the author on 2026-10-16). The card shows from the first launch, at zero.
 - **BudgetSummaryRow**: 44 pt mini ring (stroke 5, `GoldFill` on `Track`, round caps), title 15 semibold, meta 13, chevron.
 - **TransactionRow**: icon chip + title/meta + trailing amount. Income amount `Positive` with "+", expense `TextPrimary` with "−". At accessibility text sizes the amount moves under the meta and the text wraps instead of truncating.
 - **BudgetRing**: 168 pt, stroke 12, starts at 12 o'clock, center shows remaining in serif 30 + "available".
