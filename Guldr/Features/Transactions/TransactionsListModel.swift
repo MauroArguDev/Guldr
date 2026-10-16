@@ -14,8 +14,12 @@ import SwiftData
 ///
 /// The view owns the `@Query`s for transactions and categories and passes their results in, so SwiftData
 /// keeps the list and the filter menu current; this model only filters, groups and turns models into
-/// display values with `TransactionQuery`. It holds no context, so the view can create it before its
-/// environment exists. Deleting saves the given context, rolls it back on failure and throws a typed
+/// display values with `TransactionQuery`. The expensive parts, reading SwiftData properties and
+/// formatting times and day titles, happen once per data change (`update`): the values are copied into
+/// `TransactionQuery.Item`s and each row is built then. Filters and search only re-run the query on those
+/// copies and regroup the prebuilt rows, a few milliseconds for 5,000 transactions. The sections are
+/// kept, not recomputed on every render. It holds no context, so the view can create it before its environment
+/// exists. Deleting saves the given context, rolls it back on failure and throws a typed
 /// `ListError`, like the add sheet.
 @Observable
 final class TransactionsListModel {
@@ -119,23 +123,42 @@ final class TransactionsListModel {
     // MARK: - Sections
 
     /// The transactions that pass the filters, newest first, in day sections.
-    func sections(from transactions: [Transaction], currencyCode: String) -> [Section] {
-        let filtered = query.apply(to: transactions, categoryName: \.displayName)
-        let days = TransactionQuery.groupedByDay(filtered, timeZone: timeZone)
-        let labels = DayLabelFormatter(locale: locale, timeZone: timeZone)
-        let reference = now()
-        return days.map { day in
-            Section(id: day.id,
-                    title: labels.label(for: day.day, relativeTo: reference),
-                    net: net(of: day, currencyCode: currencyCode),
-                    rows: day.transactions.map(row(for:)))
-        }
-    }
+    private(set) var sections: [Section] = []
 
     /// `nil` while the list has rows.
-    func emptyState(for sections: [Section]) -> EmptyState? {
+    var emptyState: EmptyState? {
         guard sections.isEmpty else { return nil }
         return query.isFiltering ? .noResults : .noTransactions
+    }
+
+    /// Takes the latest transactions and active currency and rebuilds the sections. The view calls it when
+    /// its query's results change and after a save, since an edited transaction keeps its identity.
+    func update(transactions: [Transaction], currencyCode: String) {
+        // Seeded names are translated through the String Catalog on every read; a few categories cover
+        // thousands of rows, so each name is looked up once.
+        var names: [PersistentIdentifier: String] = [:]
+        items = transactions.map { transaction in
+            TransactionQuery.Item(transaction) { category in
+                if let cached = names[category.persistentModelID] { return cached }
+                let name = category.displayName
+                names[category.persistentModelID] = name
+                return name
+            }
+        }
+        self.currencyCode = currencyCode
+        let timeStyle = Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: timeZone)
+        let uncategorized = String(localized: "Uncategorized")
+        rows = Dictionary(items.map { item in
+            let categoryName = item.categoryName ?? uncategorized
+            return (item.id, Row(id: item.modelID,
+                                 title: item.title.isEmpty ? categoryName : item.title,
+                                 meta: categoryName + " · " + item.date.formatted(timeStyle),
+                                 symbol: item.categorySymbol ?? "questionmark",
+                                 amount: item.amount,
+                                 kind: item.kind))
+        }, uniquingKeysWith: { first, _ in first })
+        dayTitles = [:]
+        rebuild()
     }
 
     // MARK: - Delete
@@ -157,31 +180,48 @@ final class TransactionsListModel {
 
     // MARK: - Private
 
-    private var query = TransactionQuery()
+    private var query = TransactionQuery() {
+        didSet {
+            if query != oldValue { rebuild() }
+        }
+    }
     /// The selected categories with their kinds, so switching kind can drop the other kind's.
     private var selectedCategoryKinds: [UUID: TransactionKind] = [:] {
         didSet { query.categoryIDs = Set(selectedCategoryKinds.keys) }
     }
 
+    @ObservationIgnored private var items: [TransactionQuery.Item] = []
+    /// Each item's row, built once per data change and keyed by the transaction's ID.
+    @ObservationIgnored private var rows: [UUID: Row] = [:]
+    @ObservationIgnored private var dayTitles: [Date: String] = [:]
+    @ObservationIgnored private var currencyCode = ""
     @ObservationIgnored private let locale: Locale
     @ObservationIgnored private let timeZone: TimeZone
     @ObservationIgnored private let now: () -> Date
 
-    private func net(of day: TransactionQuery.DaySection, currencyCode: String) -> Money? {
-        guard day.transactions.contains(where: { $0.currencyCode == currencyCode }) else { return nil }
-        return try? day.net(currencyCode: currencyCode)
+    private func rebuild() {
+        let days = TransactionQuery.groupedByDay(query.apply(to: items), timeZone: timeZone)
+        let labels = DayLabelFormatter(locale: locale, timeZone: timeZone)
+        let reference = now()
+        sections = days.map { day in
+            Section(id: day.id,
+                    title: dayTitle(for: day.day, labels: labels, reference: reference),
+                    net: net(of: day),
+                    rows: day.items.compactMap { rows[$0.id] })
+        }
     }
 
-    private func row(for transaction: Transaction) -> Row {
-        let categoryName = transaction.category?.displayName ?? String(localized: "Uncategorized")
-        let time = transaction.date.formatted(
-            Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: timeZone)
-        )
-        return Row(id: transaction.persistentModelID,
-                   title: transaction.title.isEmpty ? categoryName : transaction.title,
-                   meta: categoryName + " · " + time,
-                   symbol: transaction.category?.symbolName ?? "questionmark",
-                   amount: transaction.amount,
-                   kind: transaction.kind)
+    /// Day titles are kept until the next data change. "Today" stays right while the app is open across
+    /// midnight only until then, which the next save or relaunch fixes.
+    private func dayTitle(for day: Date, labels: DayLabelFormatter, reference: Date) -> String {
+        if let title = dayTitles[day] { return title }
+        let title = labels.label(for: day, relativeTo: reference)
+        dayTitles[day] = title
+        return title
+    }
+
+    private func net(of day: TransactionQuery.DaySection) -> Money? {
+        guard day.items.contains(where: { $0.amount.currencyCode == currencyCode }) else { return nil }
+        return try? day.net(currencyCode: currencyCode)
     }
 }
