@@ -21,19 +21,31 @@ struct TransactionRow: View {
     /// `.regular` (42) on the Dashboard, `.compact` (40) in the Transactions list.
     var chipSize: IconChip.Size = .regular
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(spacing: Spacing.rowGap) {
+        HStack(alignment: stacks ? .top : .center, spacing: Spacing.rowGap) {
             IconChip(symbol: symbol, size: chipSize)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).textRole(.rowTitle).foregroundStyle(Color(.textPrimary)).lineLimit(1)
-                Text(meta).textRole(.meta).foregroundStyle(Color(.textSecondary)).lineLimit(1)
+                Text(title).textRole(.rowTitle).foregroundStyle(Color(.textPrimary)).lineLimit(stacks ? nil : 1)
+                Text(meta).textRole(.meta).foregroundStyle(Color(.textSecondary)).lineLimit(stacks ? nil : 1)
+                if stacks {
+                    AmountText(amount, kind: kind)
+                }
             }
-            Spacer(minLength: 8)
-            AmountText(amount, kind: kind)
+            if !stacks {
+                Spacer(minLength: 8)
+                AmountText(amount, kind: kind)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, Spacing.rowVertical)
         .accessibilityElement(children: .combine)
     }
+
+    /// At accessibility text sizes the amount no longer fits beside the title, so it moves under the
+    /// meta and the text wraps instead of truncating.
+    private var stacks: Bool { dynamicTypeSize.isAccessibilitySize }
 }
 
 /// The Dashboard's budget summary: mini ring, title, "spent of limit" detail, chevron
