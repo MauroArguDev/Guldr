@@ -95,6 +95,8 @@ struct CategoryBudgetRow: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 // MARK: - Previews
 
 private struct RowsSpecimen: View {
@@ -136,3 +138,4 @@ private struct RowsSpecimen: View {
 #Preview("Largest Dynamic Type") {
     RowsSpecimen().dynamicTypeSize(.accessibility3)
 }
+#endif

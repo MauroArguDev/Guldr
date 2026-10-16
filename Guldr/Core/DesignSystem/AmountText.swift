@@ -96,6 +96,8 @@ struct AmountText: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 // MARK: - Previews
 
 private struct AmountTextSpecimen: View {
@@ -126,3 +128,4 @@ private struct AmountTextSpecimen: View {
 #Preview("Dark") {
     AmountTextSpecimen().preferredColorScheme(.dark)
 }
+#endif

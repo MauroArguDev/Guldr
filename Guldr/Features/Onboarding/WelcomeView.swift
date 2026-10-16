@@ -86,6 +86,8 @@ struct WelcomeView: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 #Preview("Light") {
     WelcomeView()
         .environment(Preferences.preview(onboarded: false))
@@ -97,3 +99,4 @@ struct WelcomeView: View {
         .environment(Preferences.preview(onboarded: false))
         .preferredColorScheme(.dark)
 }
+#endif

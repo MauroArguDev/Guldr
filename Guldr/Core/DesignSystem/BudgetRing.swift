@@ -31,6 +31,8 @@ struct BudgetRing: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 #Preview("Light and dark") {
     VStack(spacing: 24) {
         BudgetRing(remaining: .previewUSD(58_700), usage: 0.71)
@@ -41,3 +43,4 @@ struct BudgetRing: View {
     .padding()
     .background(Color(.appBackground))
 }
+#endif

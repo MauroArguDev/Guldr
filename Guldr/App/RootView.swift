@@ -120,6 +120,8 @@ private struct EditBudgetPlaceholder: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 #Preview("Light") {
     PreviewEnvironment { RootView() }
         .preferredColorScheme(.light)
@@ -129,3 +131,4 @@ private struct EditBudgetPlaceholder: View {
     PreviewEnvironment { RootView() }
         .preferredColorScheme(.dark)
 }
+#endif

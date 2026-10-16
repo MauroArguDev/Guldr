@@ -45,6 +45,8 @@ struct OverBudgetAlert: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 #Preview("Light and dark") {
     VStack(spacing: 16) {
         OverBudgetAlert(categoryName: "Entertainment", overAmount: .previewUSD(1_600))
@@ -55,3 +57,4 @@ struct OverBudgetAlert: View {
     .padding()
     .background(Color(.appBackground))
 }
+#endif
