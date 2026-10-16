@@ -55,6 +55,14 @@ public struct BudgetStatus: Equatable, Sendable {
     }
     public var overBudgetCount: Int { lines.count { $0.isOver } }
 
+    /// Categories over their limit here that were not over in `previous`, the same month before a save.
+    /// Drives the warning haptic when a save crosses a limit (DESIGN.md › Motion) and, from Phase 25,
+    /// budget notifications. A category that was already over, or that has no budget, is not reported.
+    public func categoriesNewlyOver(since previous: BudgetStatus) -> [UUID] {
+        let wasOver = Set(previous.lines.lazy.filter(\.isOver).map(\.categoryID))
+        return lines.filter { $0.isOver && !wasOver.contains($0.categoryID) }.map(\.categoryID)
+    }
+
     public init(budgets: some Sequence<Budget>, transactions: some Sequence<Transaction>, month: YearMonth,
                 currencyCode: String, now: Date = .now, timeZone: TimeZone = .autoupdatingCurrent) throws(MoneyError) {
         let code = try Currency.validatedCode(currencyCode)

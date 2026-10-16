@@ -111,6 +111,42 @@ struct BudgetStatusTests {
         }
     }
 
+    @Test func reportsOnlyCategoriesThatCrossedTheirLimit() throws {
+        let food = category("Food")
+        let fun = category("Fun")
+        let rent = category("Rent")
+        let budgets = [try budget(10_000, food), try budget(5_000, fun), try budget(100_000, rent)]
+        let now = try date("2026-09-20T12:00:00Z")
+        var transactions = [
+            try expense(9_000, food, "2026-09-05T12:00:00Z"),     // 90 % used
+            try expense(6_000, fun, "2026-09-06T12:00:00Z"),      // already over
+            try expense(50_000, rent, "2026-09-01T12:00:00Z")     // well within
+        ]
+        let before = try BudgetStatus(budgets: budgets, transactions: transactions, month: september,
+                                      currencyCode: "USD", now: now, timeZone: utc)
+        // One save pushes Food past its limit, adds to the already-over Fun and stays within Rent.
+        transactions += [
+            try expense(1_001, food, "2026-09-20T12:00:00Z"),
+            try expense(500, fun, "2026-09-20T12:00:00Z"),
+            try expense(1_000, rent, "2026-09-20T12:00:00Z")
+        ]
+        let after = try BudgetStatus(budgets: budgets, transactions: transactions, month: september,
+                                     currencyCode: "USD", now: now, timeZone: utc)
+        #expect(after.categoriesNewlyOver(since: before) == [food.id])
+        #expect(after.categoriesNewlyOver(since: after).isEmpty)
+    }
+
+    @Test func reachingTheLimitExactlyIsNotOver() throws {
+        let food = category("Food")
+        let budgets = [try budget(10_000, food)]
+        let now = try date("2026-09-20T12:00:00Z")
+        let before = try BudgetStatus(budgets: budgets, transactions: [], month: september,
+                                      currencyCode: "USD", now: now, timeZone: utc)
+        let after = try BudgetStatus(budgets: budgets, transactions: [try expense(10_000, food, "2026-09-20T12:00:00Z")],
+                                     month: september, currencyCode: "USD", now: now, timeZone: utc)
+        #expect(after.categoriesNewlyOver(since: before).isEmpty)
+    }
+
     @Test func usageHandlesZeroAndExactLimits() throws {
         let exact = BudgetStatus.Line(budgetID: UUID(), categoryID: UUID(), spent: try usd(5_000), limit: try usd(5_000))
         #expect(exact.usage == 1 && !exact.isOver && exact.remaining.isZero && exact.overAmount.isZero)
