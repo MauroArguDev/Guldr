@@ -95,7 +95,7 @@ The `test` job uses the [`prepare-simulator`](../.github/actions/prepare-simulat
 |---|---|---|
 | `changes` | `ubuntu-latest` | Lists the files the PR changes. If they are only Markdown or under `docs/`, the macOS jobs are skipped. |
 | `core-tests` | `macos-26`, Xcode 26.6 | Runs `swift test` for `GuldrCore` with no simulator and fails if zero tests ran, then SwiftLint in strict mode over the whole repository with the binary the package pins, so any warning fails. Timeout: 15 minutes. About 1 minute. |
-| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran. Timeout: 25 minutes. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
+| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran, then builds the Release configuration (no tests, no signing) so code that only compiles in Debug, such as previews using `#if DEBUG` helpers, fails in CI. Timeout: 25 minutes. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
 
 - **Required:** the `main` ruleset blocks merging until `test` and `core-tests` succeed. Jobs skipped for a docs-only PR report success, so documentation changes are not blocked.
 - **Pushes to `main` always run both jobs**, whatever changed.
