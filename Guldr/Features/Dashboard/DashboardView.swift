@@ -18,6 +18,7 @@ struct DashboardView: View {
     @Environment(AppRouter.self) private var router
     @Environment(Preferences.self) private var preferences
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query private var transactions: [Transaction]
     @Query private var budgets: [Budget]
     /// Only the newest few, so the Recent section never reads the whole history.
@@ -94,15 +95,22 @@ struct DashboardView: View {
         return descriptor
     }
 
+    private var recentHeaderLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline))
+    }
+
     /// "Recent" with "See all", then the latest transactions; a row opens it for editing.
     private var recentSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
+            // Side by side as in the mockup; "See all" goes under the title at accessibility sizes.
+            recentHeaderLayout {
                 Text("Recent")
                     .textRole(.sectionTitle)
                     .foregroundStyle(Color(.textPrimary))
                     .accessibilityAddTraits(.isHeader)
-                Spacer(minLength: 8)
+                if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
                 Button("See all") {
                     router.select(.transactions)
                 }

@@ -57,20 +57,48 @@ struct BudgetSummaryRow: View {
     let detail: String
     let usage: Double
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(spacing: 14) {
-            MiniRing(value: usage, tone: usage > 1 ? .over : .standard)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).textRole(.cardTitle).foregroundStyle(Color(.textPrimary))
-                Text(detail).textRole(.meta).monospacedDigit().foregroundStyle(Color(.textSecondary))
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                // The text gets the full width: ring and chevron move to a row above it.
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        ring
+                        Spacer(minLength: 8)
+                        chevron
+                    }
+                    text
+                }
+            } else {
+                HStack(spacing: 14) {
+                    ring
+                    text
+                    Spacer(minLength: 8)
+                    chevron
+                }
             }
-            Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Color(.textSecondary))
-                .accessibilityHidden(true)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var ring: some View {
+        MiniRing(value: usage, tone: usage > 1 ? .over : .standard)
+    }
+
+    private var text: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title).textRole(.cardTitle).foregroundStyle(Color(.textPrimary))
+            Text(detail).textRole(.meta).monospacedDigit().foregroundStyle(Color(.textSecondary))
+        }
+    }
+
+    private var chevron: some View {
+        Image(systemName: "chevron.right")
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(Color(.textSecondary))
+            .accessibilityHidden(true)
     }
 }
 
