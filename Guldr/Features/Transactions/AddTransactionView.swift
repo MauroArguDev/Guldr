@@ -150,6 +150,9 @@ struct AddTransactionView: View {
             RoundedRectangle(cornerRadius: Size.amountCaret.width / 2)
                 .fill(Color(.goldFill))
                 .frame(width: Size.amountCaret.width, height: Size.amountCaret.height)
+                // The keypad types into the amount, so the caret blinks there, except while the system
+                // keyboard is typing the description.
+                .caretBlink(isActive: !isDescriptionFocused, restart: model.amount)
                 .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, minHeight: Size.amountRow)
