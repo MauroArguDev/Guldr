@@ -11,14 +11,15 @@ import SwiftUI
 
 /// The Home tab: the Dashboard mockup. The header is the wordmark and the current month as the first
 /// row of the content, with no large title, and Settings as a native toolbar button (author's call,
-/// 2026-10-16). Below it, the balance card; the budget summary and recent transactions arrive in the
-/// next steps of the v1 plan's Phase 19.
+/// 2026-10-16). Below it, the balance card and the month's budget summary; recent transactions arrive
+/// in the next step of the v1 plan's Phase 19.
 struct DashboardView: View {
 
     @Environment(AppRouter.self) private var router
     @Environment(Preferences.self) private var preferences
     @Environment(\.locale) private var locale
     @Query private var transactions: [Transaction]
+    @Query private var budgets: [Budget]
     @State private var model = DashboardModel()
 
     var body: some View {
@@ -31,6 +32,9 @@ struct DashboardView: View {
                                     savingsRate: balance.savingsRate,
                                     drawsLedgerLines: LedgerLaunchDraw.isFirstAppearance)
                             .onAppear { LedgerLaunchDraw.isFirstAppearance = false }
+                    }
+                    if let budget = model.budget {
+                        budgetRow(budget)
                     }
                     if !model.hasTransactions {
                         // Until 19.5 builds the Recent section, which will hold this invitation.
@@ -46,6 +50,7 @@ struct DashboardView: View {
                 .padding(.bottom, Spacing.stackDefault)
             }
             .onChange(of: transactions, initial: true) { refresh() }
+            .onChange(of: budgets, initial: true) { refresh() }
             .onChange(of: currencyCode) { refresh() }
             // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
             .onChange(of: router.lastSave) { refresh() }
@@ -73,7 +78,21 @@ struct DashboardView: View {
     }
 
     private func refresh() {
-        model.update(transactions: transactions, currencyCode: currencyCode)
+        model.update(transactions: transactions, budgets: budgets, currencyCode: currencyCode)
+    }
+
+    /// The month's budgets in one row, opening the Budget tab.
+    private func budgetRow(_ budget: DashboardModel.BudgetSummary) -> some View {
+        Button {
+            router.select(.budget)
+        } label: {
+            BudgetSummaryRow(title: budget.title, detail: budget.detail, usage: budget.usage)
+                .padding(.vertical, Spacing.summaryRowVertical)
+                .padding(.horizontal, Spacing.cardPaddingCompact)
+                .card(.compact)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(Text("Opens Budget"))
     }
 
     /// "guldr" over "October 2026".

@@ -21,6 +21,8 @@ enum Spacing {
     static let stackCompact: CGFloat = 10
     static let cardPadding: CGFloat = 22
     static let cardPaddingCompact: CGFloat = 18
+    /// The Dashboard's budget summary card: 16 pt top and bottom, `cardPaddingCompact` at the sides.
+    static let summaryRowVertical: CGFloat = 16
     static let rowVertical: CGFloat = 8
     /// Between a row's icon chip and its text.
     static let rowGap: CGFloat = 12
