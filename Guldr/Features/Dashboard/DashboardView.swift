@@ -11,8 +11,8 @@ import SwiftUI
 
 /// The Home tab: the Dashboard mockup. The header is the wordmark and the current month as the first
 /// row of the content, with no large title, and Settings as a native toolbar button (author's call,
-/// 2026-10-16). Below it, the balance card and the month's budget summary; recent transactions arrive
-/// in the next step of the v1 plan's Phase 19.
+/// 2026-10-16). Below it: the balance card, the month's budget summary and the latest transactions, or
+/// an invitation to add the first one.
 struct DashboardView: View {
 
     @Environment(AppRouter.self) private var router
@@ -20,6 +20,9 @@ struct DashboardView: View {
     @Environment(\.locale) private var locale
     @Query private var transactions: [Transaction]
     @Query private var budgets: [Budget]
+    /// Only the newest few, so the Recent section never reads the whole history.
+    @Query(Self.recentDescriptor) private var recentTransactions: [Transaction]
+    @ReduceMotion private var reduceMotion
     @State private var model = DashboardModel()
 
     var body: some View {
@@ -30,14 +33,15 @@ struct DashboardView: View {
                     if let balance = model.balance {
                         BalanceCard(balance: balance.total, income: balance.income, expenses: balance.expenses,
                                     savingsRate: balance.savingsRate,
-                                    drawsLedgerLines: LedgerLaunchDraw.isFirstAppearance)
-                            .onAppear { LedgerLaunchDraw.isFirstAppearance = false }
+                                    drawsLedgerLines: LaunchEntrance.ledgerLinesPending)
+                            .onAppear { LaunchEntrance.ledgerLinesPending = false }
                     }
                     if let budget = model.budget {
                         budgetRow(budget)
                     }
-                    if !model.hasTransactions {
-                        // Until 19.5 builds the Recent section, which will hold this invitation.
+                    if model.hasTransactions {
+                        recentSection
+                    } else {
                         EmptyStateView(title: "Your month starts here", symbol: "house",
                                        message: "Add your first expense or income to see your balance.",
                                        actionTitle: "Add transaction") {
@@ -51,6 +55,7 @@ struct DashboardView: View {
             }
             .onChange(of: transactions, initial: true) { refresh() }
             .onChange(of: budgets, initial: true) { refresh() }
+            .onChange(of: recentTransactions) { refresh() }
             .onChange(of: currencyCode) { refresh() }
             // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
             .onChange(of: router.lastSave) { refresh() }
@@ -78,7 +83,52 @@ struct DashboardView: View {
     }
 
     private func refresh() {
-        model.update(transactions: transactions, budgets: budgets, currencyCode: currencyCode)
+        model.update(transactions: transactions, budgets: budgets, recent: recentTransactions,
+                     currencyCode: currencyCode)
+    }
+
+    private static var recentDescriptor: FetchDescriptor<Transaction> {
+        var descriptor = FetchDescriptor<Transaction>(sortBy: [SortDescriptor(\.date, order: .reverse),
+                                                               SortDescriptor(\.createdAt, order: .reverse)])
+        descriptor.fetchLimit = DashboardModel.recentLimit
+        return descriptor
+    }
+
+    /// "Recent" with "See all", then the latest transactions; a row opens it for editing.
+    private var recentSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Recent")
+                    .textRole(.sectionTitle)
+                    .foregroundStyle(Color(.textPrimary))
+                    .accessibilityAddTraits(.isHeader)
+                Spacer(minLength: 8)
+                Button("See all") {
+                    router.select(.transactions)
+                }
+                .font(.body.weight(.medium))
+                .foregroundStyle(Color(.gold))
+                .accessibilityHint(Text("Opens Transactions"))
+            }
+            .padding(.horizontal, 2)
+            .padding(.top, 4)
+            .padding(.bottom, 6)
+
+            ForEach(Array(model.recent.enumerated()), id: \.element.id) { index, row in
+                Button {
+                    router.present(.editTransaction(row.id))
+                } label: {
+                    TransactionRow(title: row.title, meta: row.meta, symbol: row.symbol, amount: row.amount,
+                                   kind: row.kind)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(Text("Opens the transaction to edit it"))
+                .modifier(RecentEntrance(index: index, animates: LaunchEntrance.recentRowsPending,
+                                         reduceMotion: reduceMotion))
+            }
+            .onAppear { LaunchEntrance.recentRowsPending = false }
+        }
     }
 
     /// The month's budgets in one row, opening the Budget tab.
@@ -108,10 +158,29 @@ struct DashboardView: View {
     }
 }
 
-/// The ledger lines draw in once per launch (DESIGN.md › Motion), not every time Home reappears.
+/// Home's entrances run once per launch (DESIGN.md › Motion), not every time the tab reappears.
 @MainActor
-private enum LedgerLaunchDraw {
-    static var isFirstAppearance = true
+private enum LaunchEntrance {
+    static var ledgerLinesPending = true
+    static var recentRowsPending = true
+}
+
+/// Recent rows rise into place one after another (`stagger`); with Reduce Motion they only fade in,
+/// all together.
+private struct RecentEntrance: ViewModifier {
+
+    let index: Int
+    let animates: Bool
+    let reduceMotion: Bool
+    @State private var shown = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(!animates || shown ? 1 : 0)
+            .offset(y: !animates || shown || reduceMotion ? 0 : 8)
+            .motion(.standard, value: shown, delay: Motion.staggerDelay(index: index, reduceMotion: reduceMotion))
+            .onAppear { shown = true }
+    }
 }
 
 // Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.

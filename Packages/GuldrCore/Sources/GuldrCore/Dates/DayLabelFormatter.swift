@@ -41,6 +41,19 @@ public struct DayLabelFormatter: Sendable {
         return label(for: date, relativeTo: now) + ", " + date.formatted(style)
     }
 
+    /// The Dashboard's recent rows: "Today", "Yesterday", otherwise "Sep 25", with the year when it is
+    /// not the current one.
+    public func shortLabel(for date: Date, relativeTo now: Date = .now) -> String {
+        let calendar = YearMonth.calendar(timeZone)
+        let days = calendar.dateComponents([.day], from: startOfDay(for: now), to: startOfDay(for: date)).day ?? 0
+        guard days != 0, days != -1 else { return label(for: date, relativeTo: now) }
+        var style = Date.FormatStyle(locale: locale, calendar: calendar, timeZone: timeZone).month(.abbreviated).day()
+        if calendar.component(.year, from: date) != calendar.component(.year, from: now) {
+            style = style.year()
+        }
+        return date.formatted(style)
+    }
+
     public func label(for date: Date, relativeTo now: Date = .now) -> String {
         let calendar = YearMonth.calendar(timeZone)
         let days = calendar.dateComponents([.day], from: startOfDay(for: now), to: startOfDay(for: date)).day ?? 0
