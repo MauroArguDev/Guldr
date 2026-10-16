@@ -28,13 +28,15 @@ public struct AmountInput: Equatable, Sendable {
         self.fractionDigitLimit = try Currency.minorUnitDigits(for: self.currencyCode)
     }
 
-    /// Prefills the keypad from an existing amount (edit mode), dropping trailing fraction zeros.
+    /// Prefills the keypad from an existing amount (edit mode) as it is stored: 4280 cents shows "42.80",
+    /// so the sheet matches the list; a whole amount (4200) shows "42" with no fraction.
     public init(money: Money) throws(MoneyError) {
         try self.init(currencyCode: money.currencyCode)
         let magnitude = String(money.minorUnits.magnitude)
         let padded = String(repeating: "0", count: max(0, fractionDigitLimit + 1 - magnitude.count)) + magnitude
         let integerPart = String(padded.dropLast(fractionDigitLimit))
-        let fractionPart = String(padded.suffix(fractionDigitLimit)).replacing(/0+$/, with: "")
+        let storedFraction = String(padded.suffix(fractionDigitLimit))
+        let fractionPart = storedFraction.allSatisfy { $0 == "0" } ? "" : storedFraction
         integerDigits = integerPart == "0" ? "" : integerPart
         fractionDigits = fractionPart.isEmpty ? nil : fractionPart
     }
