@@ -70,6 +70,7 @@ struct AddTransactionView: View {
     var onDeleted: () -> Void = {}
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @FocusState private var isDescriptionFocused: Bool
     @State private var showsDatePicker = false
     @State private var failedToSave = false
@@ -159,30 +160,40 @@ struct AddTransactionView: View {
 
     private var fieldGroup: some View {
         VStack(spacing: 0) {
-            HStack(spacing: Spacing.rowGap) {
+            fieldRowLayout {
                 Text("Description")
                     .foregroundStyle(Color(.textSecondary))
                 // The prompt is what an empty description shows as: the category's name, or nothing yet.
                 TextField("Description", text: $model.title, prompt: Text(verbatim: model.titlePrompt ?? ""))
-                    .multilineTextAlignment(.trailing)
+                    .multilineTextAlignment(stacksFieldRows ? .leading : .trailing)
                     .foregroundStyle(Color(.textPrimary))
                     .focused($isDescriptionFocused)
                     .submitLabel(.done)
             }
-            .fieldRow()
+            .fieldRow(stacked: stacksFieldRows)
             Rectangle()
                 .fill(Color(.fieldAccent))
                 .frame(height: 1)
-            HStack(spacing: Spacing.rowGap) {
+            fieldRowLayout {
                 Text("Date")
                     .foregroundStyle(Color(.textSecondary))
-                Spacer(minLength: 0)
+                if !stacksFieldRows { Spacer(minLength: 0) }
                 dateChip
             }
-            .fieldRow()
+            .fieldRow(stacked: stacksFieldRows)
         }
         .font(.callout)
         .background(Color(.field), in: .rect(cornerRadius: Radius.field, style: .continuous))
+    }
+
+    /// At accessibility text sizes a label and its value no longer fit side by side, so each row stacks
+    /// them, as Settings does.
+    private var stacksFieldRows: Bool { dynamicTypeSize.isAccessibilitySize }
+
+    private var fieldRowLayout: AnyLayout {
+        stacksFieldRows
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.rowVertical))
+            : AnyLayout(HStackLayout(spacing: Spacing.rowGap))
     }
 
     private var dateChip: some View {
@@ -216,7 +227,9 @@ struct AddTransactionView: View {
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(Color(.textSecondary))
                 .padding(.horizontal, 2)
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.gridGap), count: 4),
+            // Four columns as in the mockup; two at accessibility sizes, where names no longer fit.
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.gridGap),
+                                     count: dynamicTypeSize.isAccessibilitySize ? 2 : 4),
                       spacing: Spacing.gridGap) {
                 ForEach(model.categories) { category in
                     CategoryChip(name: category.displayName, symbol: category.symbolName,
@@ -286,10 +299,12 @@ struct AddTransactionView: View {
 }
 
 private extension View {
-    /// A 46 pt row inside the add sheet's field group.
-    func fieldRow() -> some View {
-        frame(minHeight: Size.fieldRow)
+    /// A row of at least 46 pt inside the add sheet's field group; taller when the text is.
+    /// `stacked` rows (accessibility text sizes) get vertical padding, since their height comes from the text.
+    func fieldRow(stacked: Bool) -> some View {
+        frame(maxWidth: .infinity, minHeight: Size.fieldRow, alignment: .leading)
             .padding(.horizontal, Spacing.fieldRowHorizontal)
+            .padding(.vertical, stacked ? Spacing.rowVertical : 0)
     }
 }
 
