@@ -12,9 +12,10 @@ import SwiftData
 
 /// The Transactions list's filters, its day sections and deletion.
 ///
-/// The view owns the `@Query` and passes its results to `sections(from:currencyCode:)`, so SwiftData
-/// keeps the list current; this model only filters, groups and turns models into display values with
-/// `TransactionQuery`. Deleting saves the context itself, rolls it back on failure and throws a typed
+/// The view owns the `@Query`s for transactions and categories and passes their results in, so SwiftData
+/// keeps the list and the filter menu current; this model only filters, groups and turns models into
+/// display values with `TransactionQuery`. It holds no context, so the view can create it before its
+/// environment exists. Deleting saves the given context, rolls it back on failure and throws a typed
 /// `ListError`, like the add sheet.
 @Observable
 final class TransactionsListModel {
@@ -77,49 +78,42 @@ final class TransactionsListModel {
     /// Switching kind drops selected categories of the other kind, which could only hide every row.
     var kindFilter: KindFilter = .all {
         didSet {
+            query.kind = kindFilter.kind
             guard let kind = kindFilter.kind else { return }
-            selectedCategoryIDs = selectedCategoryIDs.filter { id in
-                filterableCategories.contains { $0.id == id && $0.kind == kind }
-            }
+            selectedCategoryKinds = selectedCategoryKinds.filter { $0.value == kind }
         }
     }
 
     /// Categories chosen in the toolbar's filter menu. Empty shows every category.
-    var selectedCategoryIDs: Set<UUID> {
-        get { query.categoryIDs }
-        set { query.categoryIDs = newValue }
-    }
+    var selectedCategoryIDs: Set<UUID> { query.categoryIDs }
 
-    var isFilteringByCategory: Bool { !selectedCategoryIDs.isEmpty }
+    var isFilteringByCategory: Bool { !selectedCategoryKinds.isEmpty }
 
-    /// The filter menu's options for the current kind: expenses first, then income, in display order.
-    var categoryOptions: [Category] {
-        guard let kind = kindFilter.kind else { return filterableCategories }
-        return filterableCategories.filter { $0.kind == kind }
+    /// The filter menu's options: the given categories narrowed to the selected kind.
+    func categoryOptions(from categories: [Category]) -> [Category] {
+        guard let kind = kindFilter.kind else { return categories }
+        return categories.filter { $0.kind == kind }
     }
 
     func toggleCategory(_ category: Category) {
-        if selectedCategoryIDs.contains(category.id) {
-            selectedCategoryIDs.remove(category.id)
+        if selectedCategoryKinds[category.id] == nil {
+            selectedCategoryKinds[category.id] = category.kind
         } else {
-            selectedCategoryIDs.insert(category.id)
+            selectedCategoryKinds[category.id] = nil
         }
     }
 
     func clearCategories() {
-        selectedCategoryIDs = []
+        selectedCategoryKinds = [:]
     }
 
     // MARK: - Init
 
-    init(context: ModelContext, notifier: DataChangeNotifier, locale: Locale = .autoupdatingCurrent,
-         timeZone: TimeZone = .autoupdatingCurrent, now: @escaping () -> Date = { .now }) {
-        self.context = context
-        self.notifier = notifier
+    init(locale: Locale = .autoupdatingCurrent, timeZone: TimeZone = .autoupdatingCurrent,
+         now: @escaping () -> Date = { .now }) {
         self.locale = locale
         self.timeZone = timeZone
         self.now = now
-        reloadCategories()
     }
 
     // MARK: - Sections
@@ -147,7 +141,8 @@ final class TransactionsListModel {
     // MARK: - Delete
 
     /// Deletes a transaction. One that no longer exists counts as deleted.
-    func delete(_ id: PersistentIdentifier) throws(ListError) {
+    func delete(_ id: PersistentIdentifier, in context: ModelContext,
+                notifier: DataChangeNotifier) throws(ListError) {
         let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate { $0.persistentModelID == id })
         guard let transaction = (try? context.fetch(descriptor))?.first else { return }
         context.delete(transaction)
@@ -163,21 +158,14 @@ final class TransactionsListModel {
     // MARK: - Private
 
     private var query = TransactionQuery()
-    /// Every pickable category of both kinds, for the filter menu.
-    private var filterableCategories: [Category] = []
+    /// The selected categories with their kinds, so switching kind can drop the other kind's.
+    private var selectedCategoryKinds: [UUID: TransactionKind] = [:] {
+        didSet { query.categoryIDs = Set(selectedCategoryKinds.keys) }
+    }
 
-    @ObservationIgnored private let context: ModelContext
-    @ObservationIgnored private let notifier: DataChangeNotifier
     @ObservationIgnored private let locale: Locale
     @ObservationIgnored private let timeZone: TimeZone
     @ObservationIgnored private let now: () -> Date
-
-    /// Archived categories are left out of the menu; their transactions still show with no filter set.
-    private func reloadCategories() {
-        filterableCategories = TransactionKind.allCases.flatMap { kind in
-            (try? context.fetch(Category.pickable(kind))) ?? []
-        }
-    }
 
     private func net(of day: TransactionQuery.DaySection, currencyCode: String) -> Money? {
         guard day.transactions.contains(where: { $0.currencyCode == currencyCode }) else { return nil }

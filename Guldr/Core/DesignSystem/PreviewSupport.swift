@@ -30,10 +30,16 @@ extension BudgetStatus.Line {
 /// onboarded user in US dollars and a router. Shows nothing if the in-memory store can't be built.
 struct PreviewEnvironment<Content: View>: View {
 
-    @ViewBuilder let content: () -> Content
-
-    @State private var container = try? PreviewData.makeController().container
+    @State private var container: ModelContainer?
     @State private var router = AppRouter()
+    private let content: () -> Content
+
+    /// `seeded: false` keeps only the default categories, for empty states.
+    init(seeded: Bool = true, @ViewBuilder content: @escaping () -> Content) {
+        let controller = seeded ? try? PreviewData.makeController() : try? PersistenceController(mode: .inMemory)
+        _container = State(initialValue: controller?.container)
+        self.content = content
+    }
 
     var body: some View {
         if let container {
