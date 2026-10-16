@@ -90,8 +90,9 @@ struct AmountInputTests {
     @Test func prefillsFromExistingMoney() throws {
         let input = try AmountInput(money: Money(minorUnits: 1250, currencyCode: "USD"))
         #expect(input.integerDigits == "12")
-        #expect(input.fractionDigits == "5")
+        #expect(input.fractionDigits == "50")   // shown as stored, "12.50"
         #expect(input.minorUnits == 1250)
+        #expect(input.formattedText(locale: Locale(identifier: "en_US")) == "$12.50")
 
         let whole = try AmountInput(money: Money(minorUnits: 4200, currencyCode: "USD"))
         #expect(whole.fractionDigits == nil)
@@ -101,6 +102,14 @@ struct AmountInputTests {
         #expect(cents.integerDigits.isEmpty)
         #expect(cents.fractionDigits == "05")
         #expect(cents.minorUnits == 5)
+
+        // The fraction is already full, so further digits are rejected until one is deleted.
+        var full = try AmountInput(money: Money(minorUnits: 4280, currencyCode: "USD"))
+        let rejected = full.appendDigit(1)
+        let deleted = full.deleteBackward()
+        let accepted = full.appendDigit(5)
+        #expect(!rejected && deleted && accepted)
+        #expect(full.minorUnits == 4285)
     }
 
     @Test func displayTextFollowsTheLocale() throws {
