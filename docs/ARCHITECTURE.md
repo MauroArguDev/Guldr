@@ -89,7 +89,7 @@ Config/                  xcconfig files
 docs/                    Design, decisions, workflow, roadmap and setup runbook
 ```
 
-Present today: `App/`, `Core/DesignSystem/`, `Features/` (Onboarding and a placeholder root per tab), `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built. Models and persistence live in `GuldrCore`, not in the app target, so the widget and `swift test` share them.
+Present today: `App/`, `Core/DesignSystem/`, `Core/Extensions/`, `Features/` (Onboarding, the add sheet in Transactions and a placeholder root per tab), `Resources/`, `Info.plist`, `Guldr.entitlements`. The rest appears as the features are built. Models and persistence live in `GuldrCore`, not in the app target, so the widget and `swift test` share them.
 
 ## Layers
 
@@ -100,6 +100,9 @@ SwiftUI only. Views render state and forward user intent; they hold no business 
 `GuldrApp` opens the store and the settings through `AppDataLoader`. `LaunchGate` shows the welcome screen until first launch is completed (currency chosen), then `RootView`: the native tab bar with Home, Transactions, Budget and Analytics, one `NavigationStack` each, and the Add button as the separated tab next to the bar (a `.search`-role tab whose selection opens the add sheet instead of switching tabs).
 
 `AppRouter` (`@Observable`, in the environment) owns the selected tab and the presented `AppSheet` (add or edit a transaction, edit a budget), so any screen can open a sheet. Deep links arrive through `.onOpenURL` and are parsed by `DeepLink` in `GuldrCore`, which the widget also uses to build them: `guldr://add` opens the add sheet over the current tab, `guldr://budget` closes any sheet and selects Budget. The `guldr` scheme is registered in `Info.plist`.
+
+### Adding and editing transactions
+`AddTransactionViewModel` (`Features/Transactions/`) backs one sheet for adding and editing; an edited transaction is passed by `PersistentIdentifier` and fetched by the model. The form edits plain values, so Cancel needs no undo; `save()` and `delete()` save the `ModelContext`, roll back on failure and throw a typed `EditorError`. For expenses, `save()` compares the month's `BudgetStatus` before and after (`categoriesNewlyOver(since:)` in `GuldrCore`) and returns `.saved` or `.crossedBudget`; `AppRouter.finishSave(_:)` closes the sheet and `RootView` plays the success or warning haptic, because the sheet is already gone. Seeded category names are translated at display time (`Category.displayName`), so an empty description is stored empty and shown as its category.
 
 ### View models
 One `@Observable` final class per screen, owned by the view with `@State`. They expose display-ready values and actions, and depend on the data layer through protocols so they can be tested with in-memory stores or fakes. Main-actor isolated by default.
