@@ -115,7 +115,7 @@ On the Dashboard the lines draw in once per launch (DESIGN.md › Motion); every
 ## Shape and spacing
 
 - Radii (pt): balance and ring cards 28 · generic card 24 · compact card 22 · alert 18 · field group 16 · category chip and keypad key 14 · icon chip 12–13 · segmented 12 (thumb 9) · date chip 8 · progress bar 3 · buttons are capsules.
-- Screen padding 20 pt horizontal; vertical stack spacing 16 pt (home) / 10–12 pt (lists); card padding 22 pt (18 compact); row vertical padding 8 pt, row gap 12 pt.
+- Screen padding 20 pt horizontal; vertical stack spacing 16 pt (home) / 10–12 pt (lists); card padding 22 pt (18 compact; the budget summary row 16 × 18); row vertical padding 8 pt, row gap 12 pt.
 - Icon chip 42×42 (40 in lists, 38 in budget) with a 20 pt stroke icon (1.6 pt line). Use SF Symbols in code; the mockup icons are stand-ins for their closest SF Symbol.
 
 ## Motion

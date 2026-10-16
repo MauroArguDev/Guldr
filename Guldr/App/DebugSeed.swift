@@ -11,9 +11,9 @@ import GuldrCore
 import OSLog
 import SwiftData
 
-/// Debug builds only: fills an empty store with generated transactions to try the screens with a heavy
-/// history. Pass the launch argument `-seedTransactions 5000` (Xcode › Scheme › Arguments, or
-/// `xcrun simctl launch … -seedTransactions 5000`). A store that already has transactions is left alone,
+/// Debug builds only: fills an empty store with generated transactions, and budgets for the current
+/// month, to try the screens with a heavy history. Pass the launch argument `-seedTransactions 5000`
+/// (Xcode › Scheme › Arguments, or `xcrun simctl launch … -seedTransactions 5000`). A store that already has transactions is left alone,
 /// so relaunching never duplicates them.
 enum DebugSeed {
 
@@ -51,6 +51,12 @@ enum DebugSeed {
             let cents = Int64.random(in: 100...(category.kind == .income ? 500_000 : 30_000), using: &generator)
             context.insert(Transaction(amount: try Money(minorUnits: cents, currencyCode: "USD"), kind: category.kind,
                                        title: titles[index % titles.count], date: date, category: category))
+        }
+        // $3,000 for each expense category this month: some end up over, most within.
+        let month = YearMonth(containing: now)
+        for category in categories where category.kind == .expense {
+            context.insert(Budget(month: month, limit: try Money(minorUnits: 300_000, currencyCode: "USD"),
+                                  category: category))
         }
         try context.save()
     }
