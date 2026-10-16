@@ -25,7 +25,8 @@ struct AddTransactionSheet: View {
     var body: some View {
         Group {
             if let model {
-                AddTransactionView(model: model, onCancel: router.dismissSheet, onSaved: router.finishSave)
+                AddTransactionView(model: model, onCancel: router.dismissSheet, onSaved: router.finishSave,
+                                   onDeleted: router.dismissSheet)
             } else if failedToOpen {
                 NavigationStack {
                     ContentUnavailableView("Couldn't open this transaction", systemImage: "exclamationmark.triangle",
@@ -66,11 +67,14 @@ struct AddTransactionView: View {
     @Bindable var model: AddTransactionViewModel
     let onCancel: () -> Void
     let onSaved: (AddTransactionViewModel.SaveOutcome) -> Void
+    var onDeleted: () -> Void = {}
 
     @Environment(\.locale) private var locale
     @FocusState private var isDescriptionFocused: Bool
     @State private var showsDatePicker = false
     @State private var failedToSave = false
+    @State private var confirmsDelete = false
+    @State private var failedToDelete = false
 
     var body: some View {
         NavigationStack {
@@ -80,6 +84,9 @@ struct AddTransactionView: View {
                     amountLine
                     fieldGroup
                     categorySection
+                    if model.isEditing {
+                        deleteButton
+                    }
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.sheetStack)
@@ -103,10 +110,20 @@ struct AddTransactionView: View {
         } message: {
             Text("Your changes are still here. Try again in a moment.")
         }
+        .alert("Couldn't delete this transaction", isPresented: $failedToDelete) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("It's still saved. Try again in a moment.")
+        }
     }
 
     private var title: LocalizedStringResource {
-        model.kind == .expense ? "New expense" : "New income"
+        switch (model.isEditing, model.kind) {
+        case (false, .expense): "New expense"
+        case (false, .income): "New income"
+        case (true, .expense): "Edit expense"
+        case (true, .income): "Edit income"
+        }
     }
 
     // MARK: - Sections
@@ -211,6 +228,23 @@ struct AddTransactionView: View {
         }
     }
 
+    /// Not in the mockup, which only shows adding: a plain destructive button after the categories,
+    /// behind a confirmation, so it is never next to the keys.
+    private var deleteButton: some View {
+        Button("Delete transaction", role: .destructive) {
+            confirmsDelete = true
+        }
+        .font(.body.weight(.semibold))
+        .foregroundStyle(Color(.negative))
+        .frame(maxWidth: .infinity, minHeight: Size.touchTargetMin)
+        .padding(.top, Spacing.sheetStack)
+        .confirmationDialog("Delete this transaction?", isPresented: $confirmsDelete, titleVisibility: .visible) {
+            Button("Delete transaction", role: .destructive, action: delete)
+        } message: {
+            Text("This can't be undone.")
+        }
+    }
+
     private var keypad: some View {
         AmountKeypad(acceptsDecimals: model.acceptsDecimals,
                      onDigit: { model.pressDigit($0) },
@@ -233,6 +267,15 @@ struct AddTransactionView: View {
         }
     }
 
+    private func delete() {
+        do {
+            try model.delete()
+            onDeleted()
+        } catch {
+            failedToDelete = true
+        }
+    }
+
     private func save() {
         do {
             onSaved(try model.save())
@@ -250,6 +293,8 @@ private extension View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 // MARK: - Previews
 
 #Preview("Light") {
@@ -261,3 +306,21 @@ private extension View {
     PreviewEnvironment { AddTransactionSheet() }
         .preferredColorScheme(.dark)
 }
+
+#Preview("Edit, dark") {
+    PreviewEnvironment { EditPreview() }
+        .preferredColorScheme(.dark)
+}
+
+/// Opens the sheet on the newest transaction in the preview data.
+private struct EditPreview: View {
+
+    @Query(sort: \Transaction.date, order: .reverse) private var transactions: [Transaction]
+
+    var body: some View {
+        if let first = transactions.first {
+            AddTransactionSheet(transactionID: first.persistentModelID)
+        }
+    }
+}
+#endif
