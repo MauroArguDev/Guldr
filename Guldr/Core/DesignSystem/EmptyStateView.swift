@@ -17,7 +17,18 @@ struct EmptyStateView: View {
     var actionTitle: LocalizedStringKey?
     var action: (() -> Void)?
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
+        // At the largest text sizes the content is taller than the screen, so it scrolls instead of
+        // being clipped; otherwise it stays centered like the system's empty states.
+        ViewThatFits(in: .vertical) {
+            content
+            ScrollView { content }
+        }
+    }
+
+    private var content: some View {
         ContentUnavailableView {
             Label(title, systemImage: symbol)
                 .foregroundStyle(Color(.textPrimary))
@@ -25,9 +36,11 @@ struct EmptyStateView: View {
             Text(message).foregroundStyle(Color(.textSecondary))
         } actions: {
             if let actionTitle, let action {
+                // The button hugs its title, except at accessibility sizes, where a fixed width would
+                // push the whole view wider than the screen.
                 Button(actionTitle, action: action)
                     .buttonStyle(.primary)
-                    .fixedSize()
+                    .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
             }
         }
     }
