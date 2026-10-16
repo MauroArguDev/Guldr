@@ -39,6 +39,13 @@ enum Motion {
         return self == .reveal ? nil : Self.crossFade
     }
 
+    // MARK: - Caret
+
+    /// How long the add sheet's caret stays on, then off, like the system text cursor.
+    static let caretBlinkInterval: TimeInterval = 0.5
+    /// The short fade between the caret's on and off beats.
+    static let caretFade: Animation = .easeInOut(duration: 0.12)
+
     // MARK: - Stagger
 
     static let staggerStep: Double = 0.04
@@ -68,6 +75,32 @@ extension View {
     /// A transition that becomes a plain cross-fade with Reduce Motion.
     func motionTransition(_ transition: AnyTransition) -> some View {
         modifier(MotionTransitionModifier(transition: transition))
+    }
+
+    /// Blinks like the system text cursor: on, then off, every `Motion.caretBlinkInterval`, solid again
+    /// whenever `restart` changes (a key press), as the system cursor is while typing. Hidden while
+    /// `isActive` is false. It keeps blinking with Reduce Motion, as the system cursor does: a blink is
+    /// not movement.
+    func caretBlink(isActive: Bool, restart: some Equatable) -> some View {
+        modifier(CaretBlinkModifier(isActive: isActive, restart: restart))
+    }
+}
+
+private struct CaretBlinkModifier<Restart: Equatable>: ViewModifier {
+
+    let isActive: Bool
+    let restart: Restart
+    @State private var start = Date.now
+
+    func body(content: Content) -> some View {
+        TimelineView(.periodic(from: start, by: Motion.caretBlinkInterval)) { context in
+            let beat = Int(max(0, context.date.timeIntervalSince(start)) / Motion.caretBlinkInterval)
+            content
+                .opacity(isActive && beat.isMultiple(of: 2) ? 1 : 0)
+                .animation(Motion.caretFade, value: beat)
+        }
+        .onChange(of: restart) { start = .now }
+        .onChange(of: isActive) { start = .now }
     }
 }
 
