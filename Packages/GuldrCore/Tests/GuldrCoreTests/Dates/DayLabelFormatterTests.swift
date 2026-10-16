@@ -38,6 +38,16 @@ struct DayLabelFormatterTests {
         #expect(spanish.contains("25"))
     }
 
+    @Test func chipLabelMatchesTheAddSheetMockup() throws {
+        let now = try date("2026-09-28T09:41:00Z")
+        let english = formatter("en_US")
+        #expect(english.chipLabel(for: now, relativeTo: now) == "Today, Sep 28")
+        #expect(english.chipLabel(for: try date("2026-09-27T12:00:00Z"), relativeTo: now) == "Yesterday, Sep 27")
+        #expect(english.chipLabel(for: try date("2026-09-24T12:00:00Z"), relativeTo: now) == "Thu, Sep 24")
+        #expect(english.chipLabel(for: try date("2025-12-31T12:00:00Z"), relativeTo: now) == "Wed, Dec 31, 2025")
+        #expect(formatter("es_MX").chipLabel(for: now, relativeTo: now).hasPrefix("Hoy, 28"))
+    }
+
     @Test func otherYearsIncludeTheYear() throws {
         let now = try date("2026-01-02T10:00:00Z")
         #expect(formatter("en_US").label(for: try date("2025-12-24T10:00:00Z"), relativeTo: now) == "Wednesday, Dec 24, 2025")

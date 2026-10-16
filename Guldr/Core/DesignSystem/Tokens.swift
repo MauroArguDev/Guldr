@@ -24,6 +24,12 @@ enum Spacing {
     static let rowVertical: CGFloat = 8
     /// Between a row's icon chip and its text.
     static let rowGap: CGFloat = 12
+    /// Between the add sheet's sections.
+    static let sheetStack: CGFloat = 12
+    /// Between category chips and keypad keys.
+    static let gridGap: CGFloat = 8
+    /// Inside the add sheet's field rows.
+    static let fieldRowHorizontal: CGFloat = 14
 }
 
 /// Corner radii, in points (`radius_pt`). Buttons are capsules, so there is no pill value here.
@@ -40,6 +46,7 @@ enum Radius {
     static let iconChip: CGFloat = 12
     static let segmented: CGFloat = 12
     static let segmentedThumb: CGFloat = 9
+    static let dateChip: CGFloat = 8
     static let progressBar: CGFloat = 3
 }
 
@@ -49,6 +56,12 @@ enum Size {
     static let iconChip: CGFloat = 42
     /// Transactions list rows.
     static let iconChipCompact: CGFloat = 40
+    /// The add sheet's Description and Date rows.
+    static let fieldRow: CGFloat = 46
+    /// The add sheet's amount line and its gold caret.
+    static let amountRow: CGFloat = 72
+    static let amountCaret = CGSize(width: 2, height: 48)
+    static let keypadKey: CGFloat = 50
     /// Budget category rows.
     static let iconChipBudget: CGFloat = 38
     static let iconGlyph: CGFloat = 20

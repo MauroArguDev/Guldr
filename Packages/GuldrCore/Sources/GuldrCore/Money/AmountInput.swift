@@ -92,6 +92,16 @@ public struct AmountInput: Equatable, Sendable {
         Money.unchecked(minorUnits, currencyCode)
     }
 
+    /// What the add sheet shows: `displayText(locale:)` with the currency symbol where the locale puts
+    /// it ("$42.8" in en-US, "42,8 €" in es-ES). An empty input reads as zero.
+    public func formattedText(locale: Locale) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = locale
+        formatter.currencyCode = currencyCode
+        return formatter.positivePrefix + displayText(locale: locale) + formatter.positiveSuffix
+    }
+
     /// What the keypad shows, without the currency symbol: "1,234.5" in en-US, "1.234,5" in es-ES.
     /// The typed fraction is kept as typed so the user sees each key press.
     public func displayText(locale: Locale) -> String {

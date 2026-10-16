@@ -116,4 +116,18 @@ struct AmountInputTests {
         let money = try type("9.99", currency: "eur").money
         #expect(money == (try Money(minorUnits: 999, currencyCode: "EUR")))
     }
+
+    @Test func formattedTextPlacesTheSymbolLikeTheLocale() throws {
+        var input = try AmountInput(currencyCode: "USD")
+        #expect(input.formattedText(locale: Locale(identifier: "en_US")) == "$0")
+        for key in [4, 2] { input.appendDigit(key) }
+        input.appendDecimalSeparator()
+        input.appendDigit(8)
+        #expect(input.formattedText(locale: Locale(identifier: "en_US")) == "$42.8")
+        var euros = try AmountInput(currencyCode: "EUR")
+        for key in [1, 2, 3, 4] { euros.appendDigit(key) }
+        let spanish = euros.formattedText(locale: Locale(identifier: "es_ES"))
+        #expect(spanish.hasPrefix("1234") || spanish.hasPrefix("1.234"))
+        #expect(spanish.hasSuffix("€"))
+    }
 }

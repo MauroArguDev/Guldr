@@ -62,6 +62,16 @@ final class AddTransactionViewModel {
 
     var canSave: Bool { issues.isEmpty }
 
+    /// Whether closing the sheet would lose input: anything typed or picked on a new transaction, any
+    /// change on an edited one. The sheet blocks swipe-to-dismiss while this is true; Cancel still works.
+    var hasChanges: Bool {
+        guard let transaction = editedTransaction else {
+            return !amount.isEmpty || category != nil || !title.isEmpty
+        }
+        return amount.money != transaction.amount || kind != transaction.kind || category != transaction.category
+            || title != transaction.title || date != transaction.date
+    }
+
     /// Shown in the empty description field: what the transaction will be called if left empty.
     var titlePrompt: String? { category?.displayName }
 
