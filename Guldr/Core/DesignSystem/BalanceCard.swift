@@ -22,6 +22,7 @@ struct BalanceCard: View {
     var drawsLedgerLines = false
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.stackDefault) {
@@ -37,7 +38,8 @@ struct BalanceCard: View {
 
             LedgerLines(variant: .leading, drawsIn: drawsLedgerLines)
 
-            HStack(alignment: .top, spacing: 12) {
+            // Two columns as in the mockup; stacked at accessibility sizes, where the labels no longer fit.
+            summaryLayout {
                 summary("Monthly income", symbol: "arrow.up", tint: Color(.positive), amount: income)
                 summary("Monthly expenses", symbol: "arrow.down", tint: Color(.negative), amount: expenses)
             }
@@ -47,6 +49,12 @@ struct BalanceCard: View {
         .padding(Spacing.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card(.hero)
+    }
+
+    private var summaryLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
     }
 
     private func summary(_ title: LocalizedStringKey, symbol: String, tint: Color, amount: Money) -> some View {
