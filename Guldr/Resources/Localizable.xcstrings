@@ -264,6 +264,9 @@
     "Opens the transaction to edit it" : {
 
     },
+    "Opens Transactions" : {
+
+    },
     "Other" : {
       "comment" : "Name of a default category, shown until the user renames it. Looked up at runtime by Category.displayName.",
       "extractionState" : "manual"
@@ -271,6 +274,9 @@
     "Other income" : {
       "comment" : "Name of a default category, shown until the user renames it. Looked up at runtime by Category.displayName.",
       "extractionState" : "manual"
+    },
+    "Recent" : {
+
     },
     "Results" : {
       "comment" : "A section header for the search results.",
@@ -287,6 +293,9 @@
 
     },
     "Search transactions" : {
+
+    },
+    "See all" : {
 
     },
     "Set a budget" : {

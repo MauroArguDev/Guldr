@@ -48,6 +48,16 @@ struct DayLabelFormatterTests {
         #expect(formatter("es_MX").chipLabel(for: now, relativeTo: now).hasPrefix("Hoy, 28"))
     }
 
+    @Test func shortLabelMatchesTheDashboardMockup() throws {
+        let now = try date("2026-09-28T09:41:00Z")
+        let english = formatter("en_US")
+        #expect(english.shortLabel(for: now, relativeTo: now) == "Today")
+        #expect(english.shortLabel(for: try date("2026-09-27T12:00:00Z"), relativeTo: now) == "Yesterday")
+        #expect(english.shortLabel(for: try date("2026-09-25T09:00:00Z"), relativeTo: now) == "Sep 25")
+        #expect(english.shortLabel(for: try date("2025-12-31T12:00:00Z"), relativeTo: now) == "Dec 31, 2025")
+        #expect(formatter("es_MX").shortLabel(for: now, relativeTo: now) == "Hoy")
+    }
+
     @Test func otherYearsIncludeTheYear() throws {
         let now = try date("2026-01-02T10:00:00Z")
         #expect(formatter("en_US").label(for: try date("2025-12-24T10:00:00Z"), relativeTo: now) == "Wednesday, Dec 24, 2025")
