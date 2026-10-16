@@ -41,6 +41,7 @@ private struct TransactionsList: View {
     @Environment(Preferences.self) private var preferences
     @Environment(AppRouter.self) private var router
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pendingDelete: TransactionsListModel.Row?
     @State private var failedToDelete = false
 
@@ -138,12 +139,13 @@ private struct TransactionsList: View {
         }
     }
 
-    /// "Today" on the left, the day's net on the right ("+" when positive, as in the mockup).
+    /// "Today" on the left, the day's net on the right ("+" when positive, as in the mockup); stacked at
+    /// accessibility text sizes, where both no longer fit on one line.
     private func header(_ section: TransactionsListModel.Section) -> some View {
-        HStack {
+        headerLayout {
             Text(verbatim: section.title)
                 .fontWeight(.semibold)
-            Spacer(minLength: 8)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
             if let net = section.net {
                 Text(verbatim: MoneyFormatter(locale: locale).string(from: net,
                                                                      sign: net.isNegative ? .automatic : .plus))
@@ -154,8 +156,23 @@ private struct TransactionsList: View {
         .font(.footnote)
         .foregroundStyle(Color(.textSecondary))
         .textCase(nil)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 6)
+        // A plain list pins the header while its day scrolls under it; without a background the rows show
+        // through. The background runs past the insets to the screen's edges.
+        .background {
+            Color(.appBackground).padding(.horizontal, -Spacing.screenHorizontal)
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: Spacing.screenHorizontal,
+                                  bottom: 0, trailing: Spacing.screenHorizontal))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
+    }
+
+    private var headerLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+            : AnyLayout(HStackLayout())
     }
 
     // MARK: - Filters
