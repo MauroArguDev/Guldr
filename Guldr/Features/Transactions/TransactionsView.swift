@@ -45,12 +45,11 @@ private struct TransactionsList: View {
     @State private var failedToDelete = false
 
     var body: some View {
-        let sections = model.sections(from: transactions, currencyCode: currencyCode)
         // The list stays in place even when empty, with the empty state over it: the navigation bar
         // tracks its scroll view, and swapping it for another view left the large title collapsed.
-        list(sections)
+        list(model.sections)
             .overlay {
-                if let emptyState = model.emptyState(for: sections) {
+                if let emptyState = model.emptyState {
                     emptyView(emptyState)
                 }
             }
@@ -66,6 +65,10 @@ private struct TransactionsList: View {
         .searchable(text: $model.searchText, placement: .navigationBarDrawer(displayMode: .automatic),
                     prompt: Text("Search transactions"))
         .toolbar { categoryMenu }
+        .onChange(of: transactions, initial: true) { refresh() }
+        .onChange(of: currencyCode) { refresh() }
+        // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+        .onChange(of: router.lastSave) { refresh() }
         .motion(.standard, value: model.kindFilter)
         .motion(.standard, value: model.selectedCategoryIDs)
         .alert("Couldn't delete this transaction", isPresented: $failedToDelete) {
@@ -78,6 +81,10 @@ private struct TransactionsList: View {
     /// Day totals use the active currency (ADR 005); before first launch picks one, the locale's.
     private var currencyCode: String {
         preferences.activeCurrencyCode ?? Currency.defaultCode(for: .autoupdatingCurrent)
+    }
+
+    private func refresh() {
+        model.update(transactions: transactions, currencyCode: currencyCode)
     }
 
     // MARK: - List

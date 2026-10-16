@@ -40,6 +40,9 @@ final class AppDataLoader {
         do {
             let appGroupID = try PersistenceController.appGroupID(from: infoDictionary)
             let container = try PersistenceController(mode: .app(appGroupID: appGroupID)).container
+            #if DEBUG
+            DebugSeed.applyIfRequested(to: container)
+            #endif
             return .ready(container, try AppSettings.shared(appGroupID: appGroupID))
         } catch {
             return .failed(error)

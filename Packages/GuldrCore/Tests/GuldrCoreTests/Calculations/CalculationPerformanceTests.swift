@@ -87,6 +87,14 @@ struct CalculationPerformanceTests {
             _ = try CashFlowSeries(transactions: year.transactions, period: .oneYear, endingWith: september,
                                    currencyCode: "USD", timeZone: utc)
         }
+        var items: [TransactionQuery.Item] = []
+        _ = measure("TransactionQuery items") { items = year.transactions.map { TransactionQuery.Item($0) } }
+        _ = measure("TransactionQuery items: kind filter + group") {
+            _ = TransactionQuery.groupedByDay(TransactionQuery(kind: .expense).apply(to: items), timeZone: utc)
+        }
+        _ = measure("TransactionQuery items: search + group") {
+            _ = TransactionQuery.groupedByDay(TransactionQuery(searchText: "cafe").apply(to: items), timeZone: utc)
+        }
         _ = measure("TransactionQuery search + group") {
             let matches = TransactionQuery(kind: .expense, searchText: "cafe").apply(to: year.transactions)
             _ = TransactionQuery.groupedByDay(matches, timeZone: utc)

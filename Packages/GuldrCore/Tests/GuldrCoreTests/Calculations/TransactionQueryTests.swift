@@ -27,6 +27,23 @@ struct TransactionQueryTests {
                     date: try #require(ISO8601DateFormatter().date(from: iso)), category: category)
     }
 
+    private func items(_ transactions: [Transaction]) -> [TransactionQuery.Item] {
+        transactions.map { TransactionQuery.Item($0) }
+    }
+
+    @Test func itemsCopyTheTransactionsValues() throws {
+        let food = Category(name: "Food", symbolName: "fork.knife", color: .terracotta, kind: .expense, systemKey: "food")
+        let groceries = try transaction("Groceries", note: "Weekly", category: food, cents: 4_280)
+        let item = TransactionQuery.Item(groceries) { _ in "Comida" }
+        #expect(item.id == groceries.id && item.modelID == groceries.persistentModelID)
+        #expect(item.title == "Groceries" && item.note == "Weekly" && item.kind == .expense)
+        #expect(item.amount == groceries.amount && item.date == groceries.date)
+        #expect(item.categoryID == food.id && item.categoryName == "Comida" && item.categorySymbol == "fork.knife")
+
+        let cash = TransactionQuery.Item(try transaction("Cash"))
+        #expect(cash.categoryID == nil && cash.categoryName == nil && cash.categorySymbol == nil)
+    }
+
     @Test func noFiltersReturnsEverythingNewestFirst() throws {
         let (all, _) = try previewTransactions()
         let result = TransactionQuery().apply(to: all)
@@ -47,7 +64,7 @@ struct TransactionQueryTests {
         let (all, categories) = try previewTransactions()
         let food = try #require(categories.first { $0.systemKey == "food" })
         let result = TransactionQuery(categoryIDs: [food.id]).apply(to: all)
-        #expect(!result.isEmpty && result.allSatisfy { $0.category?.id == food.id })
+        #expect(!result.isEmpty && result.allSatisfy { $0.categoryID == food.id })
 
         let uncategorized = try transaction("Cash")
         #expect(TransactionQuery(categoryIDs: [food.id]).apply(to: [uncategorized]).isEmpty)
@@ -94,7 +111,7 @@ struct TransactionQueryTests {
         let sections = TransactionQuery.groupedByDay(recent, timeZone: utc)
 
         #expect(sections.map { YearMonth.calendar(utc).component(.day, from: $0.day) } == [28, 27, 25, 24])
-        #expect(sections.map { $0.transactions.map(\.title) } == [
+        #expect(sections.map { $0.items.map(\.title) } == [
             ["Groceries", "Coffee"], ["Pharmacy", "Streaming subscription"], ["Salary"], ["Gas"]
         ])
         // "Today −$47.30", "Yesterday −$34.24", "+$5,000.00", "−$35.00"
@@ -105,17 +122,17 @@ struct TransactionQueryTests {
         let lateNight = try transaction("Late", iso: "2026-09-28T03:00:00Z")   // Sept 27, 21:00 in Mexico City
         let morning = try transaction("Morning", iso: "2026-09-28T15:00:00Z")
         let mexico = TimeZone(identifier: "America/Mexico_City")!
-        #expect(TransactionQuery.groupedByDay([morning, lateNight], timeZone: mexico).count == 2)
-        #expect(TransactionQuery.groupedByDay([morning, lateNight], timeZone: utc).count == 1)
+        #expect(TransactionQuery.groupedByDay(items([morning, lateNight]), timeZone: mexico).count == 2)
+        #expect(TransactionQuery.groupedByDay(items([morning, lateNight]), timeZone: utc).count == 1)
     }
 
     @Test func dayNetLeavesOtherCurrenciesOut() throws {
-        let sections = TransactionQuery.groupedByDay([
+        let sections = TransactionQuery.groupedByDay(items([
             try transaction("A", cents: 1_000),
             try transaction("B", cents: 5_000, currency: "EUR")
-        ], timeZone: utc)
+        ]), timeZone: utc)
         #expect(try sections.first?.net(currencyCode: "USD").minorUnits == -1_000)
-        #expect(sections.first?.transactions.count == 2)     // the list still shows both
+        #expect(sections.first?.items.count == 2)     // the list still shows both
     }
 
     @Test func equalDatesKeepAStableOrder() throws {
