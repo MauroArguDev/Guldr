@@ -24,6 +24,23 @@ public struct DayLabelFormatter: Sendable {
         YearMonth.calendar(timeZone).startOfDay(for: date)
     }
 
+    /// The add sheet's date chip: "Today, Sep 28", "Yesterday, Sep 27", otherwise "Thu, Sep 24", with
+    /// the year when it is not the current one.
+    public func chipLabel(for date: Date, relativeTo now: Date = .now) -> String {
+        let calendar = YearMonth.calendar(timeZone)
+        let days = calendar.dateComponents([.day], from: startOfDay(for: now), to: startOfDay(for: date)).day ?? 0
+        var style = Date.FormatStyle(locale: locale, calendar: calendar, timeZone: timeZone).month(.abbreviated).day()
+        if calendar.component(.year, from: date) != calendar.component(.year, from: now) {
+            style = style.year()
+        }
+        guard days == 0 || days == -1 else {
+            style = style.weekday(.abbreviated)
+            style.capitalizationContext = .beginningOfSentence
+            return date.formatted(style)
+        }
+        return label(for: date, relativeTo: now) + ", " + date.formatted(style)
+    }
+
     public func label(for date: Date, relativeTo now: Date = .now) -> String {
         let calendar = YearMonth.calendar(timeZone)
         let days = calendar.dateComponents([.day], from: startOfDay(for: now), to: startOfDay(for: date)).day ?? 0

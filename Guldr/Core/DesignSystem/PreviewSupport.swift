@@ -8,6 +8,8 @@
 #if DEBUG
 import Foundation
 import GuldrCore
+import SwiftData
+import SwiftUI
 
 extension Money {
     /// Previews only, compiled out of release builds. USD is a valid ISO 4217 code, so this cannot fail.
@@ -21,6 +23,25 @@ extension BudgetStatus.Line {
     /// Previews only: a USD budget line with `spent` of `limit` cents.
     static func preview(_ spent: Int64, of limit: Int64) -> BudgetStatus.Line {
         BudgetStatus.Line(budgetID: UUID(), categoryID: UUID(), spent: .previewUSD(spent), limit: .previewUSD(limit))
+    }
+}
+
+/// Previews only: wraps a screen in what the app provides above it, the mockups' data in memory, an
+/// onboarded user in US dollars and a router. Shows nothing if the in-memory store can't be built.
+struct PreviewEnvironment<Content: View>: View {
+
+    @ViewBuilder let content: () -> Content
+
+    @State private var container = try? PreviewData.makeController().container
+    @State private var router = AppRouter()
+
+    var body: some View {
+        if let container {
+            content()
+                .modelContainer(container)
+                .environment(Preferences.preview(onboarded: true))
+                .environment(router)
+        }
     }
 }
 #endif

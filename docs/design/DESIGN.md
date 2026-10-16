@@ -38,6 +38,8 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 | `SurfaceSecondary` | `#EFEAE0` | `#242220` | Icon chips, search field, segmented track |
 | `Field` | `#FFFFFF` | `#242220` | Unselected category chips and the add sheet's field group |
 | `FieldAccent` | `#EFEAE0` | `#35322E` | Date chip and separators inside the add sheet's field group (`SurfaceSecondary` would vanish on `Field` in dark) |
+| `SheetBackground` | `#F7F4EE` | `#1B1A18` | Add sheet background (lifted from the dimmed screen in dark) |
+| `KeypadKey` | `#FFFFFF` | `#2A2826` | Add sheet keypad keys (a step lighter than category chips in dark) |
 | `TextPrimary` | `#141312` | `#F2EEE6` | Primary text, amounts |
 | `TextSecondary` | `#6B665E` | `#9C968C` | Metadata, captions, inactive tabs |
 | `Hairline` | `#E3DDD1` | `#2C2A27` | 1 pt card borders and separators |
@@ -112,7 +114,7 @@ On the Dashboard the lines draw in once per launch (DESIGN.md › Motion); every
 
 ## Shape and spacing
 
-- Radii (pt): balance and ring cards 28 · generic card 24 · compact card 22 · alert 18 · field group 16 · category chip and keypad key 14 · icon chip 12–13 · segmented 12 (thumb 9) · progress bar 3 · buttons are capsules.
+- Radii (pt): balance and ring cards 28 · generic card 24 · compact card 22 · alert 18 · field group 16 · category chip and keypad key 14 · icon chip 12–13 · segmented 12 (thumb 9) · date chip 8 · progress bar 3 · buttons are capsules.
 - Screen padding 20 pt horizontal; vertical stack spacing 16 pt (home) / 10–12 pt (lists); card padding 22 pt (18 compact); row vertical padding 8 pt, row gap 12 pt.
 - Icon chip 42×42 (40 in lists, 38 in budget) with a 20 pt stroke icon (1.6 pt line). Use SF Symbols in code; the mockup icons are stand-ins for their closest SF Symbol.
 
@@ -186,6 +188,7 @@ When `accessibilityReduceMotion` is on:
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
 - **AddButton**: in the mockups, a 64 pt `GoldFill` circle with an `OnGold` plus. In the app it is the native separated tab next to the tab bar (a `Tab` with the `.prominent` role on iOS 27, `.search` on iOS 26, the roles each version draws apart from the bar): Liquid Glass with a `Gold` plus, sized and minimized by the system. Selecting it opens the add sheet without switching tabs. Decided by the author on 2026-10-10 (native first over a hand-drawn copy).
 - **CategoryChip** (add sheet): 62 pt tall, radius 14; selected = `GoldSoft` fill + 1.5 pt `GoldFill` border + `Gold` content.
+- **Add sheet**: `SheetBackground`, native sheet and toolbar (Cancel, title, Save in `Gold`), sections 12 pt apart. Native segmented Expense/Income; 58 pt serif amount in a 72 pt row with a 2 × 48 pt `GoldFill` caret; field group (`Field`, radius 16) of 46 pt rows with 14 pt padding, `FieldAccent` separator, and a date chip (`FieldAccent`, radius 8, 15 pt) that opens a graphical date picker; 4-column category grid with 8 pt gaps; keypad of 3 × 4 keys, 50 pt tall (never below 44), radius 14, `KeypadKey`, 24 pt regular digits, 8 pt gaps, pinned to the bottom while the rest scrolls.
 - **Charts** (Swift Charts): income bars `GoldFill`, expense bars `TextSecondary`-toned (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a subtle gradient from its category's base color to that color mixed 12% with `Surface`; slices are separated by a 2 pt gap, the legend names every slice, and large slices carry a direct label.
 - **Primary button**: capsule, 54 pt tall, `GoldFill` with `OnGold` 17 pt semibold text.
 

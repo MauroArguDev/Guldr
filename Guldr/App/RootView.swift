@@ -51,7 +51,18 @@ struct RootView: View {
         }
         .tint(Color(.gold))
         .sheet(item: $router.sheet) { sheet in
-            SheetPlaceholder(sheet: sheet)
+            switch sheet {
+            case .addTransaction:
+                AddTransactionSheet()
+            case .editTransaction(let id):
+                AddTransactionSheet(transactionID: id)
+            case .editBudget:
+                EditBudgetPlaceholder()
+            }
+        }
+        // The sheet is already closing when a save finishes, so its haptic plays here.
+        .sensoryFeedback(trigger: router.lastSave) { _, event in
+            event.map { $0.outcome == .crossedBudget ? Haptics.budgetExceeded : Haptics.saved }
         }
         .onOpenURL { url in
             router.open(url)
@@ -97,34 +108,24 @@ struct RootView: View {
     }
 }
 
-/// Stands in for the real sheets until their phases build them (add and edit transaction in Phase 17,
-/// edit budget in Phase 20).
-private struct SheetPlaceholder: View {
-
-    let sheet: AppSheet
-
+/// Stands in for the budget sheet until the budget screen (v1 plan, Phase 20).
+private struct EditBudgetPlaceholder: View {
     var body: some View {
         NavigationStack {
             Color(.appBackground)
                 .ignoresSafeArea()
-                .navigationTitle(Text(verbatim: title))
+                .navigationTitle(Text(verbatim: "Edit budget"))
                 .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-
-    private var title: String {
-        switch sheet {
-        case .addTransaction: "Add transaction"
-        case .editTransaction: "Edit transaction"
-        case .editBudget: "Edit budget"
         }
     }
 }
 
 #Preview("Light") {
-    RootView().preferredColorScheme(.light)
+    PreviewEnvironment { RootView() }
+        .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    RootView().preferredColorScheme(.dark)
+    PreviewEnvironment { RootView() }
+        .preferredColorScheme(.dark)
 }

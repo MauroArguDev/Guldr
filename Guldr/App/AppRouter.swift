@@ -21,6 +21,12 @@ enum AppSheet: Identifiable, Hashable {
     var id: Self { self }
 }
 
+/// One save, distinct from the previous one even with the same outcome, so a haptic fires every time.
+struct SaveEvent: Equatable {
+    let id = UUID()
+    let outcome: AddTransactionViewModel.SaveOutcome
+}
+
 /// App-wide navigation state: the selected tab and the presented sheet. Owned by `RootView` and shared
 /// through the environment, so any screen can open a sheet and deep links have one place to land.
 @Observable
@@ -28,6 +34,9 @@ final class AppRouter {
 
     private(set) var selectedTab: AppTab = .home
     var sheet: AppSheet?
+    /// The last successful save from the add sheet. `RootView` plays its haptic, because the sheet is
+    /// already closing when the save finishes.
+    private(set) var lastSave: SaveEvent?
 
     /// The tab bar's selection. `.add` is the Add button, not a destination: it opens the add sheet and
     /// leaves the selected tab as it was.
@@ -45,6 +54,12 @@ final class AppRouter {
 
     func dismissSheet() {
         sheet = nil
+    }
+
+    /// Closes the add sheet after a save and records the outcome for the haptic.
+    func finishSave(_ outcome: AddTransactionViewModel.SaveOutcome) {
+        lastSave = SaveEvent(outcome: outcome)
+        dismissSheet()
     }
 
     /// Handles a `guldr://` URL. Returns `false` for a URL that is not a known deep link, which is ignored.
