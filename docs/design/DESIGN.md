@@ -205,6 +205,10 @@ Glyph: a "G" that is also a clipped coin. Built on a 1024 grid: ring center (512
 
 Backgrounds: default `#111111`, light variant `#FFFFFF`, tinted variant `#2A2826` with `#D9D4CB` glyph.
 
+### Launch screen
+
+`AppBackground` with the glyph centered at 80 pt: `#8A6A2E` in light, `#C8A96A` in dark (decided by the author on 2026-10-20). The app opens from its icon onto the same glyph instead of a blank system screen. Static, as iOS requires: no text, no animation, no splash delay. The `LaunchGlyph` image set crops the glyph's 1024 grid to its ring (`viewBox` 220 220 584 584) at 80 × 80 pt, since the launch screen draws an image at its natural size. Set in the target's Info › Launch Screen (Background color `AppBackground`, Image name `LaunchGlyph`).
+
 ## Voice
 
 Short, second person, calm. "Your month, made clear." · "Your finances, just for you." Subtle gold references ("Your reserve") without overdoing it. No hype, no investing jargon. Spanish copy keeps the same tone in the String Catalog.
