@@ -6,14 +6,18 @@
 //
 
 import GuldrCore
+import SwiftData
 import SwiftUI
 
 /// The Budget tab: the Budget mockup. A native large title, then the month with previous and next
-/// buttons as the first row of the content. Until the rest of the screen is built (v1 plan, Phase 20),
-/// the body is the empty state a new user sees.
+/// buttons as the first row of the content, the ring card, an alert per over-budget category and every
+/// budgeted category's row. A month without budgets shows the empty state.
 struct BudgetView: View {
 
     @Environment(AppRouter.self) private var router
+    @Environment(Preferences.self) private var preferences
+    @Query private var transactions: [Transaction]
+    @Query private var budgets: [Budget]
     @State private var model = BudgetModel()
 
     var body: some View {
@@ -21,18 +25,51 @@ struct BudgetView: View {
             ScrollView {
                 VStack(spacing: Spacing.stackCompact) {
                     monthSwitcher
-                    EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
-                                   message: "Set a monthly limit for a category to see what is left to spend.",
-                                   actionTitle: "Set a budget") {
-                        router.present(.editBudget)
+                    if let overview = model.overview {
+                        BudgetOverviewCard(overview: overview)
+                        ForEach(model.alerts) { alert in
+                            OverBudgetAlert(categoryName: alert.categoryName, overAmount: alert.overAmount)
+                        }
+                        categoryRows
+                    } else {
+                        EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
+                                       message: "Set a monthly limit for a category to see what is left to spend.",
+                                       actionTitle: "Set a budget") {
+                            router.present(.editBudget)
+                        }
+                        .padding(.top, Spacing.stackDefault)
                     }
-                    .padding(.top, Spacing.stackDefault)
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.stackDefault)
             }
+            .onChange(of: transactions, initial: true) { refresh() }
+            .onChange(of: budgets) { refresh() }
+            .onChange(of: model.month) { refresh() }
+            .onChange(of: currencyCode) { refresh() }
+            // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+            .onChange(of: router.lastSave) { refresh() }
             .background(Color(.appBackground))
             .navigationTitle(Text(AppTab.budget.title))
+        }
+    }
+
+    /// Totals use the active currency (ADR 005); before first launch picks one, the locale's.
+    private var currencyCode: String {
+        preferences.activeCurrencyCode ?? Currency.defaultCode(for: .autoupdatingCurrent)
+    }
+
+    private func refresh() {
+        model.update(transactions: transactions, budgets: budgets, currencyCode: currencyCode)
+    }
+
+    /// The mockup's rows sit straight on the background, 2 pt apart, highest usage first.
+    private var categoryRows: some View {
+        VStack(spacing: 2) {
+            ForEach(model.rows) { row in
+                CategoryBudgetRow(name: row.name, symbol: row.symbol, line: row.line)
+                    .padding(.horizontal, 2)
+            }
         }
     }
 
@@ -71,14 +108,15 @@ struct BudgetView: View {
     }
 }
 
+// Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
+#if DEBUG
 #Preview("Light") {
-    BudgetView()
-        .environment(AppRouter())
+    PreviewEnvironment { BudgetView() }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    BudgetView()
-        .environment(AppRouter())
+    PreviewEnvironment { BudgetView() }
         .preferredColorScheme(.dark)
 }
+#endif
