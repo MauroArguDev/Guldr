@@ -16,6 +16,9 @@ struct EmptyStateView: View {
     let message: LocalizedStringKey
     var actionTitle: LocalizedStringKey?
     var action: (() -> Void)?
+    /// A second, quieter choice under the primary button, in `Gold`.
+    var secondaryActionTitle: LocalizedStringKey?
+    var secondaryAction: (() -> Void)?
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -41,6 +44,11 @@ struct EmptyStateView: View {
                 Button(actionTitle, action: action)
                     .buttonStyle(.primary)
                     .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
+            }
+            if let secondaryActionTitle, let secondaryAction {
+                Button(secondaryActionTitle, action: secondaryAction)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color(.gold))
             }
         }
     }

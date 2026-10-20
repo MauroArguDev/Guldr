@@ -17,9 +17,12 @@ struct BudgetView: View {
 
     @Environment(AppRouter.self) private var router
     @Environment(Preferences.self) private var preferences
+    @Environment(\.modelContext) private var context
+    @Environment(\.dataChangeNotifier) private var notifier
     @Query private var transactions: [Transaction]
     @Query private var budgets: [Budget]
     @State private var model = BudgetModel()
+    @State private var failedToCopy = false
 
     var body: some View {
         NavigationStack {
@@ -33,12 +36,8 @@ struct BudgetView: View {
                         }
                         categoryRows
                     } else {
-                        EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
-                                       message: "Set a monthly limit for a category to see what is left to spend.",
-                                       actionTitle: "Set a budget") {
-                            router.present(.editBudget(model.month))
-                        }
-                        .padding(.top, Spacing.stackDefault)
+                        emptyState
+                            .padding(.top, Spacing.stackDefault)
                     }
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
@@ -62,6 +61,11 @@ struct BudgetView: View {
                 }
             }
         }
+        .alert("Couldn't copy last month's budgets", isPresented: $failedToCopy) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Try again in a moment.")
+        }
     }
 
     /// Totals use the active currency (ADR 005); before first launch picks one, the locale's.
@@ -71,6 +75,40 @@ struct BudgetView: View {
 
     private func refresh() {
         model.update(transactions: transactions, budgets: budgets, currencyCode: currencyCode)
+    }
+
+    /// A month without budgets (author's call, 2026-10-20): copying last month's is the primary action
+    /// when it has any, with setting them by hand as the secondary one; otherwise only the latter.
+    @ViewBuilder
+    private var emptyState: some View {
+        if model.canCopyLastMonth {
+            EmptyStateView(title: "No budgets this month", symbol: "chart.pie",
+                           message: "Start from last month's limits, or set new ones.",
+                           actionTitle: "Copy last month's budgets", action: copyLastMonth,
+                           secondaryActionTitle: "Set budgets", secondaryAction: editBudgets)
+        } else {
+            EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
+                           message: "Set a monthly limit for a category to see what is left to spend.",
+                           actionTitle: "Set budgets", action: editBudgets)
+        }
+    }
+
+    private func editBudgets() {
+        router.present(.editBudget(model.month))
+    }
+
+    /// Copies and saves at once: the user already chose last month's limits, so there is nothing to review.
+    /// It goes through the edit sheet's model, so both paths save the same way.
+    private func copyLastMonth() {
+        do {
+            let editor = try EditBudgetModel(month: model.month, context: context, currencyCode: currencyCode,
+                                             notifier: notifier)
+            editor.copyLastMonth()
+            try editor.save()
+            router.finishSave(.saved)
+        } catch {
+            failedToCopy = true
+        }
     }
 
     /// The mockup's rows sit straight on the background, 2 pt apart, highest usage first.
