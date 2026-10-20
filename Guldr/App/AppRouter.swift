@@ -16,7 +16,8 @@ enum AppSheet: Identifiable, Hashable {
     /// The transaction is passed by identifier, not as a model: identifiers are `Sendable` and stay valid
     /// across contexts, and the sheet fetches the model it edits.
     case editTransaction(PersistentIdentifier)
-    case editBudget
+    /// The month whose budgets are edited.
+    case editBudget(YearMonth)
 
     var id: Self { self }
 }

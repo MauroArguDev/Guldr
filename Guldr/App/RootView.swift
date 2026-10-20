@@ -56,8 +56,8 @@ struct RootView: View {
                 AddTransactionSheet()
             case .editTransaction(let id):
                 AddTransactionSheet(transactionID: id)
-            case .editBudget:
-                EditBudgetPlaceholder()
+            case .editBudget(let month):
+                EditBudgetSheet(month: month)
             }
         }
         // The sheet is already closing when a save finishes, so its haptic plays here.
@@ -104,18 +104,6 @@ struct RootView: View {
             Text(tab.title)
         } icon: {
             Image(systemName: tab.symbol)
-        }
-    }
-}
-
-/// Stands in for the budget sheet until the budget screen (v1 plan, Phase 20).
-private struct EditBudgetPlaceholder: View {
-    var body: some View {
-        NavigationStack {
-            Color(.appBackground)
-                .ignoresSafeArea()
-                .navigationTitle(Text(verbatim: "Edit budget"))
-                .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

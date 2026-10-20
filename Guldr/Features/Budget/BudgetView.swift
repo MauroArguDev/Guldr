@@ -11,7 +11,8 @@ import SwiftUI
 
 /// The Budget tab: the Budget mockup. A native large title, then the month with previous and next
 /// buttons as the first row of the content, the ring card, an alert per over-budget category and every
-/// budgeted category's row. A month without budgets shows the empty state.
+/// budgeted category's row. A month without budgets shows the empty state. Edit opens the month's
+/// limits in a sheet.
 struct BudgetView: View {
 
     @Environment(AppRouter.self) private var router
@@ -35,7 +36,7 @@ struct BudgetView: View {
                         EmptyStateView(title: "No budgets yet", symbol: "chart.pie",
                                        message: "Set a monthly limit for a category to see what is left to spend.",
                                        actionTitle: "Set a budget") {
-                            router.present(.editBudget)
+                            router.present(.editBudget(model.month))
                         }
                         .padding(.top, Spacing.stackDefault)
                     }
@@ -51,6 +52,15 @@ struct BudgetView: View {
             .onChange(of: router.lastSave) { refresh() }
             .background(Color(.appBackground))
             .navigationTitle(Text(AppTab.budget.title))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit") {
+                        router.present(.editBudget(model.month))
+                    }
+                    .tint(Color(.gold))
+                    .accessibilityHint(Text("Edits this month's budgets"))
+                }
+            }
         }
     }
 
