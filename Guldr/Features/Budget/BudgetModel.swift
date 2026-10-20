@@ -50,6 +50,8 @@ final class BudgetModel {
     private(set) var alerts: [Alert] = []
     /// Every budgeted category, highest usage first (`BudgetStatus`'s order).
     private(set) var rows: [Row] = []
+    /// Whether the month before the one on screen has budgets to copy, so an empty month can offer it.
+    private(set) var canCopyLastMonth = false
 
     init(locale: Locale = .autoupdatingCurrent, timeZone: TimeZone = .autoupdatingCurrent,
          now: @escaping () -> Date = { .now }) {
@@ -82,6 +84,11 @@ final class BudgetModel {
     /// Recomputes the month on screen from the latest transactions and budgets in the active currency.
     /// The view calls it when they, the currency, a save or the month change.
     func update(transactions: [Transaction], budgets: [Budget], currencyCode: String) {
+        let previousKey = month.previous.rawValue
+        canCopyLastMonth = budgets.contains { budget in
+            budget.yearMonth == previousKey && budget.currencyCode == currencyCode
+                && budget.category.map { !$0.isArchived && $0.kind == .expense } == true
+        }
         guard let status = try? BudgetStatus(budgets: budgets, transactions: transactions, month: month,
                                              currencyCode: currencyCode, now: now(), timeZone: timeZone),
               !status.lines.isEmpty else {
