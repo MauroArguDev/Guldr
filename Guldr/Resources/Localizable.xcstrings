@@ -281,11 +281,17 @@
     "Income" : {
 
     },
+    "Income vs. expenses" : {
+      "comment" : "Title of the Analytics chart that compares income and expenses per month or week."
+    },
     "It may have been deleted." : {
 
     },
     "It's still saved. Try again in a moment." : {
 
+    },
+    "Kind" : {
+      "comment" : "Name of the chart's income or expense series, read by VoiceOver."
     },
     "Leave a category empty to have no budget for it." : {
       "comment" : "A description of the footer of the budget editing form.",
@@ -377,6 +383,9 @@
     },
     "Save" : {
 
+    },
+    "Saved" : {
+      "comment" : "Analytics total: income minus expenses for the period; negative when the period spent more than it earned."
     },
     "Savings rate" : {
 

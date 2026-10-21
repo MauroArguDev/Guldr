@@ -6,36 +6,92 @@
 //
 
 import GuldrCore
+import SwiftData
 import SwiftUI
 
-/// The Analytics tab: the Charts mockup. A native large title, then the period picker as the first row
-/// of the content. Until the charts are built (v1 plan, Phase 21), the body is the empty state a new
-/// user sees.
+/// The Analytics tab: the Charts mockup. A native large title, then the period picker, the period's
+/// income, expenses and savings, and the income vs. expenses chart. Every figure covers the period
+/// ending with the current month, in the active currency (ADR 005).
 struct AnalyticsView: View {
 
     @Environment(AppRouter.self) private var router
+    @Environment(Preferences.self) private var preferences
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Query private var transactions: [Transaction]
     /// 6M the first time, as in the mockup, then the last period chosen (author's call, 2026-10-20). A
     /// preference of this screen only, so it stays in the app's own defaults, not the App Group.
     @AppStorage("analyticsPeriod") private var period: CashFlowSeries.Period = .sixMonths
+    @State private var model = AnalyticsModel()
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.stackDefault) {
                     periodPicker
-                    EmptyStateView(title: "Nothing to chart yet", symbol: "chart.bar",
-                                   message: "Your income and spending show up here once you add transactions.",
-                                   actionTitle: "Add transaction") {
-                        router.present(.addTransaction)
+                    if model.hasData, let totals = model.totals {
+                        totalsRow(totals)
+                        CashFlowChart(bars: model.bars)
+                    } else {
+                        EmptyStateView(title: "Nothing to chart yet", symbol: "chart.bar",
+                                       message: "Your income and spending show up here once you add transactions.",
+                                       actionTitle: "Add transaction") {
+                            router.present(.addTransaction)
+                        }
+                        .padding(.top, Spacing.stackDefault)
                     }
-                    .padding(.top, Spacing.stackDefault)
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.stackDefault)
             }
+            .onChange(of: transactions, initial: true) { refresh() }
+            .onChange(of: period) { refresh() }
+            .onChange(of: currencyCode) { refresh() }
+            // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+            .onChange(of: router.lastSave) { refresh() }
             .background(Color(.appBackground))
             .navigationTitle(Text(AppTab.analytics.title))
         }
+    }
+
+    /// Totals use the active currency (ADR 005); before first launch picks one, the locale's.
+    private var currencyCode: String {
+        preferences.activeCurrencyCode ?? Currency.defaultCode(for: .autoupdatingCurrent)
+    }
+
+    private func refresh() {
+        model.update(transactions: transactions, period: period, currencyCode: currencyCode)
+    }
+
+    /// "Income $31,050 · Expenses $12,875 · Saved $18,176" in whole units, as in the mockup; Saved in
+    /// `Gold`, or with a minus sign in `Negative` when the period spent more than it earned (author's
+    /// call, 2026-10-20). Stacked at accessibility sizes.
+    private func totalsRow(_ totals: AnalyticsModel.Totals) -> some View {
+        totalsLayout {
+            total("Income", AmountText(totals.income, sign: .never, precision: .wholeUnits))
+            total("Expenses", AmountText(totals.expenses, sign: .never, precision: .wholeUnits))
+            total("Saved", AmountText(totals.net, tone: totals.net.isNegative ? .negative : .gold,
+                                      precision: .wholeUnits))
+        }
+        .padding(.horizontal, 2)
+    }
+
+    private var totalsLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 8))
+    }
+
+    private func total(_ title: LocalizedStringKey, _ amount: AmountText) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(Color(.textSecondary))
+            amount
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 
     private var periodPicker: some View {
