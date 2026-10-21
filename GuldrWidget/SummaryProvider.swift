@@ -11,8 +11,8 @@ import SwiftData
 import WidgetKit
 
 /// One moment of the widgets: the summary, or the invitation to open the app, and whether amounts are
-/// hidden.
-struct SummaryEntry: TimelineEntry {
+/// hidden. `nonisolated`, like the provider that builds it off the main actor.
+nonisolated struct SummaryEntry: TimelineEntry {
 
     enum Content: Equatable {
         /// The app was never opened, or first launch isn't done: "Open Guldr to get started".
