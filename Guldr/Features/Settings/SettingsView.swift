@@ -12,9 +12,8 @@ import UIKit
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
 /// changed, the Face ID lock and its grace period (ADR 011), budget alerts, the widgets' privacy, the
-/// categories, About and "Delete all data". Export joins it in the phase that builds it, so it never
-/// shows a control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
-/// gallery from here.
+/// categories, the CSV export, About and "Delete all data". Settings never shows a control that does
+/// nothing (author's call, 2026-10-20). Debug builds also link to the design system gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
@@ -56,6 +55,11 @@ struct SettingsView: View {
                     CategoriesView()
                 } label: {
                     Text("Categories")
+                }
+                NavigationLink {
+                    ExportView()
+                } label: {
+                    Text("Export transactions")
                 }
             }
 
