@@ -32,6 +32,12 @@
         }
       }
     },
+    "%@, expenses" : {
+      "comment" : "VoiceOver label of an expense bar in the Analytics chart; the argument is the month or week."
+    },
+    "%@, income" : {
+      "comment" : "VoiceOver label of an income bar in the Analytics chart; the argument is the month or week."
+    },
     "%lld categories over budget" : {
       "localizations" : {
         "en" : {
@@ -409,6 +415,15 @@
     "Shopping" : {
       "comment" : "Name of a default category, shown until the user renames it. Looked up at runtime by Category.displayName.",
       "extractionState" : "manual"
+    },
+    "Shows this category in the center of the chart" : {
+      "comment" : "VoiceOver hint of a donut legend row."
+    },
+    "Spending" : {
+      "comment" : "Audio Graph series name for the spending by category donut."
+    },
+    "Spending by category, %@" : {
+      "comment" : "Audio Graph title of the donut; the argument is the period, e.g. May – Oct."
     },
     "Spent" : {
       "comment" : "A label for the amount of money spent.",
