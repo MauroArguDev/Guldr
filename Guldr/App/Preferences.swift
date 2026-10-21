@@ -35,6 +35,14 @@ final class Preferences {
         activeCurrencyCode = settings.activeCurrencyCode
     }
 
+    /// After "Delete all data": `LaunchGate` sees first launch is no longer completed and shows the
+    /// welcome screen.
+    func reset() {
+        settings.reset()
+        activeCurrencyCode = settings.activeCurrencyCode
+        hasCompletedOnboarding = settings.hasCompletedOnboarding
+    }
+
     // MARK: - Private
 
     @ObservationIgnored private let settings: AppSettings
