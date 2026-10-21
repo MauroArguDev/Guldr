@@ -27,14 +27,17 @@ struct AmountText: View {
         case primary
         /// Income.
         case positive
-        /// Over budget.
+        /// Over budget, or a period that spent more than it earned.
         case negative
+        /// What a period saved (Analytics), as in the Charts mockup.
+        case gold
 
         var color: Color {
             switch self {
             case .primary: Color(.textPrimary)
             case .positive: Color(.positive)
             case .negative: Color(.negative)
+            case .gold: Color(.gold)
             }
         }
     }
