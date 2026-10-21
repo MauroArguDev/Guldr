@@ -30,6 +30,6 @@ Guldr holds a person's whole financial life on their iPhone. Anyone who picks up
 ## Consequences
 
 - The app needs `NSFaceIDUsageDescription` in `Info.plist`.
-- Every full-screen path (launch, foreground, deep links) goes through the lock first: `LaunchGate` overlays the lock screen on the app instead of replacing it, so the app keeps its state underneath.
+- Every path (launch, foreground, deep links) goes through the lock first. The lock screen and the cover live in a second window at the alert level, above the app's, so they also cover any sheet, alert or menu the app is presenting, and the app keeps its state underneath. `LaunchGate` reports the scene's phase to `AppLock`; the lock is applied on the way back from the background, while the scene is still inactive, so the app's content never shows first.
 - The widget shows amounts on the home screen even when the app is locked unless Phase 24's "Hide amounts in widgets" is on; that phase decides how the two settings interact.
 - Tests drive `AppLock` with a fake service and a fake clock: launch, grace period, cancel, failure and unavailable authentication.

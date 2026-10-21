@@ -30,6 +30,8 @@ final class AppLock {
     /// Counts failed attempts, so the lock screen can play the `.error` haptic on each one.
     private(set) var failureCount = 0
     private(set) var availability: LockAvailability
+    /// Whether the scene is active; `LaunchGate` keeps it current.
+    var isSceneActive = true
 
     init(settings: AppSettings, service: any LockService, now: @escaping () -> Date = { .now }) {
         self.settings = settings
@@ -40,9 +42,19 @@ final class AppLock {
         availability = service.availability()
         // Always locked on launch while the lock is on.
         state = settings.isLockEnabled ? .locked : .unlocked
+        promptsWhenActive = settings.isLockEnabled
     }
 
     var isLocked: Bool { state == .locked }
+
+    /// The blurred privacy cover (ADR 011): while the lock is on and the app isn't in front, except
+    /// while a prompt is up, since the prompt itself makes the scene inactive.
+    var showsCover: Bool {
+        isEnabled && !isSceneActive && !isAuthenticating
+    }
+
+    /// Whether the window above the app has anything to show.
+    var isOverlayVisible: Bool { isLocked || showsCover }
 
     /// Reads the device's abilities again: Face ID can be enrolled or the passcode removed meanwhile.
     func refreshAvailability() {
@@ -62,7 +74,16 @@ final class AppLock {
         guard isEnabled, let backgroundedAt else { return }
         if now().timeIntervalSince(backgroundedAt) >= gracePeriod.duration {
             state = .locked
+            promptsWhenActive = true
         }
+    }
+
+    /// The scene is in front. Asks on its own once after launch or a lock on return (author's call,
+    /// 2026-10-21); a dismissed prompt also makes the scene active again, and that must not ask again.
+    func sceneDidBecomeActive() async {
+        guard promptsWhenActive else { return }
+        promptsWhenActive = false
+        await unlock()
     }
 
     // MARK: - Unlocking
@@ -121,6 +142,7 @@ final class AppLock {
         gracePeriod = settings.lockGracePeriod
         state = .unlocked
         backgroundedAt = nil
+        promptsWhenActive = false
     }
 
     // MARK: - Private
@@ -129,6 +151,7 @@ final class AppLock {
     @ObservationIgnored private let service: any LockService
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private var backgroundedAt: Date?
+    @ObservationIgnored private var promptsWhenActive: Bool
 
     private func authenticate() async throws(LockError) {
         isAuthenticating = true
@@ -136,3 +159,16 @@ final class AppLock {
         try await service.authenticate(reason: String(localized: "Unlock your finances in Guldr."))
     }
 }
+
+#if DEBUG
+extension AppLock {
+    /// A lock over a throwaway defaults suite and a fake service, for previews.
+    static func preview(locked: Bool, biometry: Biometry = .faceID) -> AppLock {
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "preview.\(UUID().uuidString)") ?? .standard)
+        settings.setLockEnabled(locked)
+        let service = FakeLockService(result: .failure(.canceled),
+                                      deviceAvailability: LockAvailability(canAuthenticate: true, biometry: biometry))
+        return AppLock(settings: settings, service: service)
+    }
+}
+#endif

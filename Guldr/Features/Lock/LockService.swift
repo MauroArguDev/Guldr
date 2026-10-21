@@ -70,9 +70,11 @@ struct LocalAuthenticationLockService: LockService {
             _ = try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
         } catch let error as LAError {
             switch error.code {
-            case .userCancel, .appCancel, .systemCancel, .userFallback:
+            // `.notInteractive` means the app wasn't in front to show a prompt: try again later, never
+            // treat it as a device that can't authenticate.
+            case .userCancel, .appCancel, .systemCancel, .userFallback, .notInteractive:
                 throw .canceled
-            case .passcodeNotSet, .notInteractive:
+            case .passcodeNotSet:
                 throw .unavailable
             default:
                 throw .failed

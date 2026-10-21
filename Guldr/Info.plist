@@ -15,6 +15,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Guldr uses Face ID to keep your finances private.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
