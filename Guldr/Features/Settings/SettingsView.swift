@@ -9,7 +9,7 @@ import GuldrCore
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, and the version. Face ID, notifications, widget privacy and export join it in the phases that
+/// changed, the categories and the version. Face ID, notifications, widget privacy and export join it in the phases that
 /// build them, so it never shows a control that does nothing (author's call, 2026-10-20). Debug builds
 /// also link to the design system gallery from here.
 struct SettingsView: View {
@@ -30,6 +30,14 @@ struct SettingsView: View {
                 }
             } footer: {
                 Text("Totals, budgets and charts use this currency. Transactions keep the currency they were saved in.")
+            }
+
+            Section {
+                NavigationLink {
+                    CategoriesView()
+                } label: {
+                    Text("Categories")
+                }
             }
 
             Section {
