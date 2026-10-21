@@ -32,6 +32,7 @@ struct PreviewEnvironment<Content: View>: View {
 
     @State private var container: ModelContainer?
     @State private var router = AppRouter()
+    @State private var lock = AppLock.preview(locked: false)
     private let content: () -> Content
 
     /// `seeded: false` keeps only the default categories, for empty states.
@@ -47,6 +48,7 @@ struct PreviewEnvironment<Content: View>: View {
                 .modelContainer(container)
                 .environment(Preferences.preview(onboarded: true))
                 .environment(router)
+                .environment(lock)
         }
     }
 }

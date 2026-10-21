@@ -10,10 +10,12 @@ import SwiftUI
 
 /// First launch: the wordmark, the tagline and the currency, preset from the device's region (ADR 005).
 /// Laid out like the Lock mockup, the other full-screen brand moment. Categories are already seeded when
-/// the store opens; the Face ID opt-in joins this screen in Phase 23.
+/// the store opens. Under the currency, an opt-in to the Face ID lock, off by default (author's call,
+/// 2026-10-21); turning it on asks for Face ID right there (ADR 011). Hidden on a device without a passcode.
 struct WelcomeView: View {
 
     @Environment(Preferences.self) private var preferences
+    @Environment(AppLock.self) private var lock
     @State private var currencyCode = Currency.defaultCode(for: .autoupdatingCurrent)
     @State private var failedToSave = false
 
@@ -32,6 +34,9 @@ struct WelcomeView: View {
                 VStack(spacing: 22) {
                     LedgerLines(variant: .centered, drawsIn: true)
                     currencyRow
+                    if lock.availability.canAuthenticate || lock.isEnabled {
+                        lockRow
+                    }
                     Button("Get started", action: getStarted)
                         .buttonStyle(.primary)
                 }
@@ -77,6 +82,35 @@ struct WelcomeView: View {
         .buttonStyle(.plain)
     }
 
+    private var lockRow: some View {
+        Toggle(isOn: lockSelection) {
+            Text(lock.availability.biometry.optInTitle)
+                .textRole(.rowTitle)
+                .foregroundStyle(Color(.textPrimary))
+        }
+        .tint(Color(.goldFill))
+        .disabled(lock.isAuthenticating)
+        .padding(.horizontal, Spacing.cardPaddingCompact)
+        .padding(.vertical, Spacing.rowGap)
+        .frame(minHeight: Size.touchTargetMin)
+        .background(Color(.field), in: .rect(cornerRadius: Radius.field))
+    }
+
+    /// Moves once Face ID answers. A cancel or a failure leaves it off; Settings can turn it on later.
+    private var lockSelection: Binding<Bool> {
+        Binding {
+            lock.isEnabled
+        } set: { isOn in
+            Task {
+                if isOn {
+                    try? await lock.enable()
+                } else {
+                    try? await lock.disable()
+                }
+            }
+        }
+    }
+
     private func getStarted() {
         do {
             try preferences.completeOnboarding(currencyCode: currencyCode)
@@ -91,12 +125,14 @@ struct WelcomeView: View {
 #Preview("Light") {
     WelcomeView()
         .environment(Preferences.preview(onboarded: false))
+        .environment(AppLock.preview(locked: false))
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
     WelcomeView()
         .environment(Preferences.preview(onboarded: false))
+        .environment(AppLock.preview(locked: false))
         .preferredColorScheme(.dark)
 }
 #endif

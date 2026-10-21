@@ -87,6 +87,29 @@ struct LockView: View {
     }
 }
 
+extension Biometry {
+
+    /// The lock's name in Settings.
+    var lockTitle: LocalizedStringKey {
+        switch self {
+        case .faceID: "Face ID"
+        case .touchID: "Touch ID"
+        case .opticID: "Optic ID"
+        case .none: "Passcode lock"
+        }
+    }
+
+    /// The welcome screen's opt-in.
+    var optInTitle: LocalizedStringKey {
+        switch self {
+        case .faceID: "Lock with Face ID"
+        case .touchID: "Lock with Touch ID"
+        case .opticID: "Lock with Optic ID"
+        case .none: "Lock with passcode"
+        }
+    }
+}
+
 /// The app icon as the mockup draws it: an 84 pt tile on `Surface` with a `Hairline` border and the
 /// glyph in `Gold`. The radius is the icon grid's (228 of 1024) at this size.
 private struct AppTile: View {

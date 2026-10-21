@@ -10,12 +10,14 @@ import SwiftData
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the categories, About and "Delete all data". Face ID, notifications, widget privacy and export join it in the phases that
-/// build them, so it never shows a control that does nothing (author's call, 2026-10-20). Debug builds
-/// also link to the design system gallery from here.
+/// changed, the Face ID lock and its grace period (ADR 011), the categories, About and "Delete all data".
+/// Notifications, widget privacy and export join it in the phases that build them, so it never shows a
+/// control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
+/// gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
+    @Environment(AppLock.self) private var lock
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var context
     @Environment(\.dataChangeNotifier) private var notifier
@@ -23,6 +25,7 @@ struct SettingsView: View {
     @State private var confirmingDelete = false
     @State private var confirmingDeleteAgain = false
     @State private var failedToDelete = false
+    @State private var lockError: LockError?
 
     var body: some View {
         Form {
@@ -37,6 +40,8 @@ struct SettingsView: View {
             } footer: {
                 Text("Totals, budgets and charts use this currency. Transactions keep the currency they were saved in.")
             }
+
+            lockSection
 
             Section {
                 NavigationLink {
@@ -101,6 +106,13 @@ struct SettingsView: View {
         } message: {
             Text("Nothing was deleted. Try again in a moment.")
         }
+        .alert("Couldn't change the lock", isPresented: isShowingLockError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(lockError == .unavailable ? "Set a passcode in the Settings app first."
+                                           : "Your iPhone couldn't confirm it's you. Try again.")
+        }
+        .onAppear { lock.refreshAvailability() }
         .alert("Couldn't save your currency", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -118,6 +130,63 @@ struct SettingsView: View {
         }
         notifier.dataDidChange()
         preferences.reset()
+        lock.settingsDidReset()
+    }
+
+    /// The lock and, while it's on, how long the app may stay in the background. Disabled with a reason
+    /// on a device without a passcode, unless it's already on, so it can still be turned off.
+    private var lockSection: some View {
+        Section {
+            Toggle(isOn: lockSelection) {
+                Text(lock.availability.biometry.lockTitle)
+            }
+            .tint(Color(.goldFill))
+            .disabled(lock.isAuthenticating || (!lock.availability.canAuthenticate && !lock.isEnabled))
+            if lock.isEnabled {
+                Picker("Require", selection: gracePeriodSelection) {
+                    ForEach(LockGracePeriod.allCases, id: \.self) { period in
+                        Text(period.title)
+                    }
+                }
+            }
+        } header: {
+            Text("Security")
+        } footer: {
+            if lock.availability.canAuthenticate || lock.isEnabled {
+                Text("Guldr asks when it opens and when you come back after the time you choose. Your iPhone passcode works too.")
+            } else {
+                Text("Set a passcode in the Settings app to lock Guldr.")
+            }
+        }
+    }
+
+    /// Turning the lock on or off asks first (ADR 011); the toggle moves once the answer is in.
+    private var lockSelection: Binding<Bool> {
+        Binding {
+            lock.isEnabled
+        } set: { isOn in
+            Task {
+                do throws(LockError) {
+                    if isOn {
+                        try await lock.enable()
+                    } else {
+                        try await lock.disable()
+                    }
+                } catch .canceled {
+                    return
+                } catch {
+                    lockError = error
+                }
+            }
+        }
+    }
+
+    private var gracePeriodSelection: Binding<LockGracePeriod> {
+        Binding { lock.gracePeriod } set: { lock.setGracePeriod($0) }
+    }
+
+    private var isShowingLockError: Binding<Bool> {
+        Binding { lockError != nil } set: { if !$0 { lockError = nil } }
     }
 
     private var activeCurrencyCode: String {
@@ -156,3 +225,16 @@ struct SettingsView: View {
         .preferredColorScheme(.dark)
 }
 #endif
+
+extension LockGracePeriod {
+
+    /// Settings' "Require" picker.
+    var title: LocalizedStringKey {
+        switch self {
+        case .immediately: "Immediately"
+        case .oneMinute: "After 1 minute"
+        case .fiveMinutes: "After 5 minutes"
+        case .fifteenMinutes: "After 15 minutes"
+        }
+    }
+}
