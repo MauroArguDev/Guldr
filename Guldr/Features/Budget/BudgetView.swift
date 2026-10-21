@@ -19,6 +19,7 @@ struct BudgetView: View {
     @Environment(Preferences.self) private var preferences
     @Environment(\.modelContext) private var context
     @Environment(\.dataChangeNotifier) private var notifier
+    @Environment(BudgetAlertCenter.self) private var alerts
     @Query private var transactions: [Transaction]
     @Query private var budgets: [Budget]
     @State private var model = BudgetModel()
@@ -106,6 +107,8 @@ struct BudgetView: View {
             editor.copyLastMonth()
             try editor.save()
             router.finishSave(.saved)
+            // No sheet closes on this path, so the budget alerts offer comes from here.
+            Task { await alerts.offerIfNeeded() }
         } catch {
             failedToCopy = true
         }

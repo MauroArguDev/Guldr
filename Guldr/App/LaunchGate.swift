@@ -7,6 +7,7 @@
 
 import GuldrCore
 import SwiftUI
+import WidgetKit
 
 /// Shows first launch until it is completed, then the app. Shares `Preferences` and `AppLock` with
 /// everything below, and keeps the lock informed of the scene's phase: the grace period starts in the
@@ -16,6 +17,7 @@ struct LaunchGate: View {
 
     @State var preferences: Preferences
     @State var lock: AppLock
+    @State var alerts: BudgetAlertCenter
     @State private var overlay = LockOverlayWindow()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -43,6 +45,16 @@ struct LaunchGate: View {
         }
         .environment(preferences)
         .environment(lock)
+        .environment(alerts)
+        .environment(\.dataChangeNotifier, dataChangeNotifier)
+    }
+
+    /// Every save refreshes the widgets and checks budget alerts (ADR 007).
+    private var dataChangeNotifier: DataChangeNotifier {
+        DataChangeNotifier { [alerts] in
+            WidgetCenter.shared.reloadAllTimelines()
+            Task { await alerts.evaluate() }
+        }
     }
 
     private func sceneChanged(from old: ScenePhase, to new: ScenePhase) {

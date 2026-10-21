@@ -9,7 +9,7 @@ import SwiftUI
 import WidgetKit
 
 /// The one call the app makes after any save that changes totals (ADR 007). Everything that depends
-/// on the data refreshes from here: today the widgets, from Phase 25 also budget notifications.
+/// on the data refreshes from here: the widgets and budget notifications, which `LaunchGate` adds.
 ///
 /// Read it from the environment (`@Environment(\.dataChangeNotifier)`). The action is injectable so
 /// tests and previews can observe calls without touching WidgetKit.

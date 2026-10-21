@@ -12,13 +12,16 @@ import SwiftUI
 struct GuldrApp: App {
 
     @State private var loader = AppDataLoader()
+    /// Created with the app, so a tap on a notification that launches Guldr reaches its delegate.
+    @State private var notifications = UserNotificationService()
 
     var body: some Scene {
         WindowGroup {
             switch loader.state {
             case .ready(let container, let settings):
                 LaunchGate(preferences: Preferences(settings: settings),
-                           lock: AppLock(settings: settings, service: LocalAuthenticationLockService()))
+                           lock: AppLock(settings: settings, service: LocalAuthenticationLockService()),
+                           alerts: BudgetAlertCenter(container: container, settings: settings, service: notifications))
                     .modelContainer(container)
             case .failed(let error):
                 StoreErrorView(error: error, retry: loader.retry)
