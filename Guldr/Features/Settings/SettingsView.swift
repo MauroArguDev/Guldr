@@ -9,7 +9,7 @@ import GuldrCore
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the categories and the version. Face ID, notifications, widget privacy and export join it in the phases that
+/// changed, the categories and About. Face ID, notifications, widget privacy and export join it in the phases that
 /// build them, so it never shows a control that does nothing (author's call, 2026-10-20). Debug builds
 /// also link to the design system gallery from here.
 struct SettingsView: View {
@@ -41,8 +41,10 @@ struct SettingsView: View {
             }
 
             Section {
-                LabeledContent("Version") {
-                    Text(verbatim: Self.versionText())
+                NavigationLink {
+                    AboutView()
+                } label: {
+                    Text("About")
                 }
             }
 
@@ -94,13 +96,6 @@ struct SettingsView: View {
     private var currencyText: String {
         let option = CurrencyOption.option(for: activeCurrencyCode, locale: locale)
         return "\(option.name) (\(option.code))"
-    }
-
-    /// "1.0 (1)" from the bundle's version and build number.
-    static func versionText(infoDictionary: [String: Any]? = Bundle.main.infoDictionary) -> String {
-        let version = infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
-        guard let build = infoDictionary?["CFBundleVersion"] as? String else { return version }
-        return "\(version) (\(build))"
     }
 }
 

@@ -106,6 +106,12 @@
     "6M" : {
       "comment" : "Analytics period picker: six months."
     },
+    "About" : {
+      "comment" : "The title of the About screen and its row in Settings."
+    },
+    "Acknowledgements" : {
+      "comment" : "The header of the open-source licenses section."
+    },
     "Add category" : {
       "comment" : "The toolbar button that creates a category."
     },
@@ -512,6 +518,9 @@
     "Shows this category in the center of the chart" : {
       "comment" : "VoiceOver hint of a donut legend row."
     },
+    "SIL Open Font License 1.1" : {
+      "comment" : "The license of the Manrope typeface, beside its name."
+    },
     "Sky" : {
       "comment" : "The name VoiceOver reads for a category color swatch."
     },
@@ -542,6 +551,9 @@
     },
     "The category's color in the analytics charts." : {
       "comment" : "The footer under the category editor's color swatches."
+    },
+    "The Guldr wordmark is drawn from the Manrope typeface." : {
+      "comment" : "The footer under the open-source licenses."
     },
     "This can't be undone." : {
 
@@ -585,11 +597,14 @@
     "Uncategorized" : {
 
     },
-    "Version" : {
-
+    "Version %@" : {
+      "comment" : "What VoiceOver reads for the app version on the About screen."
     },
     "Wine" : {
       "comment" : "The name VoiceOver reads for a category color swatch."
+    },
+    "Write to %@. Your message includes the app and iOS versions." : {
+      "comment" : "The footer under Contact support; the argument is the support email address."
     },
     "Your changes are still here. Try again in a moment." : {
 
