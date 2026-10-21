@@ -17,6 +17,7 @@ public struct AppSettings {
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
         static let isLockEnabled = "isLockEnabled"
         static let lockGracePeriod = "lockGracePeriod"
+        static let hidesWidgetAmounts = "hidesWidgetAmounts"
     }
 
     private let defaults: UserDefaults
@@ -57,6 +58,21 @@ public struct AppSettings {
         return LockGracePeriod(rawValue: defaults.integer(forKey: Key.lockGracePeriod)) ?? .default
     }
 
+    /// Settings › "Hide amounts in widgets", off by default.
+    public var hidesWidgetAmounts: Bool {
+        defaults.bool(forKey: Key.hidesWidgetAmounts)
+    }
+
+    /// What the widget does: while the lock is on it always hides amounts, otherwise the setting decides
+    /// (author's call, 2026-10-21).
+    public var widgetHidesAmounts: Bool {
+        isLockEnabled || hidesWidgetAmounts
+    }
+
+    public func setHidesWidgetAmounts(_ hides: Bool) {
+        defaults.set(hides, forKey: Key.hidesWidgetAmounts)
+    }
+
     public func setLockEnabled(_ isEnabled: Bool) {
         defaults.set(isEnabled, forKey: Key.isLockEnabled)
     }
@@ -72,7 +88,8 @@ public struct AppSettings {
 
     /// Forgets every preference, so the app opens on the welcome screen again with the lock off.
     public func reset() {
-        for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod] {
+        for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod,
+                    Key.hidesWidgetAmounts] {
             defaults.removeObject(forKey: key)
         }
     }

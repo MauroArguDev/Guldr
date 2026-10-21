@@ -52,6 +52,7 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 | `Negative` | `#B4443C` | `#E07A6E` | Over-budget values, alerts |
 | `NegativeSoft` | `#F6E4E0` | `#2B1C1A` | Over-budget alert background |
 | `ChartExpense` | `#6B665E` | `#6E6962` | Expense bars in the income vs. expenses chart (added by the author on 2026-10-20) |
+| `WidgetBackground` | `#FFFFFF` | `#111111` | Home screen widgets' container background, as in the Widgets mockup (added on 2026-10-21) |
 
 ### Category palette
 

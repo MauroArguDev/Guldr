@@ -16,6 +16,7 @@ struct WelcomeView: View {
 
     @Environment(Preferences.self) private var preferences
     @Environment(AppLock.self) private var lock
+    @Environment(\.dataChangeNotifier) private var notifier
     @State private var currencyCode = Currency.defaultCode(for: .autoupdatingCurrent)
     @State private var failedToSave = false
 
@@ -114,6 +115,8 @@ struct WelcomeView: View {
     private func getStarted() {
         do {
             try preferences.completeOnboarding(currencyCode: currencyCode)
+            // The widget leaves its "Open Guldr" state.
+            notifier.dataDidChange()
         } catch {
             failedToSave = true
         }

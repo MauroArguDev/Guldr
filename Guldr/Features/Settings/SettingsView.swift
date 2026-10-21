@@ -128,9 +128,10 @@ struct SettingsView: View {
             failedToDelete = true
             return
         }
-        notifier.dataDidChange()
         preferences.reset()
         lock.settingsDidReset()
+        // After the preferences are gone, so the widget reloads into its "Open Guldr" state.
+        notifier.dataDidChange()
     }
 
     /// The lock and, while it's on, how long the app may stay in the background. Disabled with a reason
@@ -172,6 +173,8 @@ struct SettingsView: View {
                     } else {
                         try await lock.disable()
                     }
+                    // While the lock is on, the widget hides amounts.
+                    notifier.dataDidChange()
                 } catch .canceled {
                     return
                 } catch {
@@ -200,6 +203,8 @@ struct SettingsView: View {
         } set: { code in
             do {
                 try preferences.setActiveCurrency(code)
+                // The widget totals the active currency.
+                notifier.dataDidChange()
             } catch {
                 failedToSave = true
             }
