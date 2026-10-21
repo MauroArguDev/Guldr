@@ -103,6 +103,22 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func budgetAlertPreferencesAreStoredAndReset() {
+        withSettings { settings, defaults in
+            #expect(!settings.budgetAlertsEnabled)
+            #expect(!settings.hasOfferedBudgetAlerts)
+            settings.setBudgetAlertsEnabled(true)
+            settings.setHasOfferedBudgetAlerts()
+            settings.setBudgetAlertLedger(BudgetAlertLedger(keys: ["202610:A:80"]))
+            #expect(AppSettings(defaults: defaults).budgetAlertLedger.keys == ["202610:A:80"])
+
+            settings.reset()
+            #expect(!settings.budgetAlertsEnabled)
+            #expect(!settings.hasOfferedBudgetAlerts)
+            #expect(settings.budgetAlertLedger.keys.isEmpty)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")
