@@ -106,12 +106,12 @@ struct PreferencesTests {
     }
 }
 
-struct SettingsViewTests {
+struct AboutViewTests {
 
     @Test func versionShowsTheBuildNumber() {
-        #expect(SettingsView.versionText(infoDictionary: ["CFBundleShortVersionString": "1.0", "CFBundleVersion": "7"])
+        #expect(AboutView.versionText(infoDictionary: ["CFBundleShortVersionString": "1.0", "CFBundleVersion": "7"])
                 == "1.0 (7)")
-        #expect(SettingsView.versionText(infoDictionary: ["CFBundleShortVersionString": "1.0"]) == "1.0")
-        #expect(SettingsView.versionText(infoDictionary: nil) == "—")
+        #expect(AboutView.versionText(infoDictionary: ["CFBundleShortVersionString": "1.0"]) == "1.0")
+        #expect(AboutView.versionText(infoDictionary: nil) == "—")
     }
 }
