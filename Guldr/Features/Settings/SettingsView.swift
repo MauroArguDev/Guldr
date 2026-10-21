@@ -10,9 +10,9 @@ import SwiftData
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the Face ID lock and its grace period (ADR 011), the categories, About and "Delete all data".
-/// Notifications, widget privacy and export join it in the phases that build them, so it never shows a
-/// control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
+/// changed, the Face ID lock and its grace period (ADR 011), the widgets' privacy, the categories, About
+/// and "Delete all data". Notifications and export join it in the phases that build them, so it never
+/// shows a control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
 /// gallery from here.
 struct SettingsView: View {
 
@@ -42,6 +42,8 @@ struct SettingsView: View {
             }
 
             lockSection
+
+            widgetsSection
 
             Section {
                 NavigationLink {
@@ -181,6 +183,32 @@ struct SettingsView: View {
                     lockError = error
                 }
             }
+        }
+    }
+
+    /// On and fixed while the lock is on, which always hides them (author's call, 2026-10-21).
+    private var widgetsSection: some View {
+        Section {
+            Toggle("Hide amounts in widgets", isOn: hidesWidgetAmountsSelection)
+                .tint(Color(.goldFill))
+                .disabled(lock.isEnabled)
+        } header: {
+            Text("Widgets")
+        } footer: {
+            if lock.isEnabled {
+                Text("While Guldr is locked with \(Text(lock.availability.biometry.lockTitle)), widgets always hide amounts.")
+            } else {
+                Text("Widgets also hide amounts while your iPhone is locked.")
+            }
+        }
+    }
+
+    private var hidesWidgetAmountsSelection: Binding<Bool> {
+        Binding {
+            lock.isEnabled || preferences.hidesWidgetAmounts
+        } set: { hides in
+            preferences.setHidesWidgetAmounts(hides)
+            notifier.dataDidChange()
         }
     }
 
