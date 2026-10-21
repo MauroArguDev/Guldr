@@ -36,12 +36,8 @@ struct AnalyticsView: View {
                             CategoryDonut(slices: model.slices, total: expenseTotal, rangeTitle: model.rangeTitle)
                         }
                     } else {
-                        EmptyStateView(title: "Nothing to chart yet", symbol: "chart.bar",
-                                       message: "Your income and spending show up here once you add transactions.",
-                                       actionTitle: "Add transaction") {
-                            router.present(.addTransaction)
-                        }
-                        .padding(.top, Spacing.stackDefault)
+                        emptyState
+                            .padding(.top, Spacing.stackDefault)
                     }
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
@@ -97,6 +93,28 @@ struct AnalyticsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
+    }
+
+    /// A new user is invited to add a transaction. A period with nothing in it says so and, below 1Y,
+    /// offers the longest period, where older transactions show up.
+    @ViewBuilder
+    private var emptyState: some View {
+        if !model.hasTransactions {
+            EmptyStateView(title: "Nothing to chart yet", symbol: "chart.bar",
+                           message: "Your income and spending show up here once you add transactions.",
+                           actionTitle: "Add transaction") {
+                router.present(.addTransaction)
+            }
+        } else if period != .oneYear {
+            EmptyStateView(title: "Nothing in this period", symbol: "calendar",
+                           message: "No income or expenses for \(model.rangeTitle).",
+                           actionTitle: "Show the last year") {
+                period = .oneYear
+            }
+        } else {
+            EmptyStateView(title: "Nothing in this period", symbol: "calendar",
+                           message: "No income or expenses for \(model.rangeTitle).")
+        }
     }
 
     private var periodPicker: some View {
