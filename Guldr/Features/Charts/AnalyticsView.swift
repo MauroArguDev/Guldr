@@ -22,7 +22,12 @@ struct AnalyticsView: View {
     /// 6M the first time, as in the mockup, then the last period chosen (author's call, 2026-10-20). A
     /// preference of this screen only, so it stays in the app's own defaults, not the App Group.
     @AppStorage("analyticsPeriod") private var period: CashFlowSeries.Period = .sixMonths
-    @State private var model = AnalyticsModel()
+    @State private var model: AnalyticsModel
+
+    /// `now` is injectable so previews can show the preview data set on the mockups' date.
+    init(now: @escaping () -> Date = { .now }) {
+        _model = State(initialValue: AnalyticsModel(now: now))
+    }
 
     var body: some View {
         NavigationStack {
@@ -154,13 +159,18 @@ extension CashFlowSeries.Period {
 
 // Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
 #if DEBUG
+// The preview data set reproduces the Charts mockup on its date, Sept 28, 2026.
 #Preview("Light") {
-    PreviewEnvironment { AnalyticsView() }
+    PreviewEnvironment { AnalyticsView(now: { PreviewData.referenceDate() }) }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    PreviewEnvironment { AnalyticsView() }
+    PreviewEnvironment { AnalyticsView(now: { PreviewData.referenceDate() }) }
         .preferredColorScheme(.dark)
+}
+
+#Preview("Empty") {
+    PreviewEnvironment(seeded: false) { AnalyticsView() }
 }
 #endif
