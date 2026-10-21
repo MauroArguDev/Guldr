@@ -18,6 +18,9 @@ public struct AppSettings {
         static let isLockEnabled = "isLockEnabled"
         static let lockGracePeriod = "lockGracePeriod"
         static let hidesWidgetAmounts = "hidesWidgetAmounts"
+        static let budgetAlertsEnabled = "budgetAlertsEnabled"
+        static let hasOfferedBudgetAlerts = "hasOfferedBudgetAlerts"
+        static let budgetAlertKeys = "budgetAlertKeys"
     }
 
     private let defaults: UserDefaults
@@ -69,6 +72,33 @@ public struct AppSettings {
         isLockEnabled || hidesWidgetAmounts
     }
 
+    /// Settings › "Budget alerts". Off until the user turns them on, from the pre-prompt or Settings.
+    public var budgetAlertsEnabled: Bool {
+        defaults.bool(forKey: Key.budgetAlertsEnabled)
+    }
+
+    /// Whether the pre-prompt was shown, so it's offered once (author's call, 2026-10-21).
+    public var hasOfferedBudgetAlerts: Bool {
+        defaults.bool(forKey: Key.hasOfferedBudgetAlerts)
+    }
+
+    /// The thresholds already notified this month (`BudgetAlertLedger`).
+    public var budgetAlertLedger: BudgetAlertLedger {
+        BudgetAlertLedger(keys: defaults.stringArray(forKey: Key.budgetAlertKeys) ?? [])
+    }
+
+    public func setBudgetAlertsEnabled(_ isEnabled: Bool) {
+        defaults.set(isEnabled, forKey: Key.budgetAlertsEnabled)
+    }
+
+    public func setHasOfferedBudgetAlerts() {
+        defaults.set(true, forKey: Key.hasOfferedBudgetAlerts)
+    }
+
+    public func setBudgetAlertLedger(_ ledger: BudgetAlertLedger) {
+        defaults.set(ledger.keys.sorted(), forKey: Key.budgetAlertKeys)
+    }
+
     public func setHidesWidgetAmounts(_ hides: Bool) {
         defaults.set(hides, forKey: Key.hidesWidgetAmounts)
     }
@@ -89,7 +119,7 @@ public struct AppSettings {
     /// Forgets every preference, so the app opens on the welcome screen again with the lock off.
     public func reset() {
         for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod,
-                    Key.hidesWidgetAmounts] {
+                    Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys] {
             defaults.removeObject(forKey: key)
         }
     }
