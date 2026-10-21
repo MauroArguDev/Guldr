@@ -93,7 +93,7 @@ final class AppLock {
     /// passcode) unlocks, so nobody is ever locked out of their own data.
     func unlock() async {
         guard isLocked, !isAuthenticating else { return }
-        do {
+        do throws(LockError) {
             try await authenticate()
             state = .unlocked
         } catch .canceled {
@@ -121,7 +121,7 @@ final class AppLock {
     /// Turning it off also asks, so whoever holds an unlocked phone can't simply switch it off.
     func disable() async throws(LockError) {
         guard isEnabled else { return }
-        do {
+        do throws(LockError) {
             try await authenticate()
         } catch .unavailable {
             // Nothing can authenticate any more, so nothing is protected either: let it go.
