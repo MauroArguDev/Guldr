@@ -48,6 +48,12 @@ public struct AppSettings {
         defaults.set(try Currency.validatedCode(code), forKey: Key.activeCurrencyCode)
     }
 
+    /// Forgets the currency and first launch, so the app opens on the welcome screen again.
+    public func reset() {
+        defaults.removeObject(forKey: Key.activeCurrencyCode)
+        defaults.removeObject(forKey: Key.hasCompletedOnboarding)
+    }
+
     /// Ends first launch. The currency is stored before the flag, so a completed onboarding always has
     /// a currency; an invalid code throws and leaves both untouched.
     public func completeOnboarding(currencyCode: String) throws(MoneyError) {

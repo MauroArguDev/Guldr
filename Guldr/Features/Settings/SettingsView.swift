@@ -6,17 +6,23 @@
 //
 
 import GuldrCore
+import SwiftData
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the categories and About. Face ID, notifications, widget privacy and export join it in the phases that
+/// changed, the categories, About and "Delete all data". Face ID, notifications, widget privacy and export join it in the phases that
 /// build them, so it never shows a control that does nothing (author's call, 2026-10-20). Debug builds
 /// also link to the design system gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
     @Environment(\.locale) private var locale
+    @Environment(\.modelContext) private var context
+    @Environment(\.dataChangeNotifier) private var notifier
     @State private var failedToSave = false
+    @State private var confirmingDelete = false
+    @State private var confirmingDeleteAgain = false
+    @State private var failedToDelete = false
 
     var body: some View {
         Form {
@@ -48,6 +54,14 @@ struct SettingsView: View {
                 }
             }
 
+            Section {
+                Button("Delete all data", role: .destructive) {
+                    confirmingDelete = true
+                }
+            } footer: {
+                Text("Deletes your transactions, budgets and custom categories, and starts Guldr over.")
+            }
+
             #if DEBUG
             Section {
                 NavigationLink {
@@ -68,11 +82,42 @@ struct SettingsView: View {
         .background(Color(.appBackground))
         .navigationTitle(Text("Settings"))
         .navigationBarTitleDisplayMode(.inline)
+        // Two confirmations, as the plan asks for: the dialog says what goes, the alert that it's final.
+        .confirmationDialog("Delete all data?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+            Button("Delete all data", role: .destructive) {
+                confirmingDeleteAgain = true
+            }
+        } message: {
+            Text("Every transaction, budget and custom category on this iPhone is deleted, and Guldr returns to the welcome screen.")
+        }
+        .alert("Are you sure?", isPresented: $confirmingDeleteAgain) {
+            Button("Delete everything", role: .destructive, action: deleteAllData)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Your data can't be recovered.")
+        }
+        .alert("Couldn't delete your data", isPresented: $failedToDelete) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Nothing was deleted. Try again in a moment.")
+        }
         .alert("Couldn't save your currency", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Choose another currency and try again.")
         }
+    }
+
+    /// The data goes first: if it fails, the currency and first launch stay as they were.
+    private func deleteAllData() {
+        do {
+            try DataReset.eraseAll(in: context)
+        } catch {
+            failedToDelete = true
+            return
+        }
+        notifier.dataDidChange()
+        preferences.reset()
     }
 
     private var activeCurrencyCode: String {
