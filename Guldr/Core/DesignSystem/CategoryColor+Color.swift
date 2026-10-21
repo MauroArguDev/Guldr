@@ -28,4 +28,23 @@ extension CategoryColor {
         case .graphite: Color(.categoryGraphite)
         }
     }
+
+    /// What VoiceOver reads for the swatch in the category editor.
+    var accessibilityName: LocalizedStringKey {
+        switch self {
+        case .gold: "Gold"
+        case .amber: "Amber"
+        case .terracotta: "Terracotta"
+        case .wine: "Wine"
+        case .rose: "Rose"
+        case .plum: "Plum"
+        case .indigo: "Indigo"
+        case .blue: "Blue"
+        case .sky: "Sky"
+        case .teal: "Teal"
+        case .green: "Green"
+        case .olive: "Olive"
+        case .graphite: "Graphite"
+        }
+    }
 }
