@@ -88,10 +88,10 @@ struct CategoriesView: View {
             }
         }
         .sheet(item: $editing) { target in
-            CategoryEditorSheet(target: target, onCancel: { editing = nil }) {
+            CategoryEditorSheet(target: target, onCancel: { editing = nil }, onSaved: {
                 editing = nil
                 saveCount += 1
-            }
+            })
         }
         .sensoryFeedback(Haptics.saved, trigger: saveCount)
         .onChange(of: categories, initial: true) { model.update(categories: categories) }

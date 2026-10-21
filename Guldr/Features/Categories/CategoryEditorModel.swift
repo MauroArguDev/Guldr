@@ -51,7 +51,7 @@ final class CategoryEditorModel {
         name = ""
         symbolName = CategorySymbols.all[0]
         color = .graphite
-        original = ("", CategorySymbols.all[0], .graphite)
+        original = Snapshot(name: "", symbolName: CategorySymbols.all[0], color: .graphite)
     }
 
     /// The category with `id`. A seeded name shows translated; it is stored only if the user changes it,
@@ -70,7 +70,7 @@ final class CategoryEditorModel {
         name = category.displayName
         symbolName = category.symbolName
         color = category.color
-        original = (category.displayName, category.symbolName, category.color)
+        original = Snapshot(name: category.displayName, symbolName: category.symbolName, color: category.color)
     }
 
     var trimmedName: String {
@@ -133,10 +133,17 @@ final class CategoryEditorModel {
 
     // MARK: - Private
 
+    /// The values the sheet opened with, to tell whether anything changed.
+    private struct Snapshot {
+        let name: String
+        let symbolName: String
+        let color: CategoryColor
+    }
+
     @ObservationIgnored private let context: ModelContext
     @ObservationIgnored private let notifier: DataChangeNotifier
     @ObservationIgnored private let category: Category?
-    @ObservationIgnored private let original: (name: String, symbolName: String, color: CategoryColor)
+    @ObservationIgnored private let original: Snapshot
 
     private func saveContext() throws(EditorError) {
         do {
