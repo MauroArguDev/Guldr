@@ -621,8 +621,23 @@
     "Uncategorized" : {
 
     },
+    "Unlock with Face ID" : {
+      "comment" : "The lock screen's primary button on a device with Face ID."
+    },
+    "Unlock with Optic ID" : {
+      "comment" : "The lock screen's primary button on a device with Optic ID."
+    },
+    "Unlock with passcode" : {
+      "comment" : "The lock screen's primary button on a device without biometry."
+    },
+    "Unlock with Touch ID" : {
+      "comment" : "The lock screen's primary button on a device with Touch ID."
+    },
     "Unlock your finances in Guldr." : {
       "comment" : "The reason iOS shows in the passcode and Touch ID prompt when unlocking or changing the lock."
+    },
+    "Use iPhone passcode" : {
+      "comment" : "The lock screen's secondary button; iOS offers the passcode."
     },
     "Version %@" : {
       "comment" : "What VoiceOver reads for the app version on the About screen."
@@ -638,6 +653,9 @@
     },
     "Your data can't be recovered." : {
       "comment" : "The message of the second confirmation before deleting all data."
+    },
+    "Your finances, just for you." : {
+      "comment" : "The tagline on the lock screen."
     },
     "Your gold, in order." : {
       "comment" : "The tagline of the app.",

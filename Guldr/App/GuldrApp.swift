@@ -17,7 +17,8 @@ struct GuldrApp: App {
         WindowGroup {
             switch loader.state {
             case .ready(let container, let settings):
-                LaunchGate(preferences: Preferences(settings: settings))
+                LaunchGate(preferences: Preferences(settings: settings),
+                           lock: AppLock(settings: settings, service: LocalAuthenticationLockService()))
                     .modelContainer(container)
             case .failed(let error):
                 StoreErrorView(error: error, retry: loader.retry)
