@@ -8,22 +8,28 @@
 import GuldrCore
 import SwiftUI
 
-/// Settings, pushed from the Dashboard's toolbar. For now it only shows the active currency and the
-/// version; the v1 plan's Phase 22 builds the full screen (currency, Face ID, notifications, export,
-/// categories, about). Debug builds also link to the design system gallery from here.
+/// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
+/// changed, and the version. Face ID, notifications, widget privacy and export join it in the phases that
+/// build them, so it never shows a control that does nothing (author's call, 2026-10-20). Debug builds
+/// also link to the design system gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
     @Environment(\.locale) private var locale
+    @State private var failedToSave = false
 
     var body: some View {
         Form {
             Section {
-                LabeledContent("Currency") {
-                    Text(verbatim: currencyText)
+                NavigationLink {
+                    CurrencyPickerView(selection: currencySelection)
+                } label: {
+                    LabeledContent("Currency") {
+                        Text(verbatim: currencyText)
+                    }
                 }
             } footer: {
-                Text("Totals, budgets and charts use this currency.")
+                Text("Totals, budgets and charts use this currency. Transactions keep the currency they were saved in.")
             }
 
             Section {
@@ -52,12 +58,33 @@ struct SettingsView: View {
         .background(Color(.appBackground))
         .navigationTitle(Text("Settings"))
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Couldn't save your currency", isPresented: $failedToSave) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Choose another currency and try again.")
+        }
+    }
+
+    private var activeCurrencyCode: String {
+        preferences.activeCurrencyCode ?? Currency.defaultCode(for: locale)
+    }
+
+    /// The picker writes straight through `Preferences`, so every screen and the widget see the change.
+    private var currencySelection: Binding<String> {
+        Binding {
+            activeCurrencyCode
+        } set: { code in
+            do {
+                try preferences.setActiveCurrency(code)
+            } catch {
+                failedToSave = true
+            }
+        }
     }
 
     /// "US Dollar (USD)", as on the welcome screen.
     private var currencyText: String {
-        let code = preferences.activeCurrencyCode ?? Currency.defaultCode(for: locale)
-        let option = CurrencyOption.option(for: code, locale: locale)
+        let option = CurrencyOption.option(for: activeCurrencyCode, locale: locale)
         return "\(option.name) (\(option.code))"
     }
 

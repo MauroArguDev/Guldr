@@ -29,6 +29,12 @@ final class Preferences {
         hasCompletedOnboarding = settings.hasCompletedOnboarding
     }
 
+    /// Changes the currency totals show (ADR 005). Nothing is converted: transactions keep their own.
+    func setActiveCurrency(_ code: String) throws(MoneyError) {
+        try settings.setActiveCurrency(code)
+        activeCurrencyCode = settings.activeCurrencyCode
+    }
+
     // MARK: - Private
 
     @ObservationIgnored private let settings: AppSettings
