@@ -32,7 +32,8 @@ final class ExportModel {
 
     /// The file to share; `nil` while no transaction is in the range.
     private(set) var file: ExportFile?
-    private(set) var count = 0
+    /// How many transactions the range includes.
+    private(set) var includedCount = 0
 
     init(timeZone: TimeZone = .autoupdatingCurrent, now: @escaping () -> Date = { .now }) {
         self.timeZone = timeZone
@@ -72,7 +73,7 @@ final class ExportModel {
             let end = calendar.date(byAdding: .day, value: 1, to: lastDay) ?? lastDay
             included = rows.filter { $0.date >= first && $0.date < end }
         }
-        count = included.count
+        includedCount = included.count
         file = included.isEmpty ? nil : ExportFile(rows: included, timeZone: timeZone,
                                                    name: CSVExporter.fileName(on: now(), timeZone: timeZone))
     }

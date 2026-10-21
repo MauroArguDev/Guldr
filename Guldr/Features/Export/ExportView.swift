@@ -34,10 +34,10 @@ struct ExportView: View {
                     DatePicker("To", selection: $model.endDay, displayedComponents: .date)
                 }
             } footer: {
-                if model.count == 0 {
+                if model.file == nil {
                     Text("No transactions in this range.")
                 } else {
-                    Text("^[\(model.count) transaction](inflect: true) will be exported.")
+                    Text("^[\(model.includedCount) transaction](inflect: true) will be exported.")
                 }
             }
 
