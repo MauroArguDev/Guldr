@@ -68,6 +68,10 @@ final class AppRouter {
     func open(_ url: URL) -> Bool {
         guard let link = DeepLink(url: url) else { return false }
         switch link {
+        case .home:
+            // As for Budget: the user asked to see Home, so an open sheet closes first.
+            dismissSheet()
+            selectedTab = .home
         case .add:
             present(.addTransaction)
         case .budget:

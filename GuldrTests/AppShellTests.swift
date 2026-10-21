@@ -52,6 +52,15 @@ struct AppRouterTests {
         #expect(router.sheet == nil)
     }
 
+    @Test func homeLinkClosesAnySheetAndShowsHome() {
+        let router = AppRouter()
+        router.select(.analytics)
+        router.present(.addTransaction)
+        #expect(router.open(DeepLink.home.url))
+        #expect(router.selectedTab == .home)
+        #expect(router.sheet == nil)
+    }
+
     @Test func unknownLinksChangeNothing() throws {
         let router = AppRouter()
         router.select(.analytics)
