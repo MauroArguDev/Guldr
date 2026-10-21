@@ -16,11 +16,14 @@ final class Preferences {
 
     private(set) var activeCurrencyCode: String?
     private(set) var hasCompletedOnboarding: Bool
+    /// Settings › "Hide amounts in widgets". The lock hides them too, whatever this says (ADR 011).
+    private(set) var hidesWidgetAmounts: Bool
 
     init(settings: AppSettings) {
         self.settings = settings
         activeCurrencyCode = settings.activeCurrencyCode
         hasCompletedOnboarding = settings.hasCompletedOnboarding
+        hidesWidgetAmounts = settings.hidesWidgetAmounts
     }
 
     func completeOnboarding(currencyCode: String) throws(MoneyError) {
@@ -35,12 +38,18 @@ final class Preferences {
         activeCurrencyCode = settings.activeCurrencyCode
     }
 
+    func setHidesWidgetAmounts(_ hides: Bool) {
+        settings.setHidesWidgetAmounts(hides)
+        hidesWidgetAmounts = settings.hidesWidgetAmounts
+    }
+
     /// After "Delete all data": `LaunchGate` sees first launch is no longer completed and shows the
     /// welcome screen.
     func reset() {
         settings.reset()
         activeCurrencyCode = settings.activeCurrencyCode
         hasCompletedOnboarding = settings.hasCompletedOnboarding
+        hidesWidgetAmounts = settings.hidesWidgetAmounts
     }
 
     // MARK: - Private
