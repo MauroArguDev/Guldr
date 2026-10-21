@@ -40,3 +40,7 @@ This supersedes the **Appearance** bullet of ADR 008. Everything else in ADR 008
 - The design system gains thirteen color tokens. `Chart1`…`Chart7` lose their purpose and are removed in Phase 21 if no other chart uses them.
 - Adding a color later means a new asset and a new enum case; old app versions show `graphite` for it.
 - The gradient rule lives in one place (the donut component) and is documented in DESIGN.md.
+
+## Update — 2026-10-20
+
+Phase 21 built the donut at the mockup's size, an 18 pt ring, too thin for labels on the slices. The author replaced direct labels with selection: touching a slice or its legend row shows its name, amount and share in the center and dims the other slices. The 2 pt gaps and a legend that names every slice still keep the donut from relying on color alone. `Chart1`…`Chart7` were removed.

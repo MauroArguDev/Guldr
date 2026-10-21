@@ -39,12 +39,29 @@ final class AnalyticsModel {
         let isCurrent: Bool
     }
 
+    /// One donut slice: a category, or "Other" with the smallest ones and expenses without a category.
+    struct Slice: Identifiable, Equatable {
+        let id: String
+        let name: String
+        let color: CategoryColor
+        let total: Money
+        /// Whole percent; all slices add up to 100.
+        let percentage: Int
+    }
+
     private(set) var period: CashFlowSeries.Period = .sixMonths
     /// `nil` before the first `update`, or if the active currency is not a valid code.
     private(set) var totals: Totals?
     private(set) var bars: [Bar] = []
     /// Whether the period has any income or expense in the active currency.
     private(set) var hasData = false
+    /// The donut follows the selected period (author's call, 2026-10-20): "October", "May – Oct",
+    /// "Nov 2025 – Oct 2026".
+    private(set) var rangeTitle = ""
+    /// Largest first, "Other" last. Empty when the period has no expenses.
+    private(set) var slices: [Slice] = []
+    /// The period's expenses, in the donut's center.
+    private(set) var expenseTotal: Money?
 
     init(locale: Locale = .autoupdatingCurrent, timeZone: TimeZone = .autoupdatingCurrent,
          now: @escaping () -> Date = { .now }) {
@@ -55,7 +72,9 @@ final class AnalyticsModel {
 
     /// Recomputes the period ending with the current month from the latest transactions in the active
     /// currency. The view calls it when they, the period, the currency or a save change.
-    func update(transactions: [Transaction], period: CashFlowSeries.Period, currencyCode: String) {
+    /// `categories` names and colors the donut's slices, archived ones included: reports keep their history.
+    func update(transactions: [Transaction], categories: [Category], period: CashFlowSeries.Period,
+                currencyCode: String) {
         self.period = period
         let today = now()
         let month = YearMonth(containing: today, timeZone: timeZone)
@@ -64,6 +83,8 @@ final class AnalyticsModel {
             totals = nil
             bars = []
             hasData = false
+            slices = []
+            expenseTotal = nil
             return
         }
         totals = Totals(income: series.totalIncome, expenses: series.totalExpenses, net: series.net)
@@ -75,6 +96,29 @@ final class AnalyticsModel {
                 income: bucket.income, expenses: bucket.expenses,
                 isCurrent: today >= bucket.interval.start && today < bucket.interval.end)
         }
+
+        let first = month.adding(months: 1 - period.months)
+        let interval = DateInterval(start: first.dateInterval(in: timeZone).start, end: month.dateInterval(in: timeZone).end)
+        rangeTitle = rangeTitle(from: first, to: month)
+        guard let breakdown = try? CategoryBreakdown(transactions: transactions, period: interval,
+                                                     currencyCode: currencyCode) else {
+            slices = []
+            expenseTotal = nil
+            return
+        }
+        expenseTotal = breakdown.total
+        let byID = Dictionary(categories.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        slices = breakdown.slices.map { slice in
+            switch slice.kind {
+            case .category(let id):
+                let category = byID[id]
+                return Slice(id: slice.id, name: category?.displayName ?? String(localized: "Uncategorized", locale: locale),
+                             color: category?.color ?? .graphite, total: slice.total, percentage: slice.percentage)
+            case .other:
+                return Slice(id: slice.id, name: String(localized: "Other", locale: locale), color: .graphite,
+                             total: slice.total, percentage: slice.percentage)
+            }
+        }
     }
 
     // MARK: - Private
@@ -85,6 +129,19 @@ final class AnalyticsModel {
 
     private var dateStyle: Date.FormatStyle {
         Date.FormatStyle(locale: locale, timeZone: timeZone)
+    }
+
+    private func rangeTitle(from first: YearMonth, to last: YearMonth) -> String {
+        let start = first.dateInterval(in: timeZone).start
+        guard first != last else {
+            var style = dateStyle.month(.wide)
+            style.capitalizationContext = .standalone
+            return start.formatted(style)
+        }
+        let end = last.dateInterval(in: timeZone).start
+        var style = Date.IntervalFormatStyle(locale: locale, timeZone: timeZone).month(.abbreviated)
+        if first.year != last.year { style = style.year() }
+        return (start..<end).formatted(style)
     }
 
     private func label(for interval: DateInterval, granularity: CashFlowSeries.Granularity) -> String {

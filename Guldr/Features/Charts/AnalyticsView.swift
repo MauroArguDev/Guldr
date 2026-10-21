@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 /// The Analytics tab: the Charts mockup. A native large title, then the period picker, the period's
-/// income, expenses and savings, and the income vs. expenses chart. Every figure covers the period
+/// income, expenses and savings, the income vs. expenses chart and spending by category. Every figure covers the period
 /// ending with the current month, in the active currency (ADR 005).
 struct AnalyticsView: View {
 
@@ -18,6 +18,7 @@ struct AnalyticsView: View {
     @Environment(Preferences.self) private var preferences
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query private var transactions: [Transaction]
+    @Query private var categories: [Category]
     /// 6M the first time, as in the mockup, then the last period chosen (author's call, 2026-10-20). A
     /// preference of this screen only, so it stays in the app's own defaults, not the App Group.
     @AppStorage("analyticsPeriod") private var period: CashFlowSeries.Period = .sixMonths
@@ -31,6 +32,9 @@ struct AnalyticsView: View {
                     if model.hasData, let totals = model.totals {
                         totalsRow(totals)
                         CashFlowChart(bars: model.bars)
+                        if let expenseTotal = model.expenseTotal, !model.slices.isEmpty {
+                            CategoryDonut(slices: model.slices, total: expenseTotal, rangeTitle: model.rangeTitle)
+                        }
                     } else {
                         EmptyStateView(title: "Nothing to chart yet", symbol: "chart.bar",
                                        message: "Your income and spending show up here once you add transactions.",
@@ -44,6 +48,7 @@ struct AnalyticsView: View {
                 .padding(.bottom, Spacing.stackDefault)
             }
             .onChange(of: transactions, initial: true) { refresh() }
+            .onChange(of: categories) { refresh() }
             .onChange(of: period) { refresh() }
             .onChange(of: currencyCode) { refresh() }
             // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
@@ -59,7 +64,7 @@ struct AnalyticsView: View {
     }
 
     private func refresh() {
-        model.update(transactions: transactions, period: period, currencyCode: currencyCode)
+        model.update(transactions: transactions, categories: categories, period: period, currencyCode: currencyCode)
     }
 
     /// "Income $31,050 · Expenses $12,875 · Saved $18,176" in whole units, as in the mockup; Saved in
