@@ -5,6 +5,7 @@
 //  Created by Mauricio Argumedo on 10/10/26.
 //
 
+import GuldrCore
 import SwiftUI
 
 /// The app shell: the native iOS 26 tab bar with one `NavigationStack` per tab.
