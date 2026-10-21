@@ -88,6 +88,21 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func widgetsHideAmountsWhileLockedOrWhenAsked() {
+        withSettings { settings, _ in
+            #expect(!settings.widgetHidesAmounts)
+            settings.setHidesWidgetAmounts(true)
+            #expect(settings.widgetHidesAmounts)
+            settings.setHidesWidgetAmounts(false)
+            settings.setLockEnabled(true)
+            // The lock hides them whatever the setting says (ADR 011).
+            #expect(!settings.hidesWidgetAmounts)
+            #expect(settings.widgetHidesAmounts)
+            settings.reset()
+            #expect(!settings.widgetHidesAmounts)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")

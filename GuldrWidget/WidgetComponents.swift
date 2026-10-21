@@ -26,7 +26,7 @@ struct GlyphMark: View {
 
 /// The arc goes from the opening (703.5, 351.3) the long way round to (762, 512), then straight to
 /// (548, 512). Drawn with points instead of `addArc`, whose direction flips with the coordinate system.
-private struct GlyphShape: Shape {
+nonisolated private struct GlyphShape: Shape {
 
     func path(in rect: CGRect) -> Path {
         let scale = min(rect.width, rect.height) / 1024

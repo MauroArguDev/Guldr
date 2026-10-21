@@ -24,3 +24,32 @@ struct GuldrWidget: Widget {
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
+
+// Light, dark and tinted are the canvas's appearance and rendering-mode variants; each preview below
+// steps through the states a family can show.
+#Preview("Small", as: .systemSmall) {
+    GuldrWidget()
+} timeline: {
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: false)
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: true)
+    SummaryEntry(date: .now, content: .summary(.emptySample), hidesAmounts: false)
+    SummaryEntry(date: .now, content: .notStarted, hidesAmounts: false)
+}
+
+#Preview("Medium", as: .systemMedium) {
+    GuldrWidget()
+} timeline: {
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: false)
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: true)
+    SummaryEntry(date: .now, content: .summary(.emptySample), hidesAmounts: false)
+    SummaryEntry(date: .now, content: .notStarted, hidesAmounts: false)
+}
+
+private extension WidgetSummary {
+    /// A first launch without transactions: everything at zero.
+    static var emptySample: WidgetSummary {
+        let sample = WidgetSummary.sample
+        return (try? WidgetSummary(transactions: [], currencyCode: sample.balance.currencyCode, now: .now,
+                                   categoryName: { _ in "" })) ?? sample
+    }
+}
