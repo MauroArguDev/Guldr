@@ -55,6 +55,8 @@ final class AnalyticsModel {
     private(set) var bars: [Bar] = []
     /// Whether the period has any income or expense in the active currency.
     private(set) var hasData = false
+    /// Whether there is any transaction at all, so an empty period can be told apart from a new user.
+    private(set) var hasTransactions = false
     /// The donut follows the selected period (author's call, 2026-10-20): "October", "May – Oct",
     /// "Nov 2025 – Oct 2026".
     private(set) var rangeTitle = ""
@@ -76,6 +78,7 @@ final class AnalyticsModel {
     func update(transactions: [Transaction], categories: [Category], period: CashFlowSeries.Period,
                 currencyCode: String) {
         self.period = period
+        hasTransactions = !transactions.isEmpty
         let today = now()
         let month = YearMonth(containing: today, timeZone: timeZone)
         guard let series = try? CashFlowSeries(transactions: transactions, period: period, endingWith: month,
