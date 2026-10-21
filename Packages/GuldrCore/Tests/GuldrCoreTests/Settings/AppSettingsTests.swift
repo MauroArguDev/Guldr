@@ -64,6 +64,30 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func theLockStartsOffWithAOneMinuteGracePeriod() {
+        withSettings { settings, defaults in
+            #expect(!settings.isLockEnabled)
+            #expect(settings.lockGracePeriod == .oneMinute)
+            // A value no version of the app writes falls back to the default.
+            defaults.set(42, forKey: AppSettings.Key.lockGracePeriod)
+            #expect(settings.lockGracePeriod == .oneMinute)
+        }
+    }
+
+    @Test func lockPreferencesAreStoredAndReset() {
+        withSettings { settings, defaults in
+            settings.setLockEnabled(true)
+            settings.setLockGracePeriod(.immediately)
+            #expect(settings.isLockEnabled)
+            #expect(settings.lockGracePeriod == .immediately)
+            #expect(AppSettings(defaults: defaults).lockGracePeriod == .immediately)
+
+            settings.reset()
+            #expect(!settings.isLockEnabled)
+            #expect(settings.lockGracePeriod == .oneMinute)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")

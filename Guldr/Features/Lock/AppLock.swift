@@ -96,12 +96,13 @@ final class AppLock {
         do throws(LockError) {
             try await authenticate()
             state = .unlocked
-        } catch .canceled {
-            return
-        } catch .unavailable {
-            state = .unlocked
-        } catch .failed {
-            failureCount += 1
+        } catch {
+            // One `switch`, so the compiler checks every case (separate `catch` patterns aren't).
+            switch error {
+            case .canceled: break
+            case .unavailable: state = .unlocked
+            case .failed: failureCount += 1
+            }
         }
     }
 
