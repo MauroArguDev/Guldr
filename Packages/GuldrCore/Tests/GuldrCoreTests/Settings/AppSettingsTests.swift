@@ -64,6 +64,16 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
+        try withSettings { settings, defaults in
+            try settings.completeOnboarding(currencyCode: "EUR")
+            settings.reset()
+            #expect(settings.activeCurrencyCode == nil)
+            #expect(!settings.hasCompletedOnboarding)
+            #expect(defaults.object(forKey: AppSettings.Key.activeCurrencyCode) == nil)
+        }
+    }
+
     // MARK: - Helpers
 
     private func withSettings(_ body: (AppSettings, UserDefaults) throws -> Void) rethrows {

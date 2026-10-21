@@ -95,6 +95,29 @@ struct PreferencesTests {
         }
     }
 
+    @Test func changingTheCurrencyUpdatesTheStore() throws {
+        try withSuite { settings in
+            let preferences = Preferences(settings: settings)
+            try preferences.completeOnboarding(currencyCode: "USD")
+            try preferences.setActiveCurrency("EUR")
+            #expect(preferences.activeCurrencyCode == "EUR")
+            #expect(settings.activeCurrencyCode == "EUR")
+            #expect(preferences.hasCompletedOnboarding)
+        }
+    }
+
+    @Test func resettingReturnsToFirstLaunch() throws {
+        try withSuite { settings in
+            let preferences = Preferences(settings: settings)
+            try preferences.completeOnboarding(currencyCode: "USD")
+            preferences.reset()
+            #expect(!preferences.hasCompletedOnboarding)
+            #expect(preferences.activeCurrencyCode == nil)
+            #expect(!settings.hasCompletedOnboarding)
+            #expect(settings.activeCurrencyCode == nil)
+        }
+    }
+
     private func withSuite(_ body: (AppSettings) throws -> Void) rethrows {
         let suiteName = "GuldrTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
