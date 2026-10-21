@@ -24,6 +24,7 @@ struct CategoryDonut: View {
     let rangeTitle: String
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.locale) private var locale
     @ReduceMotion private var reduceMotion
     @State private var selectedID: String?
     /// The raw value Swift Charts reports for a touch on the ring: a running total of the slices' values.
@@ -63,12 +64,15 @@ struct CategoryDonut: View {
                        angularInset: 1)
                 .foregroundStyle(gradient(for: slice.color))
                 .opacity(selectedID == nil || selectedID == slice.id ? 1 : 0.35)
+                .accessibilityLabel(Text(verbatim: slice.name))
+                .accessibilityValue(Text(verbatim: spokenValue(slice)))
         }
         .chartLegend(.hidden)
         .chartAngleSelection(value: $selectedAngle)
         .chartBackground { _ in
             center
         }
+        .accessibilityChartDescriptor(CategoryDonutDescriptor(slices: slices, rangeTitle: rangeTitle, locale: locale))
         .frame(width: 136, height: 136)
         .motion(.standard, value: slices)
         .motion(.standard, value: selectedID)
@@ -80,7 +84,6 @@ struct CategoryDonut: View {
                 withMotion(.reveal) { revealed = true }
             }
         }
-        .accessibilityHidden(true)
     }
 
     /// The period and its total, or the selected slice's name, amount and share.
@@ -115,6 +118,10 @@ struct CategoryDonut: View {
                     legendRow(slice)
                 }
                 .buttonStyle(.plain)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(verbatim: slice.name))
+                .accessibilityValue(Text(verbatim: spokenValue(slice)))
+                .accessibilityHint(Text("Shows this category in the center of the chart"))
                 .accessibilityAddTraits(selectedID == slice.id ? .isSelected : [])
             }
         }
@@ -164,6 +171,38 @@ struct CategoryDonut: View {
 
     private func percentText(_ slice: AnalyticsModel.Slice) -> String {
         (Double(slice.percentage) / 100).formatted(.percent.precision(.fractionLength(0)))
+    }
+
+    /// "48%, $850.00".
+    private func spokenValue(_ slice: AnalyticsModel.Slice) -> String {
+        percentText(slice) + ", " + MoneyFormatter(locale: locale).string(from: slice.total)
+    }
+
+    private func value(_ money: Money) -> Double {
+        NSDecimalNumber(decimal: money.decimalValue).doubleValue
+    }
+}
+
+/// Audio Graphs for the donut: one category per slice, its amount as the value.
+private struct CategoryDonutDescriptor: AXChartDescriptorRepresentable {
+
+    let slices: [AnalyticsModel.Slice]
+    let rangeTitle: String
+    let locale: Locale
+
+    func makeChartDescriptor() -> AXChartDescriptor {
+        let largest = slices.map { value($0.total) }.max() ?? 0
+        let currencyCode = slices.first?.total.currencyCode ?? Currency.defaultCode(for: locale)
+        let xAxis = AXCategoricalDataAxisDescriptor(title: String(localized: "Category", locale: locale),
+                                                    categoryOrder: slices.map(\.name))
+        let yAxis = AXNumericDataAxisDescriptor(title: String(localized: "Amount", locale: locale),
+                                                range: 0...max(largest, 1), gridlinePositions: []) { amount in
+            amount.formatted(.currency(code: currencyCode).precision(.fractionLength(0)).locale(locale))
+        }
+        let series = AXDataSeriesDescriptor(name: String(localized: "Spending", locale: locale), isContinuous: false,
+                                            dataPoints: slices.map { AXDataPoint(x: $0.name, y: value($0.total)) })
+        return AXChartDescriptor(title: String(localized: "Spending by category, \(rangeTitle)", locale: locale),
+                                 summary: nil, xAxis: xAxis, yAxis: yAxis, additionalAxes: [], series: [series])
     }
 
     private func value(_ money: Money) -> Double {
