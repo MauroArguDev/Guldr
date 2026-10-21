@@ -10,6 +10,8 @@ import Foundation
 /// The app's `guldr://` URLs. The widget builds them and the app parses them, so both sides share this
 /// one definition.
 public enum DeepLink: String, CaseIterable, Sendable {
+    /// `guldr://home`: show the Home tab. Where a tap on a widget goes.
+    case home
     /// `guldr://add`: open the add transaction sheet.
     case add
     /// `guldr://budget`: show the Budget tab.

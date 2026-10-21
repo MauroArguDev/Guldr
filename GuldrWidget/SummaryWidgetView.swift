@@ -17,16 +17,21 @@ struct SummaryWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        switch entry.content {
-        case .notStarted:
-            NotStartedView()
-        case .summary(let summary):
-            if family == .systemMedium {
-                MediumSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
-            } else {
-                SmallSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
+        Group {
+            switch entry.content {
+            case .notStarted:
+                NotStartedView()
+            case .summary(let summary):
+                if family == .systemMedium {
+                    MediumSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
+                } else {
+                    SmallSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
+                }
             }
         }
+        // A tap anywhere opens Home (author's call, 2026-10-21); the medium widget's + opens the add
+        // sheet instead. With the lock on, the app asks first.
+        .widgetURL(DeepLink.home.url)
     }
 }
 
