@@ -15,6 +15,8 @@ public struct AppSettings {
     enum Key {
         static let activeCurrencyCode = "activeCurrencyCode"
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
+        static let isLockEnabled = "isLockEnabled"
+        static let lockGracePeriod = "lockGracePeriod"
     }
 
     private let defaults: UserDefaults
@@ -43,15 +45,36 @@ public struct AppSettings {
         defaults.bool(forKey: Key.hasCompletedOnboarding)
     }
 
+    /// Whether the app asks for Face ID or the passcode on launch and after the grace period (ADR 011).
+    /// Shared so the widget can respect it.
+    public var isLockEnabled: Bool {
+        defaults.bool(forKey: Key.isLockEnabled)
+    }
+
+    /// The default when nothing is stored or the stored value is not one of the choices.
+    public var lockGracePeriod: LockGracePeriod {
+        guard defaults.object(forKey: Key.lockGracePeriod) != nil else { return .default }
+        return LockGracePeriod(rawValue: defaults.integer(forKey: Key.lockGracePeriod)) ?? .default
+    }
+
+    public func setLockEnabled(_ isEnabled: Bool) {
+        defaults.set(isEnabled, forKey: Key.isLockEnabled)
+    }
+
+    public func setLockGracePeriod(_ period: LockGracePeriod) {
+        defaults.set(period.rawValue, forKey: Key.lockGracePeriod)
+    }
+
     /// Validates and stores the active currency.
     public func setActiveCurrency(_ code: String) throws(MoneyError) {
         defaults.set(try Currency.validatedCode(code), forKey: Key.activeCurrencyCode)
     }
 
-    /// Forgets the currency and first launch, so the app opens on the welcome screen again.
+    /// Forgets every preference, so the app opens on the welcome screen again with the lock off.
     public func reset() {
-        defaults.removeObject(forKey: Key.activeCurrencyCode)
-        defaults.removeObject(forKey: Key.hasCompletedOnboarding)
+        for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod] {
+            defaults.removeObject(forKey: key)
+        }
     }
 
     /// Ends first launch. The currency is stored before the flag, so a completed onboarding always has

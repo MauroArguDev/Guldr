@@ -621,6 +621,9 @@
     "Uncategorized" : {
 
     },
+    "Unlock your finances in Guldr." : {
+      "comment" : "The reason iOS shows in the passcode and Touch ID prompt when unlocking or changing the lock."
+    },
     "Version %@" : {
       "comment" : "What VoiceOver reads for the app version on the About screen."
     },
