@@ -24,18 +24,3 @@ struct GuldrWidget: Widget {
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
-
-/// Placeholder layout until the families get their own views.
-struct SummaryWidgetView: View {
-
-    let entry: SummaryEntry
-
-    var body: some View {
-        switch entry.content {
-        case .notStarted:
-            Text("Open Guldr to get started")
-        case .summary(let summary):
-            Text(verbatim: MoneyFormatter().string(from: summary.balance, precision: .wholeUnits))
-        }
-    }
-}

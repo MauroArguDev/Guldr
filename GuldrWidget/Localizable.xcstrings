@@ -1,0 +1,68 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add transaction" : {
+      "comment" : "The medium widget's + button, read by VoiceOver."
+    },
+    "Add your first transaction" : {
+      "comment" : "Shown in the widget when there are no transactions yet."
+    },
+    "Balance" : {
+      "comment" : "The widgets' header and the widget's name in the gallery."
+    },
+    "Education" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Entertainment" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Food" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Freelance" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Health" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Housing" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Open Guldr to get started" : {
+      "comment" : "Shown in the widget before the app's first launch."
+    },
+    "Other" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Other income" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Salary" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Shopping" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Transport" : {
+      "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
+      "extractionState" : "manual"
+    },
+    "Uncategorized" : {
+      "comment" : "Names a transaction without a description or category in the widget."
+    },
+    "Your balance and this month at a glance." : {
+      "comment" : "The widget's description in the gallery."
+    }
+  },
+  "version" : "1.1"
+}
