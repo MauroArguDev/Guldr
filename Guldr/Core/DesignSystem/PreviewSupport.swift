@@ -33,22 +33,25 @@ struct PreviewEnvironment<Content: View>: View {
     @State private var container: ModelContainer?
     @State private var router = AppRouter()
     @State private var lock = AppLock.preview(locked: false)
+    @State private var alerts: BudgetAlertCenter?
     private let content: () -> Content
 
     /// `seeded: false` keeps only the default categories, for empty states.
     init(seeded: Bool = true, @ViewBuilder content: @escaping () -> Content) {
         let controller = seeded ? try? PreviewData.makeController() : try? PersistenceController(mode: .inMemory)
         _container = State(initialValue: controller?.container)
+        _alerts = State(initialValue: controller.map { BudgetAlertCenter.preview(container: $0.container) })
         self.content = content
     }
 
     var body: some View {
-        if let container {
+        if let container, let alerts {
             content()
                 .modelContainer(container)
                 .environment(Preferences.preview(onboarded: true))
                 .environment(router)
                 .environment(lock)
+                .environment(alerts)
         }
     }
 }

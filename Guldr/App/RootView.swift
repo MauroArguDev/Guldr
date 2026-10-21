@@ -15,6 +15,7 @@ import SwiftUI
 struct RootView: View {
 
     @State private var router = AppRouter()
+    @Environment(BudgetAlertCenter.self) private var alerts
 
     var body: some View {
         TabView(selection: tabSelection) {
@@ -50,7 +51,8 @@ struct RootView: View {
             }
         }
         .tint(Color(.gold))
-        .sheet(item: $router.sheet) { sheet in
+        // Offered once a sheet is fully gone, so the alert never meets a sheet on its way out.
+        .sheet(item: $router.sheet, onDismiss: offerBudgetAlerts) { sheet in
             switch sheet {
             case .addTransaction:
                 AddTransactionSheet()
@@ -67,7 +69,27 @@ struct RootView: View {
         .onOpenURL { url in
             router.open(url)
         }
+        .onChange(of: alerts.openRequests) {
+            router.open(DeepLink.budget.url)
+        }
+        .alert("Get budget alerts?", isPresented: alertOffer) {
+            Button("Turn on") {
+                Task { await alerts.acceptOffer() }
+            }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text("Guldr can tell you when a category reaches 80% and 100% of its monthly budget.")
+        }
         .environment(router)
+    }
+
+    /// The pre-prompt (author's call, 2026-10-21); iOS's own dialog only follows "Turn on".
+    private var alertOffer: Binding<Bool> {
+        Binding { alerts.isOfferingAlerts } set: { alerts.isOfferingAlerts = $0 }
+    }
+
+    private func offerBudgetAlerts() {
+        Task { await alerts.offerIfNeeded() }
     }
 
     /// iOS 27 adds `.prominent`, the role meant for a primary action beside the tab bar; from iOS 27 on,
