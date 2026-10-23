@@ -31,7 +31,7 @@ public enum PreviewData {
         return controller
     }
 
-    /// Inserts the preview transactions and budgets. Expects the default categories to be seeded.
+    /// Inserts the preview transactions, budgets and logged days. Expects the default categories to be seeded.
     public static func populate(_ context: ModelContext, timeZone: TimeZone = .autoupdatingCurrent) throws {
         let categories = try context.fetch(FetchDescriptor<Category>())
         let byKey = Dictionary(categories.compactMap { category in category.systemKey.map { ($0, category) } },
@@ -52,7 +52,17 @@ public enum PreviewData {
             context.insert(Budget(month: september, limit: try Money(minorUnits: cents, currencyCode: currencyCode),
                                   category: byKey[key]))
         }
+        for (offset, source) in streakDays {
+            context.insert(LoggedDay(day: LocalDay(containing: .now, timeZone: timeZone).adding(days: offset),
+                                     source: source))
+        }
         try context.save()
+    }
+
+    /// A streak relative to the real today, since the streak is always about today: 16 days with a freeze
+    /// on day −6 and a "No spending" day, today logged.
+    static var streakDays: [(Int, LoggedDaySource)] {
+        (-16...0).filter { $0 != -6 }.map { ($0, $0 == -3 ? .noSpending : .transaction) }
     }
 
     // MARK: - Data
