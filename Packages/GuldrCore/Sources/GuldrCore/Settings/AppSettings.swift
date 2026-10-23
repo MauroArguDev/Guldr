@@ -21,6 +21,9 @@ public struct AppSettings {
         static let budgetAlertsEnabled = "budgetAlertsEnabled"
         static let hasOfferedBudgetAlerts = "hasOfferedBudgetAlerts"
         static let budgetAlertKeys = "budgetAlertKeys"
+        static let dailyReminderEnabled = "dailyReminderEnabled"
+        static let dailyReminderMinutes = "dailyReminderMinutes"
+        static let hasOfferedDailyReminder = "hasOfferedDailyReminder"
     }
 
     private let defaults: UserDefaults
@@ -87,6 +90,34 @@ public struct AppSettings {
         BudgetAlertLedger(keys: defaults.stringArray(forKey: Key.budgetAlertKeys) ?? [])
     }
 
+    /// Settings › "Daily reminder". Off until the user turns it on, from its pre-prompt or Settings.
+    public var dailyReminderEnabled: Bool {
+        defaults.bool(forKey: Key.dailyReminderEnabled)
+    }
+
+    /// The reminder's time; the default when nothing valid is stored.
+    public var dailyReminderTime: ReminderTime {
+        guard defaults.object(forKey: Key.dailyReminderMinutes) != nil else { return .default }
+        return ReminderTime(minutesAfterMidnight: defaults.integer(forKey: Key.dailyReminderMinutes)) ?? .default
+    }
+
+    /// Whether the reminder's pre-prompt was shown, so it's offered once (author's call, 2026-10-23).
+    public var hasOfferedDailyReminder: Bool {
+        defaults.bool(forKey: Key.hasOfferedDailyReminder)
+    }
+
+    public func setDailyReminderEnabled(_ isEnabled: Bool) {
+        defaults.set(isEnabled, forKey: Key.dailyReminderEnabled)
+    }
+
+    public func setDailyReminderTime(_ time: ReminderTime) {
+        defaults.set(time.minutesAfterMidnight, forKey: Key.dailyReminderMinutes)
+    }
+
+    public func setHasOfferedDailyReminder() {
+        defaults.set(true, forKey: Key.hasOfferedDailyReminder)
+    }
+
     public func setBudgetAlertsEnabled(_ isEnabled: Bool) {
         defaults.set(isEnabled, forKey: Key.budgetAlertsEnabled)
     }
@@ -119,7 +150,8 @@ public struct AppSettings {
     /// Forgets every preference, so the app opens on the welcome screen again with the lock off.
     public func reset() {
         for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod,
-                    Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys] {
+                    Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys,
+                    Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder] {
             defaults.removeObject(forKey: key)
         }
     }
