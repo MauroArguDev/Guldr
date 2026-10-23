@@ -11,15 +11,16 @@ import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
 /// changed, the Face ID lock and its grace period (ADR 011), the daily reminder and budget alerts, the
-/// widgets' privacy, the categories, the CSV export, About and "Delete all data". Settings never shows a
-/// control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
-/// gallery from here.
+/// streak, the widgets' privacy, the categories, the CSV export, About and "Delete all data". Settings
+/// never shows a control that does nothing (author's call, 2026-10-20). Debug builds also link to the
+/// design system gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
     @Environment(AppLock.self) private var lock
     @Environment(BudgetAlertCenter.self) private var alerts
     @Environment(DailyReminderCenter.self) private var reminder
+    @Environment(StreakCenter.self) private var streak
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var context
@@ -47,6 +48,8 @@ struct SettingsView: View {
             lockSection
 
             NotificationSettings()
+
+            StreakSettingsSection()
 
             widgetsSection
 
@@ -148,6 +151,7 @@ struct SettingsView: View {
         preferences.reset()
         lock.settingsDidReset()
         alerts.settingsDidReset()
+        streak.settingsDidReset()
         Task { await reminder.settingsDidReset() }
         // After the preferences are gone, so the widget reloads into its "Open Guldr" state.
         notifier.dataDidChange()

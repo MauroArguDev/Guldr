@@ -26,6 +26,8 @@ struct NotificationContent: Equatable {
     let body: String
     /// Where a tap goes: Budget for an alert, the add sheet for the daily reminder.
     let link: DeepLink
+    /// The day a reminder is for, which its "No spending today" action marks (ADR 012).
+    var day: LocalDay?
 }
 
 /// The app's only door to UserNotifications, so budget alerts and the daily reminder can be tested with
@@ -46,21 +48,29 @@ protocol NotificationService: AnyObject {
     func removeAllDelivered()
 }
 
-/// A notification the user opened. Distinct every time, so opening two reminders in a row routes twice.
-struct OpenedNotification: Equatable {
-    let id = UUID()
-    let link: DeepLink
+/// What the user did with a notification.
+enum NotificationAction: Equatable {
+    /// A tap, or "Add expense": show the screen the notification names.
+    case open(DeepLink)
+    /// The reminder's "No spending today".
+    case markNoSpending(LocalDay)
 }
 
-/// The last notification the user opened, for `RootView` to route. It lives in the service, created with
-/// the app, so a tap that launches Guldr is kept until the app's views exist to read it.
+/// A notification the user acted on. Distinct every time, so opening two reminders in a row routes twice.
+struct OpenedNotification: Equatable {
+    let id = UUID()
+    let action: NotificationAction
+}
+
+/// The last notification the user acted on, for `RootView` to handle. It lives in the service, created
+/// with the app, so a tap that launches Guldr is kept until the app's views exist to read it.
 @Observable
 final class NotificationInbox {
 
     private(set) var lastOpened: OpenedNotification?
 
-    func open(_ link: DeepLink) {
-        lastOpened = OpenedNotification(link: link)
+    func record(_ action: NotificationAction) {
+        lastOpened = OpenedNotification(action: action)
     }
 }
 
@@ -122,18 +132,22 @@ final class UserNotificationService: NSObject, NotificationService, UNUserNotifi
 
     // MARK: - Routing
 
-    /// The reminder's category: its "Add expense" action opens the app on the add sheet.
+    /// The reminder's category: "Add expense" opens the app on the add sheet; "No spending today" marks
+    /// the reminder's day (ADR 012).
     static let reminderCategoryID = "reminder"
     static let addActionID = "add"
+    static let noSpendingActionID = "noSpending"
 
-    /// Where a tapped notification goes: its own link, or the add sheet for "Add expense". `nil` for a
-    /// dismissal or a notification without a known link.
-    static func link(forAction actionIdentifier: String, userInfo: [AnyHashable: Any]) -> DeepLink? {
+    /// What an action on a notification asks for: its own link for a tap, the add sheet for "Add
+    /// expense", the reminder's day for "No spending today". `nil` for a dismissal or unknown content.
+    static func action(for actionIdentifier: String, userInfo: [AnyHashable: Any]) -> NotificationAction? {
         switch actionIdentifier {
         case addActionID:
-            return .add
+            return .open(.add)
+        case noSpendingActionID:
+            return (userInfo[dayKey] as? Int).flatMap(LocalDay.init(rawValue:)).map(NotificationAction.markNoSpending)
         case UNNotificationDefaultActionIdentifier:
-            return (userInfo[linkKey] as? String).flatMap(DeepLink.init(rawValue:))
+            return (userInfo[linkKey] as? String).flatMap(DeepLink.init(rawValue:)).map(NotificationAction.open)
         default:
             return nil
         }
@@ -154,22 +168,29 @@ final class UserNotificationService: NSObject, NotificationService, UNUserNotifi
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse) async {
-        if let link = Self.link(forAction: response.actionIdentifier,
-                                userInfo: response.notification.request.content.userInfo) {
-            inbox.open(link)
+        if let action = Self.action(for: response.actionIdentifier,
+                                    userInfo: response.notification.request.content.userInfo) {
+            inbox.record(action)
         }
     }
 
     // MARK: - Private
 
     private static let linkKey = "link"
+    private static let dayKey = "day"
 
     private static var reminderCategory: UNNotificationCategory {
         let add = UNNotificationAction(identifier: addActionID,
                                        title: String(localized: "Add expense",
                                                      comment: "The daily reminder's action that opens the add sheet."),
                                        options: [.foreground])
-        return UNNotificationCategory(identifier: reminderCategoryID, actions: [add], intentIdentifiers: [])
+        // Foreground too (ADR 012): a background action could run without the app's scene, outside the
+        // main context the screens read. Opening also shows the streak go up.
+        let noSpending = UNNotificationAction(identifier: noSpendingActionID,
+                                              title: String(localized: "No spending today",
+                                                            comment: "The daily reminder's action that marks the day."),
+                                              options: [.foreground])
+        return UNNotificationCategory(identifier: reminderCategoryID, actions: [add, noSpending], intentIdentifiers: [])
     }
 
     private static func content(for content: NotificationContent) -> UNMutableNotificationContent {
@@ -177,7 +198,9 @@ final class UserNotificationService: NSObject, NotificationService, UNUserNotifi
         notification.title = content.title
         notification.body = content.body
         notification.sound = .default
-        notification.userInfo = [linkKey: content.link.rawValue]
+        var userInfo: [String: Any] = [linkKey: content.link.rawValue]
+        if let day = content.day { userInfo[dayKey] = day.rawValue }
+        notification.userInfo = userInfo
         if content.link == .add {
             notification.categoryIdentifier = reminderCategoryID
             notification.threadIdentifier = "reminder"

@@ -18,6 +18,8 @@ enum AppSheet: Identifiable, Hashable {
     case editTransaction(PersistentIdentifier)
     /// The month whose budgets are edited.
     case editBudget(YearMonth)
+    /// The logging streak, from Home's chip.
+    case streak
 
     var id: Self { self }
 }

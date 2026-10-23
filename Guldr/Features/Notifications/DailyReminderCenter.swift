@@ -13,8 +13,9 @@ import SwiftData
 /// The daily reminder (v1 plan, Phase 28): one notification a day at the user's time, which opens the add
 /// sheet. iOS can't skip a day of a repeating trigger, so it keeps the next week as one-off requests
 /// (`ReminderSchedule`) and reschedules after every save, when the app comes to the front and when the
-/// clock or the time zone changes; a day with a transaction dated that day loses its reminder. It owns
-/// the "Daily reminder" preferences and its one-time pre-prompt (author's calls, 2026-10-23).
+/// clock or the time zone changes; a logged day (ADR 012), or one with a transaction dated that day, loses
+/// its reminder. The next reminder names the streak (Phase 29). It owns the "Daily reminder" preferences
+/// and its one-time pre-prompt (author's calls, 2026-10-23).
 @Observable
 final class DailyReminderCenter {
 
@@ -56,13 +57,35 @@ final class DailyReminderCenter {
         await task.value
     }
 
-    /// The reminder's text: a calm question, with no amounts, so it reads the same with the lock on.
-    static func content(for components: DateComponents) -> NotificationContent {
-        NotificationContent(identifier: ReminderSchedule.identifier(for: components),
-                            title: "Guldr",
-                            body: String(localized: "Anything to log today? It takes a few seconds.",
-                                         comment: "The daily reminder's notification."),
-                            link: .add)
+    /// The reminder's text: a calm question, with no amounts, so it reads the same with the lock on. With
+    /// the streak (only for the next reminder, since later days depend on what happens before them), it
+    /// mentions an open day before the reminder's that a run depends on, or names the run from day 3.
+    static func content(for components: DateComponents, streak: LoggingStreak? = nil) -> NotificationContent {
+        let day = components.year.flatMap { year in
+            components.month.flatMap { month in components.day.flatMap { LocalDay(year: year, month: month, day: $0) } }
+        }
+        return NotificationContent(identifier: ReminderSchedule.identifier(for: components), title: "Guldr",
+                                   body: body(for: day, streak: streak), link: .add, day: day)
+    }
+
+    static func body(for day: LocalDay?, streak: LoggingStreak?) -> String {
+        guard let day, let streak, streak.current > 0 else {
+            return String(localized: "Anything to log today? It takes a few seconds.",
+                          comment: "The daily reminder's notification.")
+        }
+        // Today's reminder depends on yesterday; tomorrow's on today, which will be yesterday by then.
+        let dayBeforeIsOpen = day == streak.today ? streak.isYesterdayAtRisk
+                                                  : day == streak.today.adding(days: 1) && !streak.isTodayLogged
+        if dayBeforeIsOpen {
+            return String(localized: "Yesterday is still open: log it or mark no spending to keep your \(streak.current)-day streak.",
+                          comment: "The daily reminder while yesterday can still save the streak; the argument is its length.")
+        }
+        guard streak.current >= 3 else {
+            return String(localized: "Anything to log today? It takes a few seconds.",
+                          comment: "The daily reminder's notification.")
+        }
+        return String(localized: "Your streak is at \(streak.current) days. Anything to log today?",
+                      comment: "The daily reminder from a 3-day streak on; the argument is its length.")
     }
 
     // MARK: - Settings
@@ -143,20 +166,28 @@ final class DailyReminderCenter {
                                                   timeZone: timeZone)
         let wanted = Set(reminders.map(ReminderSchedule.identifier(for:)))
         service.removePending(pending.filter { !wanted.contains($0) })
-        // Every wanted day is added again, replacing its request, so a new time or language reaches all.
-        for components in reminders {
-            await service.schedule(Self.content(for: components), at: components)
+        let streak = settings.hidesStreak
+            ? nil : try? LoggedDays.streak(in: container.mainContext, now: date, timeZone: timeZone)
+        // Every wanted day is added again, replacing its request, so a new time, language or streak
+        // reaches all.
+        for (index, components) in reminders.enumerated() {
+            await service.schedule(Self.content(for: components, streak: index == 0 ? streak : nil), at: components)
         }
     }
 
-    /// Whether a transaction is dated on the day containing `date`, whenever it was added (author's call,
-    /// 2026-10-23): backfilling older days doesn't count as logging today.
+    /// Whether the day containing `date` is logged (ADR 012: a new transaction or "No spending"), or has a
+    /// transaction dated on it, whenever it was added (author's call, 2026-10-23): backfilling older days
+    /// doesn't count as logging today.
     private func isLogged(on date: Date) -> Bool {
+        let context = container.mainContext
+        let key = LocalDay(containing: date, timeZone: timeZone).rawValue
+        let logged = FetchDescriptor<LoggedDay>(predicate: #Predicate { $0.dayKey == key })
+        if ((try? context.fetchCount(logged)) ?? 0) > 0 { return true }
         let today = ReminderSchedule.today(containing: date, timeZone: timeZone)
         let start = today.start
         let end = today.end
         let descriptor = FetchDescriptor<Transaction>(predicate: #Predicate { $0.date >= start && $0.date < end })
-        return ((try? container.mainContext.fetchCount(descriptor)) ?? 0) > 0
+        return ((try? context.fetchCount(descriptor)) ?? 0) > 0
     }
 }
 
