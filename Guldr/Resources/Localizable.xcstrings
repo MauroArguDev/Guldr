@@ -2616,6 +2616,17 @@
         }
       }
     },
+    "Privacy policy" : {
+      "comment" : "Settings › About: opens the privacy policy web page.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidad"
+          }
+        }
+      }
+    },
     "Recent" : {
       "localizations" : {
         "es" : {

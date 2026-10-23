@@ -179,6 +179,22 @@ Before every archive that will be uploaded:
 
 Xcode's **Manage Version and Build Number** option in **Distribute App** stays off, so the repository always holds the uploaded number. After the App Store release, `main` is tagged `v1.0.0`.
 
+## Public pages
+
+The privacy policy and the support page, which App Store Connect and Settings › About link to, are served by GitHub Pages from the `gh-pages` branch:
+
+| Page | URL | Source on `main` |
+|---|---|---|
+| Privacy policy | https://mauroargudev.github.io/Guldr/privacy/ | [`docs/PRIVACY.md`](PRIVACY.md) |
+| Support | https://mauroargudev.github.io/Guldr/support/ | [`docs/SUPPORT.md`](SUPPORT.md) |
+
+`gh-pages` holds only these pages, a landing page and the layout, so the rest of `docs/` isn't published as a site. To change a page:
+1. Edit it in `docs/` through a normal PR.
+2. Once it's merged, check out `gh-pages` in a separate worktree (`git worktree add ../guldr-pages gh-pages`).
+3. Run `scripts/publish-pages.sh ../guldr-pages`, then commit and push there. Pages rebuilds in about a minute.
+
+A change to the privacy policy also updates its **Effective** date.
+
 ## Architecture decisions
 
 Non-obvious decisions are recorded as ADRs in [`decisions/`](decisions/), using [`000-template.md`](decisions/000-template.md).
