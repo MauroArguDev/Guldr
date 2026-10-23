@@ -119,6 +119,27 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func dailyReminderPreferencesAreStoredAndReset() throws {
+        try withSettings { settings, defaults in
+            #expect(!settings.dailyReminderEnabled)
+            #expect(!settings.hasOfferedDailyReminder)
+            #expect(settings.dailyReminderTime == .default)
+
+            settings.setDailyReminderEnabled(true)
+            settings.setHasOfferedDailyReminder()
+            settings.setDailyReminderTime(try #require(ReminderTime(hour: 21, minute: 15)))
+            #expect(AppSettings(defaults: defaults).dailyReminderTime == ReminderTime(hour: 21, minute: 15))
+
+            defaults.set(5_000, forKey: AppSettings.Key.dailyReminderMinutes)
+            #expect(settings.dailyReminderTime == .default)
+
+            settings.reset()
+            #expect(!settings.dailyReminderEnabled)
+            #expect(!settings.hasOfferedDailyReminder)
+            #expect(defaults.object(forKey: AppSettings.Key.dailyReminderMinutes) == nil)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")
