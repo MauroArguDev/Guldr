@@ -39,7 +39,10 @@ struct GuldrWidget: Widget {
 #Preview("Medium", as: .systemMedium) {
     GuldrWidget()
 } timeline: {
-    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: false)
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: false,
+                 streak: SummaryEntry.Streak(count: 12, isTodayLogged: true))
+    SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: false,
+                 streak: SummaryEntry.Streak(count: 12, isTodayLogged: false))
     SummaryEntry(date: .now, content: .summary(.sample), hidesAmounts: true)
     SummaryEntry(date: .now, content: .summary(.emptySample), hidesAmounts: false)
     SummaryEntry(date: .now, content: .notStarted, hidesAmounts: false)

@@ -165,6 +165,53 @@
         }
       }
     },
+    "Streak, %lld days" : {
+      "comment" : "VoiceOver label of the streak line in the medium widget.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Streak, %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Streak, %lld days"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld días"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld día"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld días"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Transport" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
       "extractionState" : "manual",
