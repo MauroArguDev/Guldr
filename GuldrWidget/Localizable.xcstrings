@@ -2,66 +2,202 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Add transaction" : {
-      "comment" : "The medium widget's + button, read by VoiceOver."
+      "comment" : "The medium widget's + button, read by VoiceOver.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar movimiento"
+          }
+        }
+      }
     },
     "Add your first transaction" : {
-      "comment" : "Shown in the widget when there are no transactions yet."
+      "comment" : "Shown in the widget when there are no transactions yet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega tu primer movimiento"
+          }
+        }
+      }
     },
     "Balance" : {
-      "comment" : "The widgets' header and the widget's name in the gallery."
+      "comment" : "The widgets' header and the widget's name in the gallery.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo"
+          }
+        }
+      }
     },
     "Education" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Educación"
+          }
+        }
+      }
     },
     "Entertainment" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entretenimiento"
+          }
+        }
+      }
     },
     "Food" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comida"
+          }
+        }
+      }
     },
     "Freelance" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freelance"
+          }
+        }
+      }
     },
     "Health" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salud"
+          }
+        }
+      }
     },
     "Housing" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vivienda"
+          }
+        }
+      }
     },
     "Open Guldr to get started" : {
-      "comment" : "Shown in the widget before the app's first launch."
+      "comment" : "Shown in the widget before the app's first launch.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Guldr para comenzar"
+          }
+        }
+      }
     },
     "Other" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otros"
+          }
+        }
+      }
     },
     "Other income" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otros ingresos"
+          }
+        }
+      }
     },
     "Salary" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salario"
+          }
+        }
+      }
     },
     "Shopping" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compras"
+          }
+        }
+      }
     },
     "Transport" : {
       "comment" : "Name of a default category, shown in the widget until the user renames it. Looked up at runtime.",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transporte"
+          }
+        }
+      }
     },
     "Uncategorized" : {
-      "comment" : "Names a transaction without a description or category in the widget."
+      "comment" : "Names a transaction without a description or category in the widget.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin categoría"
+          }
+        }
+      }
     },
     "Your balance and this month at a glance." : {
-      "comment" : "The widget's description in the gallery."
+      "comment" : "The widget's description in the gallery.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu saldo y tu mes de un vistazo."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
