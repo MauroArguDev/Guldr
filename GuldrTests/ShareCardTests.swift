@@ -32,7 +32,7 @@ struct ShareCardTests {
         #expect(card.rows.count == 5, "\(text)")
         let locale = Locale(identifier: localeID)
         let symbol = 1.0.formatted(.currency(code: currencyCode).locale(locale))
-            .filter { !$0.isNumber && $0 != "." && $0 != "," && !$0.isWhitespace }
+            .filter { !$0.isNumber && !$0.isWhitespace && !".,".contains($0) }
         #expect(!symbol.isEmpty)
         #expect(!text.contains(symbol), "\(symbol) in \(text)")
         #expect(!text.contains(currencyCode))
