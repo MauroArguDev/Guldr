@@ -164,6 +164,21 @@ xcodebuild test-without-building -project Guldr.xcodeproj -scheme Guldr \
 - [ ] README with screenshots and demo GIF
 - [ ] Version tagged on `main`
 
+## Versioning
+
+Both numbers live in [`Config/Shared.xcconfig`](../Config/Shared.xcconfig), shared by the app and the widget, which App Store Connect requires to match.
+
+| Setting | Shown as | Rule |
+|---|---|---|
+| `MARKETING_VERSION` | Version, `1.0.0` | [Semantic versioning](https://semver.org): patch for fixes, minor for features, major for breaking changes. Raised once per release, in that release's PR. |
+| `CURRENT_PROJECT_VERSION` | Build, `1` | A whole number raised by one for every upload to App Store Connect, never reused, never reset when the version changes (author's call, 2026-10-23). |
+
+Before every archive that will be uploaded:
+1. On a branch such as `chore/build-4`, raise `CURRENT_PROJECT_VERSION` by one.
+2. Merge its PR, then archive from `main`, so every build in TestFlight matches a commit on `main`.
+
+Xcode's **Manage Version and Build Number** option in **Distribute App** stays off, so the repository always holds the uploaded number. After the App Store release, `main` is tagged `v1.0.0`.
+
 ## Architecture decisions
 
 Non-obvious decisions are recorded as ADRs in [`decisions/`](decisions/), using [`000-template.md`](decisions/000-template.md).
