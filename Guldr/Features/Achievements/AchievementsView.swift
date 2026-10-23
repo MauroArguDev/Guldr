@@ -6,6 +6,7 @@
 //
 
 import GuldrCore
+import SwiftData
 import SwiftUI
 
 /// The achievements gallery (v1 plan, Phase 30), pushed from the streak sheet and from Settings
