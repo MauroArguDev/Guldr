@@ -24,3 +24,4 @@ Each file records one decision that shapes the project: the context, what was ch
 | [009](009-category-color-palette.md) | Category colors from a curated palette, gradient donut slices | Accepted |
 | [010](010-app-settings-storage.md) | App settings in the App Group's UserDefaults | Accepted |
 | [011](011-lock-policy.md) | Optional Face ID lock with passcode fallback, grace period and privacy cover | Accepted |
+| [012](012-logging-streak.md) | Logging streak from stored logged days, with a one-day repair and earned freezes | Accepted |
