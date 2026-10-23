@@ -147,9 +147,9 @@ Implemented in `Guldr/Core/DesignSystem/Motion.swift`; every animation and hapti
 | Element | Behavior | Token |
 |---|---|---|
 | Amounts (balance, totals, ring center) | `.contentTransition(.numericText(value:))`: digits roll to the new value | `standard` |
-| Progress bars, mini rings, budget ring | Fill from 0 on first appearance; later changes animate from the current value | `reveal`, then `standard` |
+| Progress bars, mini rings, budget ring | Fill from 0 on first appearance, starting 0.1 s after it so they grow in place once layout has settled; later changes animate from the current value | `reveal`, then `standard` |
 | Ledger lines | Draw in left to right, once per launch on the Dashboard; static elsewhere | `reveal` + `stagger` |
-| Charts | Marks grow on first appearance and morph on period change | `standard` + `stagger` |
+| Charts | Marks grow on first appearance (0.1 s after it, only the marks' values animate) and morph on period change | `reveal`, then `standard` |
 | Category chip | Selection fill and border | `snappy` |
 | Save | The saved row appears in place; the checkmark bounces (`.symbolEffect(.bounce)`) | `emphasized` |
 | Over-budget alert | Slides in with the list; its warning symbol pulses once (`.symbolEffect(.pulse)`) | `standard` |
