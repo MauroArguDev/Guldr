@@ -11,8 +11,9 @@ import GuldrCore
 import OSLog
 import SwiftData
 
-/// Debug builds only: fills an empty store with generated transactions, and budgets for the current
-/// month, to try the screens with a heavy history. Pass the launch argument `-seedTransactions 5000`
+/// Debug builds only: fills an empty store with generated transactions, budgets for the current month
+/// and two years of logged days (every 13th missed), to try the screens, the streak and the achievements
+/// with a heavy history. Pass the launch argument `-seedTransactions 5000`
 /// (Xcode › Scheme › Arguments, or `xcrun simctl launch … -seedTransactions 5000`). A store that already has transactions is left alone,
 /// so relaunching never duplicates them.
 enum DebugSeed {
@@ -57,6 +58,10 @@ enum DebugSeed {
         for category in categories where category.kind == .expense {
             context.insert(Budget(month: month, limit: try Money(minorUnits: 300_000, currencyCode: "USD"),
                                   category: category))
+        }
+        let today = LocalDay(containing: now, timeZone: .autoupdatingCurrent)
+        for offset in -730 ... 0 where !offset.isMultiple(of: 13) {
+            context.insert(LoggedDay(day: today.adding(days: offset), source: .transaction))
         }
         try context.save()
     }
