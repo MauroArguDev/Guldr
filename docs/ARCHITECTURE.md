@@ -73,7 +73,8 @@ Guldr/
 │   ├── Export/          Settings › Export transactions: the range, the CSV file and the share
 │   ├── Lock/            Face ID lock: service, state machine, lock screen and its window
 │   ├── Notifications/   Budget alerts and the daily reminder: the UserNotifications service and both centers
-│   ├── Streak/          The logging streak: its center, Home's chip, the sheet, the milestone card, the setting
+│   ├── Streak/          The logging streak: its center, Home's chip, the sheet, the setting
+│   ├── Achievements/    The achievement center, medals, their words and the gallery
 │   └── Settings/        Settings and About
 ├── Resources/           Asset catalogs, String Catalogs (strings and InfoPlist), privacy manifest
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
@@ -143,6 +144,18 @@ The logging streak follows [ADR 012](decisions/012-logging-streak.md).
 - **Notifications:** the reminder's "No spending today" action is recorded in `NotificationInbox` like a tap. The action opens the app, and `RootView` marks the day.
 - **Widget:** the medium widget reads the same days through `LoggedDays.streak`.
 
+### Achievements
+Achievements follow [ADR 013](decisions/013-achievements.md).
+
+- **Catalog and evaluation (`GuldrCore`):**
+  - `AchievementCatalog` holds the eight achievements and their thresholds.
+  - `AchievementEvaluator` turns transactions, budgets and logged days into one value per achievement. Money ones only count complete months: over, with 90 % of their days logged or frozen.
+  - The evaluator also combines the values with the stored tiers, keeping the higher one, and lists the tiers newly reached.
+  - `EarnedAchievements` reads and records the `EarnedAchievement` rows.
+- **`AchievementCenter`** evaluates after every save, on scene active and on a new day, stores new tiers and queues them; its first evaluation records the history silently.
+- **`RootView`** shows one `MomentBanner` at a time once no sheet is up: a streak milestone first, then each unlock.
+- **Words:** `GuldrCore` keeps no display text. Names, summaries, families and tiers live in the app (`Achievement+Text.swift`); tiers have their own keys, since "Gold" is already a category color.
+
 ### Export
 `ExportView` (`Features/Export/`) keeps one `@Query` of transactions; `ExportModel` copies them once into `CSVExporter.Row`s (plain values: SwiftData models can't leave their context) and filters the copies by range. `ExportFile` is the `Transferable` behind `ShareLink`: its `FileRepresentation` calls `CSVExporter.data(for:)`, which is `@concurrent`, only when the user picks a destination, and writes `Guldr-YYYY-MM-DD.csv` to the temporary directory. `CSVExporter` (`GuldrCore`) writes RFC 4180 with CRLF line endings, ISO 8601 dates with the offset, signed amounts from the minor units with the currency's digits, and English headers and `type`.
 
@@ -158,11 +171,11 @@ One `@Observable` final class per screen, owned by the view with `@State`. They 
 ### Data
 Everything about the store lives in `GuldrCore` ([ADR 007](decisions/007-persistence-and-widget-data.md)).
 
-- **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`), and `LoggedDay` (ADR 012), added in `SchemaV2`, which lists the three unchanged classes too. `GuldrMigrationPlan` has one lightweight stage, V1 → V2, tested by opening a V1 store from disk. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
+- **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`), `LoggedDay` (ADR 012), added in `SchemaV2`, and `EarnedAchievement` (ADR 013), added in `SchemaV3`; each version lists the unchanged classes too. `GuldrMigrationPlan` has two lightweight stages, V1 → V2 → V3, tested by opening a V1 store from disk. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
 - **Container:** `PersistenceController(mode:)` opens `<App Group>/Library/Application Support/Guldr.store` read-write for the app (`.app`), read-only for the widget (`.widget`), or in memory for tests and previews (`.inMemory`). CloudKit is off (`cloudKitDatabase: .none`). The app and in-memory modes seed the default categories on every open; seeding matches `systemKey`s, so it never duplicates.
 - **Errors:** opening throws `PersistenceError`: `appGroupUnavailable`, `storeCreationFailed(underlying:)`, or `storeNotFound` (widget only, before the app's first launch). In the app, `AppDataLoader` turns the result into the app or `StoreErrorView`, a calm screen with a retry and a prefilled support mail. There is no `fatalError` and no silent fallback to an empty store.
 - **Settings:** the active currency and the first-launch flag live in the App Group's `UserDefaults` through `AppSettings`, so the widget reads them too ([ADR 010](decisions/010-app-settings-storage.md)). The app observes them through `Preferences`.
-- **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: `LaunchGate` gives it the streak refresh, the widget reload, the budget alert check and the reminder's reschedule.
+- **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: `LaunchGate` gives it the streak and achievement refreshes, the widget reload, the budget alert check and the reminder's reschedule.
 - **Previews:** `PreviewData.makeController()` returns an in-memory store with April–September 2026 that reproduces the mockups' numbers, with "now" fixed at `PreviewData.referenceDate` (Sept 28, 9:41).
 
 Names: outside `GuldrCore`, `Transaction` collides with SwiftUI's and `Category` with the Objective-C runtime typedef re-exported by Foundation. Client modules declare module-level aliases (`typealias Category = GuldrCore.Category`), which win over imported names.
