@@ -24,6 +24,7 @@ struct GuldrApp: App {
                            alerts: BudgetAlertCenter(container: container, settings: settings, service: notifications),
                            reminder: DailyReminderCenter(container: container, settings: settings,
                                                          service: notifications),
+                           streak: StreakCenter(container: container, settings: settings),
                            inbox: notifications.inbox)
                     .modelContainer(container)
             case .failed(let error):

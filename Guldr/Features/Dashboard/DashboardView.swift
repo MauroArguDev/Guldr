@@ -11,12 +11,13 @@ import SwiftUI
 
 /// The Home tab: the Dashboard mockup. The header is the wordmark and the current month as the first
 /// row of the content, with no large title, and Settings as a native toolbar button (author's call,
-/// 2026-10-16). Below it: the balance card, the month's budget summary and the latest transactions, or
-/// an invitation to add the first one.
+/// 2026-10-16), with the streak chip on the right (author's call, 2026-10-23). Below it: the balance card,
+/// the month's budget summary and the latest transactions, or an invitation to add the first one.
 struct DashboardView: View {
 
     @Environment(AppRouter.self) private var router
     @Environment(Preferences.self) private var preferences
+    @Environment(StreakCenter.self) private var streak
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query private var transactions: [Transaction]
@@ -155,14 +156,22 @@ struct DashboardView: View {
 
     /// "guldr" over "October 2026".
     private var header: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Wordmark()
-            Text(verbatim: model.month.title(locale: locale))
-                .textRole(.meta)
-                .foregroundStyle(Color(.textSecondary))
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Wordmark()
+                Text(verbatim: model.month.title(locale: locale))
+                    .textRole(.meta)
+                    .foregroundStyle(Color(.textSecondary))
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: 0)
+            if streak.isShown {
+                StreakChip(streak: streak.streak) {
+                    router.present(.streak)
+                }
+            }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
     }
 }
 

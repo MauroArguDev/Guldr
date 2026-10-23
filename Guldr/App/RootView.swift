@@ -19,6 +19,8 @@ struct RootView: View {
     @Environment(BudgetAlertCenter.self) private var alerts
     @Environment(DailyReminderCenter.self) private var reminder
     @Environment(NotificationInbox.self) private var inbox
+    @Environment(StreakCenter.self) private var streak
+    @Environment(\.dataChangeNotifier) private var notifier
 
     var body: some View {
         TabView(selection: tabSelection) {
@@ -63,6 +65,15 @@ struct RootView: View {
                 AddTransactionSheet(transactionID: id)
             case .editBudget(let month):
                 EditBudgetSheet(month: month)
+            case .streak:
+                StreakSheet()
+            }
+        }
+        // A milestone waits for any sheet to close, so it never shows behind one.
+        .overlay(alignment: .top) {
+            if let milestone = streak.celebration, router.sheet == nil {
+                StreakMilestoneBanner(milestone: milestone) { streak.celebrationDidEnd() }
+                    .id(milestone)
             }
         }
         // The sheet is already closing when a save finishes, so its haptic plays here.
@@ -74,7 +85,15 @@ struct RootView: View {
         }
         // `initial`: a tap that launched Guldr was recorded before this view existed.
         .onChange(of: inbox.lastOpened, initial: true) { _, opened in
-            if let opened { router.open(opened.link.url) }
+            guard let opened else { return }
+            switch opened.action {
+            case .open(let link):
+                router.open(link.url)
+            case .markNoSpending(let day):
+                // A day that can no longer be marked (an old notification) is left as it is.
+                guard (try? streak.markNoSpending(day)) != nil else { return }
+                notifier.dataDidChange()
+            }
         }
         .alert("Get budget alerts?", isPresented: alertOffer) {
             Button("Turn on") {

@@ -127,6 +127,53 @@
         }
       }
     },
+    "%lld days in a row" : {
+      "comment" : "The title of the streak milestone card.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld day in a row"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld days in a row"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld días seguidos"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld día seguido"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld días seguidos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld days left" : {
       "localizations" : {
         "en" : {
@@ -166,6 +213,53 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld días restantes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld freezes" : {
+      "comment" : "How many freezes are held; a freeze covers a missed day.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld freeze"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld freezes"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld protectores"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld protector"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld protectores"
                 }
               }
             }
@@ -286,6 +380,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "6M"
+          }
+        }
+      }
+    },
+    "A day counts when you log something dated that day, or mark it as no spending, by the end of the next day. Every 7 days in a row earn a freeze, up to 2, which covers a missed day." : {
+      "comment" : "How the streak works, at the bottom of the streak sheet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un día cuenta cuando anotas algo con esa fecha, o lo marcas sin gastos, antes de que termine el día siguiente. Cada 7 días seguidos ganas un protector, hasta 2, que cubre un día sin anotar."
           }
         }
       }
@@ -558,6 +663,53 @@
         }
       }
     },
+    "Best: %lld days" : {
+      "comment" : "The longest streak, in the streak sheet.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Best: %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Best: %lld days"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mejor: %lld días"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mejor: %lld día"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mejor: %lld días"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Blue" : {
       "comment" : "The name VoiceOver reads for a category color swatch.",
       "localizations" : {
@@ -800,6 +952,17 @@
         }
       }
     },
+    "Couldn't save this day" : {
+      "comment" : "The title of an alert shown when marking a day without spending fails.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar este día"
+          }
+        }
+      }
+    },
     "Couldn't save this transaction" : {
       "localizations" : {
         "es" : {
@@ -845,6 +1008,17 @@
         }
       }
     },
+    "Covered by a freeze" : {
+      "comment" : "VoiceOver: a missed day covered by a freeze in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cubierto por un protector"
+          }
+        }
+      }
+    },
     "Currency" : {
       "comment" : "The title of the screen that lets the user select their preferred currency.",
       "isCommentAutoGenerated" : true,
@@ -853,6 +1027,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moneda"
+          }
+        }
+      }
+    },
+    "Current streak" : {
+      "comment" : "The overline above the streak's count in the streak sheet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racha actual"
           }
         }
       }
@@ -885,6 +1070,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rango de fechas"
+          }
+        }
+      }
+    },
+    "day in a row" : {
+      "comment" : "After the streak's count when it is 1.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "día seguido"
+          }
+        }
+      }
+    },
+    "days in a row" : {
+      "comment" : "After the streak's count when it isn't 1.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "días seguidos"
           }
         }
       }
@@ -1016,6 +1223,17 @@
         }
       }
     },
+    "Dismisses this message" : {
+      "comment" : "VoiceOver hint of the streak milestone card.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cierra este mensaje"
+          }
+        }
+      }
+    },
     "Done" : {
       "comment" : "The label of a button that dismisses the keyboard.",
       "isCommentAutoGenerated" : true,
@@ -1115,6 +1333,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entretenimiento"
+          }
+        }
+      }
+    },
+    "Every milestone reached. Keep it going." : {
+      "comment" : "The milestone card after the last milestone.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcanzaste todos los hitos. Sigue así."
           }
         }
       }
@@ -1384,6 +1613,17 @@
         }
       }
     },
+    "Hides the streak on Home, in the widget and in the daily reminder. Your logged days are kept." : {
+      "comment" : "The footer under Show streak.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oculta la racha en Inicio, en el widget y en el recordatorio diario. Tus días anotados se conservan."
+          }
+        }
+      }
+    },
     "Home" : {
       "comment" : "Title of the home tab.",
       "isCommentAutoGenerated" : true,
@@ -1493,6 +1733,17 @@
         }
       }
     },
+    "Last 5 weeks" : {
+      "comment" : "The title of the streak sheet's calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimas 5 semanas"
+          }
+        }
+      }
+    },
     "Leave a category empty to have no budget for it." : {
       "comment" : "A description of the footer of the budget editing form.",
       "isCommentAutoGenerated" : true,
@@ -1545,6 +1796,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bloquear con Touch ID"
+          }
+        }
+      }
+    },
+    "Logged" : {
+      "comment" : "VoiceOver: a logged day in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anotado"
           }
         }
       }
@@ -1607,6 +1869,53 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuevo ingreso"
+          }
+        }
+      }
+    },
+    "Next milestone: %lld days." : {
+      "comment" : "The next streak milestone.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Next milestone: %lld day."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Next milestone: %lld days."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Próximo hito: %lld días."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Próximo hito: %lld día."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Próximo hito: %lld días."
+                }
+              }
+            }
           }
         }
       }
@@ -1679,6 +1988,39 @@
         }
       }
     },
+    "No spending" : {
+      "comment" : "VoiceOver: a day marked without spending in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin gastos"
+          }
+        }
+      }
+    },
+    "No spending today" : {
+      "comment" : "Marks today as a day without spending, in the streak sheet and the daily reminder.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy no gasté"
+          }
+        }
+      }
+    },
+    "No spending yesterday" : {
+      "comment" : "Marks yesterday as a day without spending while it can still be repaired.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer no gasté"
+          }
+        }
+      }
+    },
     "No transactions in this range." : {
       "comment" : "The footer of the export range when nothing is included.",
       "localizations" : {
@@ -1698,6 +2040,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aún no hay movimientos"
+          }
+        }
+      }
+    },
+    "Not logged" : {
+      "comment" : "VoiceOver: a missed day in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin anotar"
           }
         }
       }
@@ -1850,6 +2203,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abre Movimientos"
+          }
+        }
+      }
+    },
+    "Opens your streak" : {
+      "comment" : "VoiceOver hint of the streak chip.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre tu racha"
           }
         }
       }
@@ -2142,6 +2506,17 @@
         }
       }
     },
+    "Show streak" : {
+      "comment" : "The toggle in Settings that shows or hides the streak.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar racha"
+          }
+        }
+      }
+    },
     "Show the last year" : {
       "comment" : "Button in the Analytics empty state that switches the period to one year.",
       "localizations" : {
@@ -2227,6 +2602,75 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parte de los límites del mes pasado o define nuevos."
+          }
+        }
+      }
+    },
+    "Still open" : {
+      "comment" : "VoiceOver: yesterday, still repairable, in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún abierto"
+          }
+        }
+      }
+    },
+    "Streak" : {
+      "comment" : "The title of the streak sheet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racha"
+          }
+        }
+      }
+    },
+    "Streak, %lld days" : {
+      "comment" : "VoiceOver label of the streak chip on Home.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Streak, %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Streak, %lld days"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld días"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld día"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha, %lld días"
+                }
+              }
+            }
           }
         }
       }
@@ -2325,6 +2769,61 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hasta"
+          }
+        }
+      }
+    },
+    "Today is logged" : {
+      "comment" : "VoiceOver value of the streak chip once today is logged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy ya está anotado"
+          }
+        }
+      }
+    },
+    "Today is logged." : {
+      "comment" : "The streak sheet's status once today is logged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy ya está anotado."
+          }
+        }
+      }
+    },
+    "Today is still open" : {
+      "comment" : "VoiceOver value of the streak chip while today isn't logged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy sigue abierto"
+          }
+        }
+      }
+    },
+    "Today is still open." : {
+      "comment" : "The streak sheet's status while today isn't logged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy sigue abierto."
+          }
+        }
+      }
+    },
+    "Today, still open" : {
+      "comment" : "VoiceOver: today, not logged yet, in the streak calendar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy, aún abierto"
           }
         }
       }
@@ -2635,6 +3134,64 @@
         }
       }
     },
+    "Yesterday is still open: log it or mark no spending to keep your %lld-day streak." : {
+      "comment" : "The daily reminder while yesterday can still save the streak; the argument is its length.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Yesterday is still open: log it or mark no spending to keep your %lld-day streak."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Yesterday is still open: log it or mark no spending to keep your %lld-day streak."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ayer sigue abierto: anótalo o márcalo sin gastos para mantener tu racha de %lld días."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ayer sigue abierto: anótalo o márcalo sin gastos para mantener tu racha de %lld día."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ayer sigue abierto: anótalo o márcalo sin gastos para mantener tu racha de %lld días."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Yesterday is still open: log it or mark no spending." : {
+      "comment" : "The streak sheet's status while yesterday can still save the streak.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer sigue abierto: anótalo o márcalo sin gastos."
+          }
+        }
+      }
+    },
     "You've reached your %@ budget: %@ of %@." : {
       "comment" : "Budget alert body at 100%: the month, the amount spent and the limit.",
       "localizations" : {
@@ -2766,6 +3323,53 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu región"
+          }
+        }
+      }
+    },
+    "Your streak is at %lld days. Anything to log today?" : {
+      "comment" : "The daily reminder from a 3-day streak on; the argument is its length.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Your streak is at %lld day. Anything to log today?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Your streak is at %lld days. Anything to log today?"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu racha va en %lld días. ¿Algo que anotar hoy?"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu racha va en %lld día. ¿Algo que anotar hoy?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu racha va en %lld días. ¿Algo que anotar hoy?"
+                }
+              }
+            }
           }
         }
       }

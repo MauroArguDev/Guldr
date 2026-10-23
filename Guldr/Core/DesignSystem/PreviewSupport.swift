@@ -35,6 +35,7 @@ struct PreviewEnvironment<Content: View>: View {
     @State private var lock = AppLock.preview(locked: false)
     @State private var alerts: BudgetAlertCenter?
     @State private var reminder: DailyReminderCenter?
+    @State private var streak: StreakCenter?
     @State private var inbox = NotificationInbox()
     private let content: () -> Content
 
@@ -44,11 +45,12 @@ struct PreviewEnvironment<Content: View>: View {
         _container = State(initialValue: controller?.container)
         _alerts = State(initialValue: controller.map { BudgetAlertCenter.preview(container: $0.container) })
         _reminder = State(initialValue: controller.map { DailyReminderCenter.preview(container: $0.container) })
+        _streak = State(initialValue: controller.map { StreakCenter.preview(container: $0.container) })
         self.content = content
     }
 
     var body: some View {
-        if let container, let alerts, let reminder {
+        if let container, let alerts, let reminder, let streak {
             content()
                 .modelContainer(container)
                 .environment(Preferences.preview(onboarded: true))
@@ -56,6 +58,7 @@ struct PreviewEnvironment<Content: View>: View {
                 .environment(lock)
                 .environment(alerts)
                 .environment(reminder)
+                .environment(streak)
                 .environment(inbox)
         }
     }
