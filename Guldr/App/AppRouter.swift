@@ -20,6 +20,10 @@ enum AppSheet: Identifiable, Hashable {
     case editBudget(YearMonth)
     /// The logging streak, from Home's chip.
     case streak
+    /// Sharing an earned achievement, from its unlock moment.
+    case shareAchievement(AchievementID)
+    /// A month in review, from Home's recap card.
+    case recap(YearMonth)
 
     var id: Self { self }
 }

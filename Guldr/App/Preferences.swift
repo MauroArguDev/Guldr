@@ -18,12 +18,15 @@ final class Preferences {
     private(set) var hasCompletedOnboarding: Bool
     /// Settings › Security › "Hide amounts in widgets", independent of the lock (author's call, 2026-10-23).
     private(set) var hidesWidgetAmounts: Bool
+    /// The month whose recap card was closed on Home (v1 plan, Phase 31).
+    private(set) var dismissedRecapMonth: YearMonth?
 
     init(settings: AppSettings) {
         self.settings = settings
         activeCurrencyCode = settings.activeCurrencyCode
         hasCompletedOnboarding = settings.hasCompletedOnboarding
         hidesWidgetAmounts = settings.hidesWidgetAmounts
+        dismissedRecapMonth = settings.dismissedRecapMonth
     }
 
     func completeOnboarding(currencyCode: String) throws(MoneyError) {
@@ -43,6 +46,11 @@ final class Preferences {
         hidesWidgetAmounts = settings.hidesWidgetAmounts
     }
 
+    func dismissRecap(_ month: YearMonth) {
+        settings.setDismissedRecapMonth(month)
+        dismissedRecapMonth = settings.dismissedRecapMonth
+    }
+
     /// After "Delete all data": `LaunchGate` sees first launch is no longer completed and shows the
     /// welcome screen.
     func reset() {
@@ -50,6 +58,7 @@ final class Preferences {
         activeCurrencyCode = settings.activeCurrencyCode
         hasCompletedOnboarding = settings.hasCompletedOnboarding
         hidesWidgetAmounts = settings.hidesWidgetAmounts
+        dismissedRecapMonth = settings.dismissedRecapMonth
     }
 
     // MARK: - Private

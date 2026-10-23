@@ -43,12 +43,12 @@ struct AchievementMedal: View {
 
 extension MomentBanner where Icon == AchievementMedal {
 
-    /// An achievement unlocked (Phase 30): "Saver · Gold", what it measures, and its medal.
-    init(unlock: EarnedTier, onEnd: @escaping () -> Void) {
+    /// An achievement unlocked (Phase 30): "Saver · Gold", what it measures, its medal and Share (Phase 31).
+    init(unlock: EarnedTier, onEnd: @escaping () -> Void, onShare: @escaping () -> Void) {
         let achievement = AchievementCatalog.achievement(unlock.id)
         self.init(title: "\(unlock.id.title) · \(unlock.tier.title)", subtitle: unlock.id.summary,
                   icon: { AchievementMedal(achievement: achievement, tier: unlock.tier, side: Size.iconChip) },
-                  onEnd: onEnd)
+                  onEnd: onEnd, onShare: onShare)
     }
 }
 

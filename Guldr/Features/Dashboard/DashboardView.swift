@@ -18,6 +18,7 @@ struct DashboardView: View {
     @Environment(AppRouter.self) private var router
     @Environment(Preferences.self) private var preferences
     @Environment(StreakCenter.self) private var streak
+    @Environment(\.modelContext) private var context
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query private var transactions: [Transaction]
@@ -26,12 +27,22 @@ struct DashboardView: View {
     @Query(Self.recentDescriptor) private var recentTransactions: [Transaction]
     @ReduceMotion private var reduceMotion
     @State private var model = DashboardModel()
+    /// Last month, while its recap is offered on Home; read with the rest of the data, not on every render.
+    @State private var recapMonth: YearMonth?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.stackDefault) {
                     header
+                    if let month = recapMonth, month != preferences.dismissedRecapMonth {
+                        RecapHomeCard(month: month) {
+                            router.present(.recap(month))
+                        } onClose: {
+                            withMotion(.standard) { preferences.dismissRecap(month) }
+                        }
+                        .motionTransition(.opacity)
+                    }
                     if let balance = model.balance {
                         BalanceCard(balance: balance.total, income: balance.income, expenses: balance.expenses,
                                     savingsRate: balance.savingsRate,
@@ -85,8 +96,22 @@ struct DashboardView: View {
     }
 
     private func refresh() {
+        refreshRecapMonth()
         model.update(transactions: transactions, budgets: budgets, recent: recentTransactions,
                      currencyCode: currencyCode)
+    }
+
+    /// Last month's recap during the first days of this one (v1 plan, Phase 31), if last month has anything
+    /// in it; the view leaves it out once closed.
+    private func refreshRecapMonth() {
+        guard let currencyCode = preferences.activeCurrencyCode else {
+            recapMonth = nil
+            return
+        }
+        let now = Date.now
+        recapMonth = RecapLibrary.homeMonth(now: now, timeZone: .autoupdatingCurrent, dismissed: nil,
+                                            available: RecapLibrary.availableMonths(in: context, currencyCode: currencyCode,
+                                                                                    now: now, timeZone: .autoupdatingCurrent))
     }
 
     private static var recentDescriptor: FetchDescriptor<Transaction> {
