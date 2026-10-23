@@ -26,12 +26,10 @@ public enum EarnedAchievements {
         return AchievementEvaluator.values(for: input, now: now, timeZone: timeZone)
     }
 
-    /// Evaluates the store, stores the tiers newly reached and saves. Returns them, highest first within
-    /// the catalog's order, for the unlock moments.
+    /// Stores the tiers `values` newly reach and saves. Returns them in the catalog's order, one per
+    /// achievement (its highest new tier), for the unlock moments.
     @discardableResult
-    public static func record(in context: ModelContext, currencyCode: String, now: Date,
-                              timeZone: TimeZone) throws -> [EarnedTier] {
-        let values = try values(in: context, currencyCode: currencyCode, now: now, timeZone: timeZone)
+    public static func record(_ values: [AchievementID: Int], in context: ModelContext, at now: Date) throws -> [EarnedTier] {
         let new = AchievementEvaluator.newlyEarned(values: values, earned: try all(in: context), at: now)
         guard !new.isEmpty else { return [] }
         for tier in new { context.insert(EarnedAchievement(tier)) }

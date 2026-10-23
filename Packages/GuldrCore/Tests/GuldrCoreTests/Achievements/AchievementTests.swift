@@ -239,15 +239,16 @@ struct EarnedAchievementsTests {
         }
         try context.save()
 
-        let first = try EarnedAchievements.record(in: context, currencyCode: "USD", now: now, timeZone: utc)
+        let values = try EarnedAchievements.values(in: context, currencyCode: "USD", now: now, timeZone: utc)
+        let first = try EarnedAchievements.record(values, in: context, at: now)
         #expect(first == [EarnedTier(id: .unbroken, tier: .bronze, earnedAt: now)])
-        #expect(try EarnedAchievements.record(in: context, currencyCode: "USD", now: now, timeZone: utc).isEmpty)
+        #expect(try EarnedAchievements.record(values, in: context, at: now).isEmpty)
 
         // Deleting the days doesn't take the medal back.
         for day in try context.fetch(FetchDescriptor<LoggedDay>()) { context.delete(day) }
         try context.save()
-        let values = try EarnedAchievements.values(in: context, currencyCode: "USD", now: now, timeZone: utc)
-        let progress = AchievementEvaluator.progress(values: values, earned: try EarnedAchievements.all(in: context))
+        let after = try EarnedAchievements.values(in: context, currencyCode: "USD", now: now, timeZone: utc)
+        let progress = AchievementEvaluator.progress(values: after, earned: try EarnedAchievements.all(in: context))
         #expect(progress.first { $0.id == .unbroken }?.tier == .bronze)
     }
 
