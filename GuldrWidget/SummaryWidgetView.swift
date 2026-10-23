@@ -23,7 +23,7 @@ struct SummaryWidgetView: View {
                 NotStartedView()
             case .summary(let summary):
                 if family == .systemMedium {
-                    MediumSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
+                    MediumSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts, streak: entry.streak)
                 } else {
                     SmallSummaryView(summary: summary, hidesAmounts: entry.hidesAmounts)
                 }
@@ -84,6 +84,7 @@ struct MediumSummaryView: View {
 
     let summary: WidgetSummary
     let hidesAmounts: Bool
+    var streak: SummaryEntry.Streak?
 
     var body: some View {
         HStack(spacing: 14) {
@@ -115,9 +116,24 @@ struct MediumSummaryView: View {
             VStack(alignment: .leading, spacing: 3) {
                 monthLine("arrow.up", formatter.string(from: summary.monthIncome, sign: .never), Color(.positive))
                 monthLine("arrow.down", formatter.string(from: summary.monthExpenses, sign: .never), Color(.negative))
+                if let streak { streakLine(streak) }
             }
             .font(.caption)
         }
+    }
+
+    /// The streak under the month (author's call, 2026-10-23): a filled flame in `Gold` once today is
+    /// logged, an outlined one in `TextSecondary` while it's open.
+    private func streakLine(_ streak: SummaryEntry.Streak) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: streak.isTodayLogged ? "flame.fill" : "flame")
+                .font(.caption2.weight(.semibold))
+            Text(streak.count, format: .number)
+                .monospacedDigit()
+        }
+        .foregroundStyle(streak.isTodayLogged ? Color(.gold) : Color(.textSecondary))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Streak, \(streak.count) days"))
     }
 
     private func monthLine(_ symbol: String, _ amount: String, _ tint: Color) -> some View {

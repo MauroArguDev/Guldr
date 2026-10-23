@@ -20,10 +20,18 @@ nonisolated struct SummaryEntry: TimelineEntry {
         case summary(WidgetSummary)
     }
 
+    /// The medium widget's streak line (ADR 012). It holds no amounts, so the lock doesn't hide it.
+    nonisolated struct Streak: Equatable {
+        let count: Int
+        let isTodayLogged: Bool
+    }
+
     let date: Date
     let content: Content
     /// The lock is on, or Settings › "Hide amounts in widgets" (author's call, 2026-10-21).
     let hidesAmounts: Bool
+    /// `nil` without a run, or while Settings › "Show streak" is off.
+    var streak: Streak?
 }
 
 /// Builds the entry from the shared store, read-only, with the app's own calculations (ADR 007).
@@ -62,12 +70,20 @@ nonisolated struct SummaryProvider: TimelineProvider {
                                                categoryName: Self.name(of:)) else {
             return SummaryEntry(date: now, content: .notStarted, hidesAmounts: hidesAmounts)
         }
-        return SummaryEntry(date: now, content: .summary(summary), hidesAmounts: hidesAmounts)
+        return SummaryEntry(date: now, content: .summary(summary), hidesAmounts: hidesAmounts,
+                            streak: settings.hidesStreak ? nil : Self.streak(in: context, at: now))
     }
 
     static func nextMidnight(after date: Date, calendar: Calendar = .autoupdatingCurrent) -> Date {
         let today = calendar.startOfDay(for: date)
         return calendar.date(byAdding: .day, value: 1, to: today) ?? date.addingTimeInterval(86_400)
+    }
+
+    /// The same days and rules as the app's chip; midnight's timeline refresh keeps "today" current.
+    static func streak(in context: ModelContext, at now: Date) -> SummaryEntry.Streak? {
+        guard let streak = try? LoggedDays.streak(in: context, now: now, timeZone: .autoupdatingCurrent),
+              streak.current > 0 else { return nil }
+        return SummaryEntry.Streak(count: streak.current, isTodayLogged: streak.isTodayLogged)
     }
 
     /// As the app's `Category.displayName`: seeded names are translated until the user renames them.
