@@ -101,6 +101,29 @@ struct PersistenceControllerTests {
         #expect(titles == ["Groceries"])
     }
 
+    /// The first real migration: a store written with `SchemaV1` opens with `SchemaV2`, keeps its data and
+    /// accepts logged days (ADR 012).
+    @Test func aVersionOneStoreMigratesAndKeepsItsData() throws {
+        let group = FakeAppGroup()
+        defer { group.remove() }
+        let url = try PersistenceController.storeURL(appGroupID: "group.test", groupContainerURL: group.lookup)
+        do {
+            let schema = Schema(versionedSchema: SchemaV1.self)
+            let original = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url,
+                                                                                        cloudKitDatabase: .none))
+            let context = ModelContext(original)
+            context.insert(Transaction(amount: try usd(4280), kind: .expense, title: "Groceries"))
+            try context.save()
+        }
+
+        let migrated = try PersistenceController(mode: .app(appGroupID: "group.test"), groupContainerURL: group.lookup)
+        let context = ModelContext(migrated.container)
+        #expect(try context.fetch(FetchDescriptor<Transaction>()).map(\.title) == ["Groceries"])
+        context.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 23)!, source: .noSpending))
+        try context.save()
+        #expect(try context.fetchCount(FetchDescriptor<LoggedDay>()) == 1)
+    }
+
     // MARK: - Widget
 
     @Test func widgetBeforeTheAppHasNoDataYet() {

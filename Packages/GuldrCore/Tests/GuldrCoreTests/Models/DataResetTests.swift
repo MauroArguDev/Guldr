@@ -21,12 +21,14 @@ struct DataResetTests {
         context.insert(Transaction(amount: try usd(1_250), kind: .expense, category: food))
         context.insert(Transaction(amount: try usd(800), kind: .expense, category: pets))
         context.insert(Budget(month: YearMonth(year: 2026, month: 10)!, limit: try usd(40_000), category: food))
+        context.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 23)!, source: .transaction))
         try context.save()
 
         try DataReset.eraseAll(in: context)
 
         #expect(try context.fetchCount(FetchDescriptor<Transaction>()) == 0)
         #expect(try context.fetchCount(FetchDescriptor<Budget>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<LoggedDay>()) == 0)
         let remaining = try context.fetch(FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)]))
         #expect(remaining.compactMap(\.systemKey) == DefaultCategory.all.map(\.systemKey))
         #expect(remaining.count == DefaultCategory.all.count)

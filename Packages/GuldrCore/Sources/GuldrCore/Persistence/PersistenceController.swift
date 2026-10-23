@@ -38,7 +38,7 @@ public struct PersistenceController: Sendable {
 
     /// `groupContainerURL` is injectable so tests can point the App Group at a temporary folder.
     init(mode: Mode, groupContainerURL: (String) -> URL?) throws(PersistenceError) {
-        let schema = Schema(versionedSchema: SchemaV1.self)
+        let schema = Schema(versionedSchema: SchemaV2.self)
         let configuration: ModelConfiguration
         switch mode {
         case .app(let appGroupID):

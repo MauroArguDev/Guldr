@@ -10,7 +10,7 @@ import SwiftData
 
 /// Settings › "Delete all data": the store as a first launch leaves it (author's call, 2026-10-20).
 ///
-/// Transactions, budgets and custom categories are deleted. The default categories are restored rather
+/// Transactions, budgets, logged days and custom categories are deleted. The default categories are restored rather
 /// than recreated, so their identity survives: names, symbols, colors and order go back to the seeded
 /// ones and none stays archived. A default the store lacks is seeded again. Everything happens in one
 /// save; on failure the context is rolled back and nothing changes.
@@ -27,6 +27,9 @@ public enum DataReset {
             }
             for budget in try context.fetch(FetchDescriptor<Budget>()) {
                 context.delete(budget)
+            }
+            for loggedDay in try context.fetch(FetchDescriptor<LoggedDay>()) {
+                context.delete(loggedDay)
             }
             var restoredKeys = Set<String>()
             for category in try context.fetch(FetchDescriptor<Category>()) {
