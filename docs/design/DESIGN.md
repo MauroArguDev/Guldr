@@ -226,3 +226,19 @@ Backgrounds: default `#111111`, light variant `#FFFFFF`, tinted variant `#2A2826
 ## Voice
 
 Short, second person, calm. "Your month, made clear." · "Your finances, just for you." Subtle gold references ("Your reserve") without overdoing it. No hype, no investing jargon. Spanish copy keeps the same tone in the String Catalog.
+
+Spanish is one neutral Latin American `es` that addresses the user as *tú* ("Agrega", "tu saldo"), with no regionalisms (decided by the author on 2026-10-22). The system app is "la configuración de tu iPhone", never named, since iOS calls it Configuración in Latin America and Ajustes in Spain. Terms used everywhere:
+
+| English | Spanish |
+|---|---|
+| Balance | Saldo |
+| Transactions / transaction | Movimientos / movimiento |
+| Expenses / Income (totals, filters) | Gastos / Ingresos |
+| Expense / Income (a transaction's type) | Gasto / Ingreso |
+| Budget | Presupuesto |
+| Analytics | Análisis |
+| Settings | Configuración |
+| Amount | Monto |
+| Passcode | Código |
+| Add | Agregar |
+| Delete | Eliminar |
