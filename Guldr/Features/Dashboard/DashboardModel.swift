@@ -115,7 +115,8 @@ final class DashboardModel {
             ? String(localized: "\(status.overBudgetCount) categories over budget", locale: locale)
             : String(localized: "\(status.daysLeft) days left", locale: locale)
         var monthStyle = Date.FormatStyle(locale: locale, timeZone: timeZone).month(.wide)
-        monthStyle.capitalizationContext = .beginningOfSentence
+        // Mid-sentence: Spanish puts the month after "Presupuesto de", lowercase; English months stay capitalized.
+        monthStyle.capitalizationContext = .middleOfSentence
         let monthName = month.dateInterval(in: timeZone).start.formatted(monthStyle)
         return BudgetSummary(title: String(localized: "\(monthName) budget", locale: locale),
                              detail: amounts + " · " + state, usage: status.overallUsage)

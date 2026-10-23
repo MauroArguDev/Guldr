@@ -132,7 +132,10 @@ struct AddTransactionView: View {
     private var kindPicker: some View {
         Picker("Type", selection: Binding(get: { model.kind }, set: { model.setKind($0) })) {
             Text("Expense").tag(TransactionKind.expense)
-            Text("Income").tag(TransactionKind.income)
+            // Its own key: "Income" elsewhere is a total or a filter, which Spanish says in the plural.
+            Text(String(localized: "transaction.kind.income", defaultValue: "Income",
+                        comment: "The add sheet's type picker: the transaction is an income."))
+                .tag(TransactionKind.income)
         }
         .pickerStyle(.segmented)
         .sensoryFeedback(Haptics.selection, trigger: model.kind)
