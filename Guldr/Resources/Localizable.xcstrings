@@ -2000,7 +2000,7 @@
       }
     },
     "No spending today" : {
-      "comment" : "Marks today as a day without spending, in the streak sheet and the daily reminder.",
+      "comment" : "The daily reminder's action that marks the day.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3075,28 +3075,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versión %@"
-          }
-        }
-      }
-    },
-    "While Guldr is locked with %@, widgets always hide amounts." : {
-      "comment" : "The footer under Hide amounts in widgets while the lock is on; the argument is Face ID, Touch ID or Passcode lock.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mientras Guldr esté bloqueado con %@, los widgets siempre ocultan los montos."
-          }
-        }
-      }
-    },
-    "Widgets" : {
-      "comment" : "The header of the widgets section in Settings.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Widgets"
           }
         }
       }

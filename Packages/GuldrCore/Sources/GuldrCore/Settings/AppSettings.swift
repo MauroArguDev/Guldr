@@ -68,15 +68,10 @@ public struct AppSettings {
         return LockGracePeriod(rawValue: defaults.integer(forKey: Key.lockGracePeriod)) ?? .default
     }
 
-    /// Settings › "Hide amounts in widgets", off by default.
+    /// Settings › Security › "Hide amounts in widgets", off by default. Independent of the lock (author's
+    /// call, 2026-10-23): a locked app can still show its balance on the home screen if the user wants.
     public var hidesWidgetAmounts: Bool {
         defaults.bool(forKey: Key.hidesWidgetAmounts)
-    }
-
-    /// What the widget does: while the lock is on it always hides amounts, otherwise the setting decides
-    /// (author's call, 2026-10-21).
-    public var widgetHidesAmounts: Bool {
-        isLockEnabled || hidesWidgetAmounts
     }
 
     /// Settings › "Budget alerts". Off until the user turns them on, from the pre-prompt or Settings.

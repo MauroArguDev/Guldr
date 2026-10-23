@@ -28,7 +28,8 @@ nonisolated struct SummaryEntry: TimelineEntry {
 
     let date: Date
     let content: Content
-    /// The lock is on, or Settings › "Hide amounts in widgets" (author's call, 2026-10-21).
+    /// Settings › Security › "Hide amounts in widgets", whether or not the lock is on (author's call,
+    /// 2026-10-23).
     let hidesAmounts: Bool
     /// `nil` without a run, or while Settings › "Show streak" is off.
     var streak: Streak?
@@ -58,7 +59,7 @@ nonisolated struct SummaryProvider: TimelineProvider {
 
     func entry(at now: Date) -> SummaryEntry {
         let settings = WidgetStore.settings()
-        let hidesAmounts = settings?.widgetHidesAmounts ?? false
+        let hidesAmounts = settings?.hidesWidgetAmounts ?? false
         guard case .ready(let container) = WidgetStore.open(),
               let settings, settings.hasCompletedOnboarding,
               let currencyCode = settings.activeCurrencyCode else {

@@ -31,5 +31,5 @@ Guldr holds a person's whole financial life on their iPhone. Anyone who picks up
 
 - The app needs `NSFaceIDUsageDescription` in `Info.plist`.
 - Every path (launch, foreground, deep links) goes through the lock first. The lock screen and the cover live in a second window at the alert level, above the app's, so they also cover any sheet, alert or menu the app is presenting, and the app keeps its state underneath. `LaunchGate` reports the scene's phase to `AppLock`; the lock is applied on the way back from the background, while the scene is still inactive, so the app's content never shows first.
-- The widget shows amounts on the home screen even when the app is locked unless Phase 24's "Hide amounts in widgets" is on; that phase decides how the two settings interact.
+- The widget shows amounts on the home screen even when the app is locked unless "Hide amounts in widgets" is on. Phase 24 first made the lock always hide them; on 2026-10-23 the author made the two settings independent, with "Hide amounts in widgets" moved to Settings › Security, so someone with the lock on can still see their balance on the home screen.
 - Tests drive `AppLock` with a fake service and a fake clock: launch, grace period, cancel, failure and unavailable authentication.

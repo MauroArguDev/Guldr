@@ -51,8 +51,6 @@ struct SettingsView: View {
 
             StreakSettingsSection()
 
-            widgetsSection
-
             Section {
                 NavigationLink {
                     CategoriesView()
@@ -157,8 +155,9 @@ struct SettingsView: View {
         notifier.dataDidChange()
     }
 
-    /// The lock and, while it's on, how long the app may stay in the background. Disabled with a reason
-    /// on a device without a passcode, unless it's already on, so it can still be turned off.
+    /// The lock and, while it's on, how long the app may stay in the background; disabled with a reason on
+    /// a device without a passcode, unless it's already on, so it can still be turned off. Then the
+    /// widgets' privacy, independent of the lock (author's call, 2026-10-23).
     private var lockSection: some View {
         Section {
             Toggle(isOn: lockSelection) {
@@ -173,13 +172,18 @@ struct SettingsView: View {
                     }
                 }
             }
+            Toggle("Hide amounts in widgets", isOn: hidesWidgetAmountsSelection)
+                .tint(Color(.goldFill))
         } header: {
             Text("Security")
         } footer: {
-            if lock.availability.canAuthenticate || lock.isEnabled {
-                Text("Guldr asks when it opens and when you come back after the time you choose. Your iPhone passcode works too.")
-            } else {
-                Text("Set a passcode in the Settings app to lock Guldr.")
+            VStack(alignment: .leading, spacing: 6) {
+                if lock.availability.canAuthenticate || lock.isEnabled {
+                    Text("Guldr asks when it opens and when you come back after the time you choose. Your iPhone passcode works too.")
+                } else {
+                    Text("Set a passcode in the Settings app to lock Guldr.")
+                }
+                Text("Widgets also hide amounts while your iPhone is locked.")
             }
         }
     }
@@ -196,8 +200,6 @@ struct SettingsView: View {
                     } else {
                         try await lock.disable()
                     }
-                    // While the lock is on, the widget hides amounts.
-                    notifier.dataDidChange()
                 } catch .canceled {
                     return
                 } catch {
@@ -207,26 +209,10 @@ struct SettingsView: View {
         }
     }
 
-    /// On and fixed while the lock is on, which always hides them (author's call, 2026-10-21).
-    private var widgetsSection: some View {
-        Section {
-            Toggle("Hide amounts in widgets", isOn: hidesWidgetAmountsSelection)
-                .tint(Color(.goldFill))
-                .disabled(lock.isEnabled)
-        } header: {
-            Text("Widgets")
-        } footer: {
-            if lock.isEnabled {
-                Text("While Guldr is locked with \(Text(lock.availability.biometry.lockTitle)), widgets always hide amounts.")
-            } else {
-                Text("Widgets also hide amounts while your iPhone is locked.")
-            }
-        }
-    }
-
+    /// The widgets reload right away with or without amounts.
     private var hidesWidgetAmountsSelection: Binding<Bool> {
         Binding {
-            lock.isEnabled || preferences.hidesWidgetAmounts
+            preferences.hidesWidgetAmounts
         } set: { hides in
             preferences.setHidesWidgetAmounts(hides)
             notifier.dataDidChange()

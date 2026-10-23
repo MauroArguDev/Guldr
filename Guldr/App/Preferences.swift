@@ -16,7 +16,7 @@ final class Preferences {
 
     private(set) var activeCurrencyCode: String?
     private(set) var hasCompletedOnboarding: Bool
-    /// Settings › "Hide amounts in widgets". The lock hides them too, whatever this says (ADR 011).
+    /// Settings › Security › "Hide amounts in widgets", independent of the lock (author's call, 2026-10-23).
     private(set) var hidesWidgetAmounts: Bool
 
     init(settings: AppSettings) {
