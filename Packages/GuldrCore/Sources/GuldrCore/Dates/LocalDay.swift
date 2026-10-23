@@ -50,6 +50,11 @@ public struct LocalDay: Hashable, Comparable, Sendable {
         return LocalDay(containing: date, timeZone: Self.utc.timeZone)
     }
 
+    /// 1 for Sunday through 7 for Saturday, as `Calendar` numbers weekdays.
+    public var weekday: Int {
+        Self.utc.component(.weekday, from: noonUTC)
+    }
+
     /// Whole days from this day to `other`; negative when `other` is earlier.
     public func days(to other: LocalDay) -> Int {
         Self.utc.dateComponents([.day], from: noonUTC, to: other.noonUTC).day ?? 0
