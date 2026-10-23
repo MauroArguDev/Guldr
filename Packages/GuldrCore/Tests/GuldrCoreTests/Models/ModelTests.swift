@@ -13,10 +13,14 @@ import Testing
 struct ModelTests {
 
     @Test func schemaContainsEveryModel() {
-        let names = SchemaV1.models.map { String(describing: $0) }
-        #expect(Set(names) == ["Transaction", "Category", "Budget"])
+        let first = SchemaV1.models.map { String(describing: $0) }
+        #expect(Set(first) == ["Transaction", "Category", "Budget"])
         #expect(SchemaV1.versionIdentifier == Schema.Version(1, 0, 0))
-        #expect(GuldrMigrationPlan.stages.isEmpty)
+        let second = SchemaV2.models.map { String(describing: $0) }
+        #expect(Set(second) == ["Transaction", "Category", "Budget", "LoggedDay"])
+        #expect(SchemaV2.versionIdentifier == Schema.Version(2, 0, 0))
+        #expect(GuldrMigrationPlan.schemas.count == 2)
+        #expect(GuldrMigrationPlan.stages.count == 1)
     }
 
     @Test func transactionStoresMoneyAsMinorUnitsAndCode() throws {

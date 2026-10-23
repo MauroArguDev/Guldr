@@ -164,6 +164,9 @@ final class AddTransactionViewModel {
         } else {
             context.insert(Transaction(amount: amount.money, kind: kind, title: trimmedTitle,
                                        date: date, category: category))
+            // A new transaction logs its day for the streak (ADR 012) in this same save; an edit never
+            // does. A failed lookup only skips the day, never the transaction.
+            _ = try? LoggedDays.recordTransaction(dated: date, now: .now, timeZone: timeZone, in: context)
         }
         do {
             try context.save()
