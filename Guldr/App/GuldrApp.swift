@@ -21,7 +21,10 @@ struct GuldrApp: App {
             case .ready(let container, let settings):
                 LaunchGate(preferences: Preferences(settings: settings),
                            lock: AppLock(settings: settings, service: LocalAuthenticationLockService()),
-                           alerts: BudgetAlertCenter(container: container, settings: settings, service: notifications))
+                           alerts: BudgetAlertCenter(container: container, settings: settings, service: notifications),
+                           reminder: DailyReminderCenter(container: container, settings: settings,
+                                                         service: notifications),
+                           inbox: notifications.inbox)
                     .modelContainer(container)
             case .failed(let error):
                 StoreErrorView(error: error, retry: loader.retry)

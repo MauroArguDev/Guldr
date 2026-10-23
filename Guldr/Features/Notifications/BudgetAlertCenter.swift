@@ -23,8 +23,6 @@ final class BudgetAlertCenter {
     private(set) var permission: NotificationPermission = .notDetermined
     /// Drives the pre-prompt alert in `RootView`.
     var isOfferingAlerts = false
-    /// Bumped when the user taps an alert; `RootView` opens Budget.
-    private(set) var openRequests = 0
 
     init(container: ModelContainer, settings: AppSettings, service: any NotificationService,
          locale: Locale = .autoupdatingCurrent, timeZone: TimeZone = .autoupdatingCurrent,
@@ -36,7 +34,6 @@ final class BudgetAlertCenter {
         self.timeZone = timeZone
         self.now = now
         isEnabled = settings.budgetAlertsEnabled
-        service.onOpen = { [weak self] in self?.openRequests += 1 }
     }
 
     func refreshPermission() async {
@@ -64,21 +61,13 @@ final class BudgetAlertCenter {
         let categories = (try? context.fetch(FetchDescriptor<Category>())) ?? []
         let names = Dictionary(categories.map { ($0.id, $0.displayName) }, uniquingKeysWith: { first, _ in first })
         for alert in alerts {
-            let content = content(for: alert, categoryName: names[alert.categoryID])
-            await service.deliver(identifier: content.identifier, title: content.title, body: content.body)
+            await service.deliver(content(for: alert, categoryName: names[alert.categoryID]))
         }
     }
 
-    /// A notification's identifier and text.
-    struct AlertContent: Equatable {
-        let identifier: String
-        let title: String
-        let body: String
-    }
-
     /// The notification's text. Amounts only while the Face ID lock is off, since alerts can show on the
-    /// iPhone's lock screen (author's call, 2026-10-21).
-    func content(for alert: BudgetAlert, categoryName: String?) -> AlertContent {
+    /// iPhone's lock screen (author's call, 2026-10-21). A tap opens Budget.
+    func content(for alert: BudgetAlert, categoryName: String?) -> NotificationContent {
         var monthStyle = Date.FormatStyle(locale: locale, timeZone: timeZone).month(.wide)
         monthStyle.capitalizationContext = .middleOfSentence
         let month = alert.month.dateInterval(in: timeZone).start.formatted(monthStyle)
@@ -101,7 +90,7 @@ final class BudgetAlertCenter {
         }
         let title = categoryName ?? String(localized: "Uncategorized", locale: locale)
         let identifier = "budget-\(alert.month.rawValue)-\(alert.categoryID.uuidString)-\(alert.threshold.rawValue)"
-        return AlertContent(identifier: identifier, title: title, body: body)
+        return NotificationContent(identifier: identifier, title: title, body: body, link: .budget)
     }
 
     // MARK: - Permission
