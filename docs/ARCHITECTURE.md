@@ -73,6 +73,7 @@ Guldr/
 │   ├── Export/          Settings › Export transactions: the range, the CSV file and the share
 │   ├── Lock/            Face ID lock: service, state machine, lock screen and its window
 │   ├── Notifications/   Budget alerts and the daily reminder: the UserNotifications service and both centers
+│   ├── Streak/          The logging streak: its center, Home's chip, the sheet, the milestone card, the setting
 │   └── Settings/        Settings and About
 ├── Resources/           Asset catalogs, String Catalogs (strings and InfoPlist), privacy manifest
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
@@ -128,6 +129,20 @@ The Face ID lock follows [ADR 011](decisions/011-lock-policy.md). `LockService` 
 
 `DailyReminderCenter` (same folder) sends one notification a day at the user's time. iOS can't skip a day of a repeating trigger, so `ReminderSchedule` (`GuldrCore`) lists the next 7 days as wall-clock components and the center keeps them as one-off `UNCalendarNotificationTrigger` requests named by day (`reminder-2026-10-23`): it removes the days no longer wanted and re-adds the rest. Today drops out once a transaction is dated today. It reschedules after every save (`DataChangeNotifier`), when the scene becomes active, and on `significantTimeChange` and time zone changes; the calls are chained, so an older answer never lands after a newer one. Its pre-prompt follows the budget alerts pattern: once, after a sheet closes with at least one transaction saved, and not while the budget alerts offer shows. The reminder's "Add expense" action and a tap both open the add sheet. Tests use the same fake service.
 
+### Streak
+The logging streak follows [ADR 012](decisions/012-logging-streak.md).
+
+- **Rules (`GuldrCore`):**
+  - `LocalDay` is a Gregorian day stored as `yyyymmdd`.
+  - `LoggedDays` records a new transaction's day or "No spending" while the day is still open (today, or yesterday until today ends), inside the caller's save. It also imports the history once.
+  - `LoggingStreak` derives the current and best runs, the freezes, each day's state and the milestones from the days alone. There's no counter to drift, and the widget and the app agree.
+- **Recording:** `AddTransactionViewModel` logs a new transaction's day in the same save; an edit never does.
+- **`StreakCenter`:**
+  - **Data:** imports the history on the first start, rereads the streak after every save, on scene active and at midnight, and marks "No spending";
+  - **Milestones:** spots a milestone once per run (remembered in `AppSettings` by the run's first day). `RootView` shows the card once no sheet is up.
+- **Notifications:** the reminder's "No spending today" action is recorded in `NotificationInbox` like a tap. The action opens the app, and `RootView` marks the day.
+- **Widget:** the medium widget reads the same days through `LoggedDays.streak`.
+
 ### Export
 `ExportView` (`Features/Export/`) keeps one `@Query` of transactions; `ExportModel` copies them once into `CSVExporter.Row`s (plain values: SwiftData models can't leave their context) and filters the copies by range. `ExportFile` is the `Transferable` behind `ShareLink`: its `FileRepresentation` calls `CSVExporter.data(for:)`, which is `@concurrent`, only when the user picks a destination, and writes `Guldr-YYYY-MM-DD.csv` to the temporary directory. `CSVExporter` (`GuldrCore`) writes RFC 4180 with CRLF line endings, ISO 8601 dates with the offset, signed amounts from the minor units with the currency's digits, and English headers and `type`.
 
@@ -143,11 +158,11 @@ One `@Observable` final class per screen, owned by the view with `@State`. They 
 ### Data
 Everything about the store lives in `GuldrCore` ([ADR 007](decisions/007-persistence-and-widget-data.md)).
 
-- **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`) with a `GuldrMigrationPlan` that is empty until the first change. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
+- **Models:** `Transaction`, `Category` and `Budget`, declared in `SchemaV1` (a `VersionedSchema`), and `LoggedDay` (ADR 012), added in `SchemaV2`, which lists the three unchanged classes too. `GuldrMigrationPlan` has one lightweight stage, V1 → V2, tested by opening a V1 store from disk. Top-level aliases point at the current version. They stay CloudKit-compatible: no `@Attribute(.unique)`, optional relationships with inverses, a default for every property, only plain stored types. Amounts are `Int64` minor units plus `currencyCode`, exposed as `Money` ([ADR 005](decisions/005-money-representation.md)); enums are stored as raw strings behind computed properties; `Budget.yearMonth` is `YearMonth.rawValue` ([ADR 008](decisions/008-categories-and-month-keys.md)). Category colors come from a curated palette ([ADR 009](decisions/009-category-color-palette.md)).
 - **Container:** `PersistenceController(mode:)` opens `<App Group>/Library/Application Support/Guldr.store` read-write for the app (`.app`), read-only for the widget (`.widget`), or in memory for tests and previews (`.inMemory`). CloudKit is off (`cloudKitDatabase: .none`). The app and in-memory modes seed the default categories on every open; seeding matches `systemKey`s, so it never duplicates.
 - **Errors:** opening throws `PersistenceError`: `appGroupUnavailable`, `storeCreationFailed(underlying:)`, or `storeNotFound` (widget only, before the app's first launch). In the app, `AppDataLoader` turns the result into the app or `StoreErrorView`, a calm screen with a retry and a prefilled support mail. There is no `fatalError` and no silent fallback to an empty store.
 - **Settings:** the active currency and the first-launch flag live in the App Group's `UserDefaults` through `AppSettings`, so the widget reads them too ([ADR 010](decisions/010-app-settings-storage.md)). The app observes them through `Preferences`.
-- **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: `LaunchGate` gives it the widget reload and the budget alert check.
+- **After saves:** the app calls `DataChangeNotifier.dataDidChange()` (from the environment), the one place that refreshes dependents: `LaunchGate` gives it the streak refresh, the widget reload, the budget alert check and the reminder's reschedule.
 - **Previews:** `PreviewData.makeController()` returns an in-memory store with April–September 2026 that reproduces the mockups' numbers, with "now" fixed at `PreviewData.referenceDate` (Sept 28, 9:41).
 
 Names: outside `GuldrCore`, `Transaction` collides with SwiftUI's and `Category` with the Objective-C runtime typedef re-exported by Foundation. Client modules declare module-level aliases (`typealias Category = GuldrCore.Category`), which win over imported names.

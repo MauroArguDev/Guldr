@@ -151,6 +151,8 @@ Implemented in `Guldr/Core/DesignSystem/Motion.swift`; every animation and hapti
 | Category chip | Selection fill and border | `snappy` |
 | Save | The saved row appears in place; the checkmark bounces (`.symbolEffect(.bounce)`) | `emphasized` |
 | Over-budget alert | Slides in with the list; its warning symbol pulses once (`.symbolEffect(.pulse)`) | `standard` |
+| Streak chip | The count rolls (`numericText`); the flame bounces once when today becomes logged | `standard`, `snappy` |
+| Streak milestone | The card drops in from the top 0.4 s after the sheet closes, leaves after 3.5 s or on a tap | `emphasized` |
 | Sheets, navigation, tabs | Native transitions, untouched | — |
 
 ### Haptics
@@ -162,6 +164,7 @@ Through `.sensoryFeedback`, tied to the state change, never to a timer.
 | Category chip or segmented control changes | `.selection` |
 | Keypad key | `.impact(weight: .light)` |
 | Transaction or budget saved | `.success` |
+| A day marked "No spending", a streak milestone | `.success` |
 | A save pushes a budget over its limit | `.warning` |
 | Face ID unlock fails | `.error` |
 
@@ -174,6 +177,7 @@ When `accessibilityReduceMotion` is on:
 | Fills (bars, rings, ledger lines) | Appear at their final value, no fill animation |
 | Layout and list changes | Opacity cross-fade (`.easeInOut(duration: 0.2)`) instead of movement |
 | Stagger | Off: everything appears together |
+| Streak milestone card | Fades in and out instead of dropping in |
 | Chart marks | Appear at their final value |
 | Symbol effects | Off (the pulse and the bounce) |
 | Numeric text transitions | Kept: they do not move content around the screen |
@@ -185,6 +189,7 @@ When `accessibilityReduceMotion` is on:
 - **BudgetSummaryRow**: 44 pt mini ring (stroke 5, `GoldFill` on `Track`, round caps; `Negative` when the month's total is over), title 15 semibold, meta 13, chevron. At accessibility text sizes the ring and chevron sit above the text.
 - **TransactionRow**: icon chip + title/meta + trailing amount. Income amount `Positive` with "+", expense `TextPrimary` with "−". At accessibility text sizes the amount moves under the meta and the text wraps instead of truncating.
 - **BudgetRing**: 168 pt, stroke 12, starts at 12 o'clock, center shows remaining in serif 30 + "available".
+- **StreakChip**: a capsule with a flame and the count (15 semibold, tabular), 12 × 6 padding in a 44 pt target. Once today is logged: `flame.fill` and text in `Gold` on `GoldSoft`; while today is open: `flame` and text in `TextSecondary` on `Field` (decided by the author on 2026-10-23: in Home's header, beside the month).
 - **CategoryBudgetRow**: icon chip 38, name 15 semibold, "spent of limit" 13 (spent semibold), 5 pt bar; over budget turns bar and spent value `Negative`.
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
 - **AddButton**: in the mockups, a 64 pt `GoldFill` circle with an `OnGold` plus. In the app it is the native separated tab next to the tab bar (a `Tab` with the `.prominent` role on iOS 27, `.search` on iOS 26, the roles each version draws apart from the bar): Liquid Glass with a `Gold` plus, sized and minimized by the system. Selecting it opens the add sheet without switching tabs. Decided by the author on 2026-10-10 (native first over a hand-drawn copy).
@@ -204,8 +209,17 @@ When `accessibilityReduceMotion` is on:
 - **Welcome lock opt-in**: under the currency row, a toggle row in the same `Field` style ("Lock with Face ID", off by default, `GoldFill` tint); hidden on a device without a passcode.
 - **Export**: native `Form`, inline title "Export". A native segmented "All time" / "Date range" on the background, From and To date pickers for a range, a footer with the number of transactions ("12 transactions will be exported.", or "No transactions in this range."), then "Export CSV" (`square.and.arrow.up`) in `Gold` as a `ShareLink`, `TextSecondary` while nothing is included; its footer lists the columns and says expenses are negative (decided by the author on 2026-10-21).
 - **Budget alerts**: a native alert pre-prompt, once, after the first budgets are saved: "Get budget alerts?", "Guldr can tell you when a category reaches 80% and 100% of its monthly budget.", "Turn on" / "Not now"; only "Turn on" shows iOS's dialog (decided by the author on 2026-10-21). Notifications are titled with the category ("Food") and read "You've used 80% of your October budget: $320.00 of $400.00." or "You've reached your October budget: $412.00 of $400.00."; without amounts while the Face ID lock is on. They show as a banner even while Guldr is open; a tap opens Budget.
+- **Streak** (ADR 012; decided by the author on 2026-10-23, drafted by Claude Code in existing tokens, no mockup yet):
+  - **Sheet:** opened from the chip, on `SheetBackground`, inline title "Streak", Done in `Gold`.
+    - **Hero card** (`.hero`): "CURRENT STREAK" (overline), the count in New York 46 (`balance`) with "days in a row", the day's status (13, `Gold` once logged), a `Hairline`, then "Best: 34 days" with a trophy, and two snowflakes (`snowflake.circle.fill` in `Gold` per freeze held, outlined in `TextSecondary` otherwise).
+    - **"No spending":** "No spending today" as the primary button and "No spending yesterday" as a `Gold` text button, each only while it counts.
+    - **"Last 5 weeks" card** (`.standard`): weekday initials from the locale, then 32 pt circles. Logged is `GoldFill` with the day in `OnGold`; no spending is `GoldSoft` ringed in `GoldFill`; a freeze is a snowflake on `Track`; missed is `Track`; an open yesterday has a dashed `GoldFill` ring; an open today a solid one. Days after today are blank.
+    - **Bottom:** "Next milestone: 7 days." (`rowTitle`) and how a day counts (13, `TextSecondary`).
+  - **Milestone card:** at 3, 7, 14, 30, 60, 100, 180 and 365 days, once per run. A `.standard` card at the top of the screen with a `flame.fill` in `Gold` on a 42 pt `GoldSoft` square, "7 days in a row" (`rowTitle`) and "Next milestone: 14 days." (13, `TextSecondary`). It never blocks the app.
+  - **Reminder:** from day 3 the daily reminder reads "Your streak is at 12 days. Anything to log today?". While the day before the reminder is still open and the run depends on it, it reads "Yesterday is still open: log it or mark no spending to keep your 12-day streak.". Its "No spending today" action opens the app and marks the day.
+  - **Settings:** "Show streak", on by default; off hides the chip, the widget line and the reminder's streak copy.
 - **Daily reminder**: a native alert pre-prompt, once, after a sheet closes with the first transaction saved (not while the budget alerts offer shows): "Get a daily reminder?", "Guldr can remind you once a day to log what you spent. You can change the time in Settings.", "Turn on" / "Not now"; iOS's dialog follows only if it hasn't been asked yet (decided by the author on 2026-10-23). The notification is titled "Guldr" and reads "Anything to log today? It takes a few seconds."; it has no amounts, so it's the same with the lock on. It arrives at 20:00 by default, never on a day that already has a transaction dated that day, and a tap or its "Add expense" action opens the add sheet.
-- **Widgets** (Widgets mockup): `WidgetBackground` container. Small: "Balance" (12 semibold, `TextSecondary`) with the 18 pt glyph in `Gold` at the trailing edge; at the bottom the balance (New York 28, whole units), the two compact ledger lines and "Sep: −$1,759.50" (12, `TextSecondary`). Medium: a 128 pt left column (16 pt glyph and "Balance", a 24 pt `GoldFill` + that opens the add sheet, the balance in New York 26, ↑ income `Positive` and ↓ expenses `Negative` in 12), a 1 pt `Hairline`, then the three newest transactions (13 semibold title over an 11 pt day, 13 semibold amount; income `Positive` with +) (decided by the author on 2026-10-21, over budget usage). Without transactions "Add your first transaction"; before first launch the glyph and "Open Guldr to get started". Amounts are privacy-sensitive and redacted while the lock is on or "Hide amounts in widgets" is set. The glyph, the lines and the + follow the tinted home screen. Tapping opens Home.
+- **Widgets** (Widgets mockup): `WidgetBackground` container. Small: "Balance" (12 semibold, `TextSecondary`) with the 18 pt glyph in `Gold` at the trailing edge; at the bottom the balance (New York 28, whole units), the two compact ledger lines and "Sep: −$1,759.50" (12, `TextSecondary`). Medium: a 128 pt left column (16 pt glyph and "Balance", a 24 pt `GoldFill` + that opens the add sheet, the balance in New York 26, ↑ income `Positive` and ↓ expenses `Negative` in 12, then the streak: a flame and the count in 12, `Gold` and filled once today is logged, `TextSecondary` otherwise, never redacted), a 1 pt `Hairline`, then the three newest transactions (13 semibold title over an 11 pt day, 13 semibold amount; income `Positive` with +) (decided by the author on 2026-10-21, over budget usage). Without transactions "Add your first transaction"; before first launch the glyph and "Open Guldr to get started". Amounts are privacy-sensitive and redacted while the lock is on or "Hide amounts in widgets" is set. The glyph, the lines and the + follow the tinted home screen. Tapping opens Home.
 - **Charts** (Swift Charts): income bars `GoldFill`, expense bars `ChartExpense` (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a subtle gradient from its category's base color to that color mixed 12% with `Surface`; slices are separated by a 2 pt gap and the legend names every slice with its share. The 18 pt ring is too thin for labels on the slices, so touching a slice or its legend row selects it instead: the center shows its name, amount and share and the other slices dim (decided by the author on 2026-10-20).
 - **Primary button**: capsule, 54 pt tall, `GoldFill` with `OnGold` 17 pt semibold text.
 
@@ -241,5 +255,6 @@ Spanish is one neutral Latin American `es` that addresses the user as *tú* ("Ag
 | Settings | Configuración |
 | Amount | Monto |
 | Passcode | Código |
+| Streak / freeze | Racha / protector |
 | Add | Agregar |
 | Delete | Eliminar |
