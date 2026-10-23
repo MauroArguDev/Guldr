@@ -141,28 +141,28 @@ final class UserNotificationService: NSObject, NotificationService, UNUserNotifi
 
     // MARK: - UNUserNotificationCenterDelegate
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            willPresent notification: UNNotification)
-        async -> UNNotificationPresentationOptions {
+    // Both methods stay on the main actor, the app's default. iOS calls the delegate from a background
+    // thread and, for an async method, runs the completion handler where the method ends; UIKit requires
+    // it on the main thread and crashes otherwise ("Call must be made on main thread"). An async method
+    // isolated to the main actor can satisfy these nonisolated requirements: Swift hops to the main actor
+    // first, so the method and the completion both run there.
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         [.banner, .list, .sound]
     }
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            didReceive response: UNNotificationResponse) async {
-        let action = response.actionIdentifier
-        // The link travels as a String, which is Sendable, rather than the whole `userInfo`.
-        let rawLink = response.notification.request.content.userInfo[Self.linkKey] as? String
-        await MainActor.run {
-            if let link = Self.link(forAction: action, userInfo: rawLink.map { [Self.linkKey: $0] } ?? [:]) {
-                inbox.open(link)
-            }
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse) async {
+        if let link = Self.link(forAction: response.actionIdentifier,
+                                userInfo: response.notification.request.content.userInfo) {
+            inbox.open(link)
         }
     }
 
     // MARK: - Private
 
-    /// Read by the delegate, which runs off the main actor.
-    private nonisolated static let linkKey = "link"
+    private static let linkKey = "link"
 
     private static var reminderCategory: UNNotificationCategory {
         let add = UNNotificationAction(identifier: addActionID,
