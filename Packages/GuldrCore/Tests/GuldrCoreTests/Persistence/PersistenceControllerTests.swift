@@ -101,8 +101,8 @@ struct PersistenceControllerTests {
         #expect(titles == ["Groceries"])
     }
 
-    /// The first real migration: a store written with `SchemaV1` opens with `SchemaV2`, keeps its data and
-    /// accepts logged days (ADR 012).
+    /// The real migrations: a store written with `SchemaV1` opens with the current schema through both
+    /// stages, keeps its data and accepts logged days (ADR 012) and earned achievements (ADR 013).
     @Test func aVersionOneStoreMigratesAndKeepsItsData() throws {
         let group = FakeAppGroup()
         defer { group.remove() }
@@ -120,8 +120,10 @@ struct PersistenceControllerTests {
         let context = ModelContext(migrated.container)
         #expect(try context.fetch(FetchDescriptor<Transaction>()).map(\.title) == ["Groceries"])
         context.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 23)!, source: .noSpending))
+        context.insert(EarnedAchievement(EarnedTier(id: .daysLogged, tier: .bronze, earnedAt: .now)))
         try context.save()
         #expect(try context.fetchCount(FetchDescriptor<LoggedDay>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<EarnedAchievement>()) == 1)
     }
 
     // MARK: - Widget
