@@ -149,6 +149,8 @@ struct AppSettingsTests {
             settings.setHidesStreak(true)
             settings.setHasImportedStreakHistory()
             settings.setHasRecordedAchievementHistory()
+            settings.setDismissedRecapMonth(YearMonth(year: 2026, month: 9)!)
+            #expect(settings.dismissedRecapMonth == YearMonth(year: 2026, month: 9))
             settings.setCelebratedMilestone(7, inRunStartingOn: run)
             #expect(settings.celebratedMilestone(inRunStartingOn: run) == 7)
             #expect(settings.celebratedMilestone(inRunStartingOn: otherRun) == 0)
@@ -157,6 +159,7 @@ struct AppSettingsTests {
             #expect(!settings.hidesStreak)
             #expect(!settings.hasImportedStreakHistory)
             #expect(!settings.hasRecordedAchievementHistory)
+            #expect(settings.dismissedRecapMonth == nil)
             #expect(settings.celebratedMilestone(inRunStartingOn: run) == 0)
         }
     }
