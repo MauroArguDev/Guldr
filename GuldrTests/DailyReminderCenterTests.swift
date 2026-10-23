@@ -43,6 +43,36 @@ struct DailyReminderCenterTests {
         }
     }
 
+    @Test func noSpendingTodayRemovesTodaysReminder() async throws {
+        try await withFixture(enabled: true) { fixture in
+            fixture.container.mainContext.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 16)!,
+                                                           source: .noSpending))
+            try fixture.container.mainContext.save()
+            await fixture.center.reschedule()
+            #expect(fixture.pendingDays.first == "2026-10-17")
+        }
+    }
+
+    @Test func onlyTheNextReminderNamesTheStreak() async throws {
+        try await withFixture(enabled: true) { fixture in
+            for offset in -3 ... -1 {
+                fixture.container.mainContext.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 16)!
+                    .adding(days: offset), source: .transaction))
+            }
+            try fixture.container.mainContext.save()
+            await fixture.center.reschedule()
+            #expect(fixture.service.scheduled["reminder-2026-10-16"]?.content.body
+                    == "Your streak is at 3 days. Anything to log today?")
+            #expect(fixture.service.scheduled["reminder-2026-10-17"]?.content.body
+                    == "Anything to log today? It takes a few seconds.")
+
+            fixture.settings.setHidesStreak(true)
+            await fixture.center.reschedule()
+            #expect(fixture.service.scheduled["reminder-2026-10-16"]?.content.body
+                    == "Anything to log today? It takes a few seconds.")
+        }
+    }
+
     @Test func backfillingAnotherDayKeepsTodaysReminder() async throws {
         try await withFixture(enabled: true) { fixture in
             try fixture.add(on: "2026-10-15T21:00:00Z")
@@ -169,33 +199,79 @@ struct DailyReminderCenterTests {
     }
 }
 
-/// Where a tapped notification goes, and the inbox that hands it to `RootView`.
+/// What an action on a notification asks for, and the inbox that hands it to `RootView`.
 struct NotificationRoutingTests {
 
     @Test func aTapOpensTheNotificationsOwnLink() {
-        let link = UserNotificationService.link(forAction: UNNotificationDefaultActionIdentifier,
-                                                userInfo: ["link": "budget"])
-        #expect(link == .budget)
+        let action = UserNotificationService.action(for: UNNotificationDefaultActionIdentifier,
+                                                    userInfo: ["link": "budget"])
+        #expect(action == .open(.budget))
     }
 
     @Test func addExpenseOpensTheAddSheet() {
-        #expect(UserNotificationService.link(forAction: UserNotificationService.addActionID, userInfo: [:]) == .add)
+        #expect(UserNotificationService.action(for: UserNotificationService.addActionID, userInfo: [:]) == .open(.add))
+    }
+
+    @Test func noSpendingMarksTheRemindersDay() {
+        let action = UserNotificationService.action(for: UserNotificationService.noSpendingActionID,
+                                                    userInfo: ["link": "add", "day": 20_261_016])
+        #expect(action == .markNoSpending(LocalDay(year: 2026, month: 10, day: 16)!))
+        #expect(UserNotificationService.action(for: UserNotificationService.noSpendingActionID, userInfo: [:]) == nil)
     }
 
     @Test func dismissalsAndUnknownLinksGoNowhere() {
-        #expect(UserNotificationService.link(forAction: UNNotificationDismissActionIdentifier,
-                                             userInfo: ["link": "add"]) == nil)
-        #expect(UserNotificationService.link(forAction: UNNotificationDefaultActionIdentifier,
-                                             userInfo: ["link": "settings"]) == nil)
+        #expect(UserNotificationService.action(for: UNNotificationDismissActionIdentifier,
+                                               userInfo: ["link": "add"]) == nil)
+        #expect(UserNotificationService.action(for: UNNotificationDefaultActionIdentifier,
+                                               userInfo: ["link": "settings"]) == nil)
     }
 
-    @Test func openingTheSameLinkTwiceRoutesTwice() throws {
+    @Test func recordingTheSameActionTwiceRoutesTwice() throws {
         let inbox = NotificationInbox()
-        inbox.open(.add)
+        inbox.record(.open(.add))
         let first = try #require(inbox.lastOpened)
-        inbox.open(.add)
+        inbox.record(.open(.add))
         #expect(inbox.lastOpened != first)
-        #expect(inbox.lastOpened?.link == .add)
+        #expect(inbox.lastOpened?.action == .open(.add))
+    }
+}
+
+/// The reminder's copy with the streak (ADR 012), as of Friday, October 16, 2026.
+struct ReminderCopyTests {
+
+    private let today = LocalDay(year: 2026, month: 10, day: 16)!
+    private let generic = "Anything to log today? It takes a few seconds."
+
+    @Test func withoutAStreakTheQuestionStaysCalm() {
+        #expect(DailyReminderCenter.body(for: today, streak: nil) == generic)
+        #expect(DailyReminderCenter.body(for: today, streak: streak([])) == generic)
+        #expect(DailyReminderCenter.body(for: today, streak: streak([-2, -1])) == generic)
+    }
+
+    @Test func fromDayThreeTheStreakIsNamed() {
+        #expect(DailyReminderCenter.body(for: today, streak: streak([-3, -2, -1]))
+                == "Your streak is at 3 days. Anything to log today?")
+        // Tomorrow's reminder after today is logged counts today too.
+        #expect(DailyReminderCenter.body(for: today.adding(days: 1), streak: streak([-3, -2, -1, 0]))
+                == "Your streak is at 4 days. Anything to log today?")
+    }
+
+    @Test func anOpenDayTheRunDependsOnIsMentioned() {
+        #expect(DailyReminderCenter.body(for: today, streak: streak([-4, -3, -2]))
+                == "Yesterday is still open: log it or mark no spending to keep your 3-day streak.")
+        // Tomorrow's reminder while today is still open: by then, today is yesterday.
+        #expect(DailyReminderCenter.body(for: today.adding(days: 1), streak: streak([-2, -1]))
+                == "Yesterday is still open: log it or mark no spending to keep your 2-day streak.")
+    }
+
+    @Test func remindersCarryTheirDay() {
+        let components = DateComponents(year: 2026, month: 10, day: 16, hour: 20, minute: 0)
+        #expect(DailyReminderCenter.content(for: components).day == today)
+    }
+
+    private func streak(_ offsets: [Int]) -> LoggingStreak {
+        LoggingStreak(loggedDays: Dictionary(uniqueKeysWithValues: offsets.map { (today.adding(days: $0), .transaction) }),
+                      today: today)
     }
 }
 
