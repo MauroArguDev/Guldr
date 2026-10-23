@@ -16,7 +16,7 @@ typealias Category = GuldrCore.Category
 /// A fresh in-memory store per test, built from the versioned schema and migration plan the app uses.
 func makeInMemoryContext() throws -> ModelContext {
     let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-    let container = try ModelContainer(for: Schema(versionedSchema: SchemaV2.self),
+    let container = try ModelContainer(for: Schema(versionedSchema: SchemaV3.self),
                                        migrationPlan: GuldrMigrationPlan.self,
                                        configurations: configuration)
     return ModelContext(container)

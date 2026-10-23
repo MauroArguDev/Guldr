@@ -226,3 +226,37 @@ private final class Fixture {
         try #require(ISO8601DateFormatter().date(from: day + "T12:00:00Z"))
     }
 }
+
+/// Recording earned tiers in the store.
+struct EarnedAchievementsTests {
+
+    @Test func recordingStoresNewTiersOnceAndKeepsThem() throws {
+        let context = ModelContext(try PersistenceController(mode: .inMemory).container)
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-10-16T12:00:00Z"))
+        let utc = try #require(TimeZone(identifier: "UTC"))
+        for offset in -6...0 {
+            context.insert(LoggedDay(day: LocalDay(year: 2026, month: 10, day: 16)!.adding(days: offset), source: .transaction))
+        }
+        try context.save()
+
+        let first = try EarnedAchievements.record(in: context, currencyCode: "USD", now: now, timeZone: utc)
+        #expect(first == [EarnedTier(id: .unbroken, tier: .bronze, earnedAt: now)])
+        #expect(try EarnedAchievements.record(in: context, currencyCode: "USD", now: now, timeZone: utc).isEmpty)
+
+        // Deleting the days doesn't take the medal back.
+        for day in try context.fetch(FetchDescriptor<LoggedDay>()) { context.delete(day) }
+        try context.save()
+        let values = try EarnedAchievements.values(in: context, currencyCode: "USD", now: now, timeZone: utc)
+        let progress = AchievementEvaluator.progress(values: values, earned: try EarnedAchievements.all(in: context))
+        #expect(progress.first { $0.id == .unbroken }?.tier == .bronze)
+    }
+
+    @Test func anUnknownRecordIsIgnored() throws {
+        let context = ModelContext(try PersistenceController(mode: .inMemory).container)
+        let future = EarnedAchievement(EarnedTier(id: .saver, tier: .gold, earnedAt: .now))
+        future.achievementID = "fromANewerVersion"
+        context.insert(future)
+        try context.save()
+        #expect(try EarnedAchievements.all(in: context).isEmpty)
+    }
+}

@@ -148,6 +148,7 @@ struct AppSettingsTests {
 
             settings.setHidesStreak(true)
             settings.setHasImportedStreakHistory()
+            settings.setHasRecordedAchievementHistory()
             settings.setCelebratedMilestone(7, inRunStartingOn: run)
             #expect(settings.celebratedMilestone(inRunStartingOn: run) == 7)
             #expect(settings.celebratedMilestone(inRunStartingOn: otherRun) == 0)
@@ -155,6 +156,7 @@ struct AppSettingsTests {
             settings.reset()
             #expect(!settings.hidesStreak)
             #expect(!settings.hasImportedStreakHistory)
+            #expect(!settings.hasRecordedAchievementHistory)
             #expect(settings.celebratedMilestone(inRunStartingOn: run) == 0)
         }
     }

@@ -28,6 +28,7 @@ public struct AppSettings {
         static let hasImportedStreakHistory = "hasImportedStreakHistory"
         static let celebratedStreakRun = "celebratedStreakRun"
         static let celebratedStreakMilestone = "celebratedStreakMilestone"
+        static let hasRecordedAchievementHistory = "hasRecordedAchievementHistory"
     }
 
     private let defaults: UserDefaults
@@ -133,6 +134,15 @@ public struct AppSettings {
         return defaults.integer(forKey: Key.celebratedStreakMilestone)
     }
 
+    /// Whether the history's achievements were recorded once, silently (ADR 013).
+    public var hasRecordedAchievementHistory: Bool {
+        defaults.bool(forKey: Key.hasRecordedAchievementHistory)
+    }
+
+    public func setHasRecordedAchievementHistory() {
+        defaults.set(true, forKey: Key.hasRecordedAchievementHistory)
+    }
+
     public func setHidesStreak(_ hides: Bool) {
         defaults.set(hides, forKey: Key.hidesStreak)
     }
@@ -180,7 +190,8 @@ public struct AppSettings {
         for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod,
                     Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys,
                     Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder, Key.hidesStreak,
-                    Key.hasImportedStreakHistory, Key.celebratedStreakRun, Key.celebratedStreakMilestone] {
+                    Key.hasImportedStreakHistory, Key.celebratedStreakRun, Key.celebratedStreakMilestone,
+                    Key.hasRecordedAchievementHistory] {
             defaults.removeObject(forKey: key)
         }
     }

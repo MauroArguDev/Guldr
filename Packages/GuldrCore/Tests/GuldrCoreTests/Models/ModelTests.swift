@@ -19,8 +19,11 @@ struct ModelTests {
         let second = SchemaV2.models.map { String(describing: $0) }
         #expect(Set(second) == ["Transaction", "Category", "Budget", "LoggedDay"])
         #expect(SchemaV2.versionIdentifier == Schema.Version(2, 0, 0))
-        #expect(GuldrMigrationPlan.schemas.count == 2)
-        #expect(GuldrMigrationPlan.stages.count == 1)
+        let third = SchemaV3.models.map { String(describing: $0) }
+        #expect(Set(third) == ["Transaction", "Category", "Budget", "LoggedDay", "EarnedAchievement"])
+        #expect(SchemaV3.versionIdentifier == Schema.Version(3, 0, 0))
+        #expect(GuldrMigrationPlan.schemas.count == 3)
+        #expect(GuldrMigrationPlan.stages.count == 2)
     }
 
     @Test func transactionStoresMoneyAsMinorUnitsAndCode() throws {
