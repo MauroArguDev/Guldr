@@ -24,6 +24,8 @@ Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](pl
 - [ ] **CSV export** of transactions
 - [ ] **Daily reminder:** one opt-in local notification a day, skipped once the day is logged
 - [ ] **Logging streak:** consecutive logged days with repair, earned freezes and milestones, on Home and in the widget
+- [ ] **Achievements:** bronze, silver and gold coins for consistency, complete months, budgets and savings; money achievements only count complete months
+- [ ] **Share cards and monthly recap:** an image of an achievement or of the month, with no amounts
 
 ### Quality
 - [ ] English and Spanish
@@ -56,5 +58,5 @@ Ideas, not commitments:
 | Siri and App Shortcuts | Adds surface without improving the core flow. App Intents are used only where widgets need them. |
 | iPad and Mac | iPhone-first; a good iPad layout is its own project. |
 | Languages beyond English and Spanish | Two languages done well beat several done poorly. |
-| Paid streak freezes, leaderboards, social sharing | The streak exists to keep the user's own data complete; buying or comparing it would reward the streak instead of the logging. |
+| Paid streak freezes, leaderboards, social feeds | The streak and achievements exist to keep the user's own data complete; buying or comparing them would reward the game instead of the logging. Sharing is a user-made image with no amounts, not a feed. |
 | Networking, accounts, third-party analytics | Local-first and private by design: data never leaves the device (iCloud in v1.1 stays in the user's own account). |
