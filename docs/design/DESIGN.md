@@ -154,7 +154,7 @@ Implemented in `Guldr/Core/DesignSystem/Motion.swift`; every animation and hapti
 | Save | The saved row appears in place; the checkmark bounces (`.symbolEffect(.bounce)`) | `emphasized` |
 | Over-budget alert | Slides in with the list; its warning symbol pulses once (`.symbolEffect(.pulse)`) | `standard` |
 | Streak chip | The count rolls (`numericText`); the flame bounces once when today becomes logged | `standard`, `snappy` |
-| Streak milestone | The card drops in from the top 0.4 s after the sheet closes, leaves after 3.5 s or on a tap | `emphasized` |
+| Streak milestone, achievement unlocked (`MomentBanner`) | The card drops in from the top 0.4 s after the sheet closes, leaves after 3.5 s or on a tap; one at a time, a streak milestone first | `emphasized` |
 | Sheets, navigation, tabs | Native transitions, untouched | — |
 
 ### Haptics
@@ -166,7 +166,7 @@ Through `.sensoryFeedback`, tied to the state change, never to a timer.
 | Category chip or segmented control changes | `.selection` |
 | Keypad key | `.impact(weight: .light)` |
 | Transaction or budget saved | `.success` |
-| A day marked "No spending", a streak milestone | `.success` |
+| A day marked "No spending", a streak milestone, an achievement unlocked | `.success` |
 | A save pushes a budget over its limit | `.warning` |
 | Face ID unlock fails | `.error` |
 
@@ -179,7 +179,7 @@ When `accessibilityReduceMotion` is on:
 | Fills (bars, rings, ledger lines) | Appear at their final value, no fill animation |
 | Layout and list changes | Opacity cross-fade (`.easeInOut(duration: 0.2)`) instead of movement |
 | Stagger | Off: everything appears together |
-| Streak milestone card | Fades in and out instead of dropping in |
+| Streak milestone and achievement cards | Fade in and out instead of dropping in |
 | Chart marks | Appear at their final value |
 | Symbol effects | Off (the pulse and the bounce) |
 | Numeric text transitions | Kept: they do not move content around the screen |
@@ -191,6 +191,7 @@ When `accessibilityReduceMotion` is on:
 - **BudgetSummaryRow**: 44 pt mini ring (stroke 5, `GoldFill` on `Track`, round caps; `Negative` when the month's total is over), title 15 semibold, meta 13, chevron. At accessibility text sizes the ring and chevron sit above the text.
 - **TransactionRow**: icon chip + title/meta + trailing amount. Income amount `Positive` with "+", expense `TextPrimary` with "−". At accessibility text sizes the amount moves under the meta and the text wraps instead of truncating.
 - **BudgetRing**: 168 pt, stroke 12, starts at 12 o'clock, center shows remaining in serif 30 + "available".
+- **AchievementMedal**: a coin (52 pt in rows, 56 pt in the gallery header, 42 pt in the unlock card) filled with its tier's color, a 1 pt inner ring at 8 % of its size (`OnGold` at 20 %), and the achievement's SF Symbol at 38 % of the size, semibold, in `OnGold`. Tier colors: `TierBronze`, `TierSilver` and `GoldFill` for gold. Before bronze: `Track` with a `Hairline` ring and the symbol in `TextSecondary` (ADR 013; decided by the author on 2026-10-23). Decorative for VoiceOver.
 - **StreakChip**: a capsule with a flame and the count (15 semibold, tabular), 12 × 6 padding in a 44 pt target. Once today is logged: `flame.fill` and text in `Gold` on `GoldSoft`; while today is open: `flame` and text in `TextSecondary` on `Field` (decided by the author on 2026-10-23: in Home's header, beside the month).
 - **CategoryBudgetRow**: icon chip 38, name 15 semibold, "spent of limit" 13 (spent semibold), 5 pt bar; over budget turns bar and spent value `Negative`.
 - **OverBudgetAlert**: `NegativeSoft` background, radius 18, warning icon in `Negative`, text `TextPrimary`.
@@ -220,6 +221,12 @@ When `accessibilityReduceMotion` is on:
   - **Milestone card:** at 3, 7, 14, 30, 60, 100, 180 and 365 days, once per run. A `.standard` card at the top of the screen with a `flame.fill` in `Gold` on a 42 pt `GoldSoft` square, "7 days in a row" (`rowTitle`) and "Next milestone: 14 days." (13, `TextSecondary`). It never blocks the app.
   - **Reminder:** from day 3 the daily reminder reads "Your streak is at 12 days. Anything to log today?". While the day before the reminder is still open and the run depends on it, it reads "Yesterday is still open: log it or mark no spending to keep your 12-day streak.". Its "No spending today" action opens the app and marks the day.
   - **Settings:** "Show streak", on by default; off hides the chip, the widget line and the reminder's streak copy.
+- **Achievements** (ADR 013; drafted by Claude Code in the design system, with the author's new tier tokens, no mockup yet):
+  - **Gallery:** pushed as "Achievements" from the bottom of the streak sheet (a `.compact` card with `medal` and a chevron) and from Settings, inline title, on `AppBackground`.
+    - **Header card** (`.hero`): the highest medal earned and "12 of 24 medals" over a ProgressBar.
+    - **Families:** one per family ("Consistency", "Ledger up to date", "Budget", "Reserve"), each a `sectionTitle` over a `.standard` card. Rows hold the medal, the name (`rowTitle`) and what it measures (13, `TextSecondary`), then the tier in `Gold` caption semibold with the month it was earned, "8 / 12" at the trailing edge, and a compact ProgressBar toward the next tier (none after gold). Nothing is hidden behind a "?".
+    - **Footer:** "Money achievements only count complete months, so every medal stands for data you can trust."
+  - **Unlock moment:** the streak's card (`MomentBanner`) with the 42 pt medal, "Saver · Gold" and what it measures. Tiers are queued one at a time after any sheet and any streak milestone; the history earned before the version is recorded without moments. No notification (decided by the author on 2026-10-23).
 - **Daily reminder**: a native alert pre-prompt, once, after a sheet closes with the first transaction saved (not while the budget alerts offer shows): "Get a daily reminder?", "Guldr can remind you once a day to log what you spent. You can change the time in Settings.", "Turn on" / "Not now"; iOS's dialog follows only if it hasn't been asked yet (decided by the author on 2026-10-23). The notification is titled "Guldr" and reads "Anything to log today? It takes a few seconds."; it has no amounts, so it's the same with the lock on. It arrives at 20:00 by default, never on a day that already has a transaction dated that day, and a tap or its "Add expense" action opens the add sheet.
 - **Widgets** (Widgets mockup): `WidgetBackground` container. Small: "Balance" (12 semibold, `TextSecondary`) with the 18 pt glyph in `Gold` at the trailing edge; at the bottom the balance (New York 28, whole units), the two compact ledger lines and "Sep: −$1,759.50" (12, `TextSecondary`). Medium: a 128 pt left column (16 pt glyph and "Balance", a 24 pt `GoldFill` + that opens the add sheet, the balance in New York 26, ↑ income `Positive` and ↓ expenses `Negative` in 12, then the streak: a flame and the count in 12, `Gold` and filled once today is logged, `TextSecondary` otherwise, never redacted), a 1 pt `Hairline`, then the three newest transactions (13 semibold title over an 11 pt day, 13 semibold amount; income `Positive` with +) (decided by the author on 2026-10-21, over budget usage). Without transactions "Add your first transaction"; before first launch the glyph and "Open Guldr to get started". Amounts are privacy-sensitive (iOS hides them while the iPhone is locked) and redacted while "Hide amounts in widgets" is on, whether or not Guldr's lock is (decided by the author on 2026-10-23, replacing the 2026-10-21 rule that the lock always hid them). The glyph, the lines and the + follow the tinted home screen. Tapping opens Home.
 - **Charts** (Swift Charts): income bars `GoldFill`, expense bars `ChartExpense` (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a subtle gradient from its category's base color to that color mixed 12% with `Surface`; slices are separated by a 2 pt gap and the legend names every slice with its share. The 18 pt ring is too thin for labels on the slices, so touching a slice or its legend row selects it instead: the center shows its name, amount and share and the other slices dim (decided by the author on 2026-10-20).
@@ -258,5 +265,6 @@ Spanish is one neutral Latin American `es` that addresses the user as *tú* ("Ag
 | Amount | Monto |
 | Passcode | Código |
 | Streak / freeze | Racha / protector |
+| Achievements / medal; bronze, silver, gold | Logros / medalla; bronce, plata, oro |
 | Add | Agregar |
 | Delete | Eliminar |
