@@ -164,7 +164,9 @@ Achievements follow [ADR 013](decisions/013-achievements.md).
   - decides whether Home offers last month (days 1–7, until closed in `Preferences`);
   - builds a `RecapCard` with the top category's shown name.
 - **Rendering:** `ShareCardView` draws a card at a fixed size and Dynamic Type; `ShareCardRenderer` renders it with `ImageRenderer` at 3× in the app's appearance and language.
-- **Sharing:** `ShareCardSheet` hands the PNG over through `ShareLink` as `ShareImage` (`Transferable`, `nonisolated` like `ExportFile`), with a short text.
+- **Sharing:** `ShareCardSheet` opens the system share sheet through `ActivitySharing` (`UIActivityViewController`) rather than `ShareLink`, since each destination needs something different:
+  - the image goes as a `UIImage`, with the card's title and thumbnail in the sheet's header;
+  - the short text goes to every app except Instagram, whose extension rejects an image with text or raw PNG data ("Content currently unavailable"), found in the author's device test.
 - **Entry points:** the unlock moment goes through `AppRouter` (`shareAchievement`, `recap`); the gallery uses its own sheet, by identifier, so the sheet always reads current data.
 
 ### Export

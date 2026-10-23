@@ -239,7 +239,7 @@ When `accessibilityReduceMotion` is on:
     - a `.standard` card of rows ("Days logged 28 / 31", "Budgets kept 5 / 6", "Saved 32%", "Best streak 14 days in a row", "Top spending Food · 34%"; rows without data are left out, a square keeps three);
     - on a story, up to five 40 pt medals earned that month.
   - **Never an amount:** the recap is built from `MonthlyRecap`, which holds no money.
-  - **Share sheet:** inline title, Done in `Gold`, a segmented "Story / Square", the exact image (radius 24, `Hairline` border; VoiceOver reads the shared text), and Share as the primary button. It shares a PNG with "Saver · Gold, earned in Guldr." or "My October in Guldr: 28 of 31 days logged.".
+  - **Share sheet:** inline title, Done in `Gold`, a segmented "Story / Square", the exact image (radius 24, `Hairline` border; VoiceOver reads the shared text), and Share as the primary button, which opens the system share sheet. It shares the image with "Saver · Gold, earned in Guldr." or "My October in Guldr: 28 of 31 days logged.", except to Instagram, which takes the image alone.
   - **Where:**
     - the unlock card's Share button (`Gold`, trailing);
     - a Share button on each earned achievement in the gallery;
