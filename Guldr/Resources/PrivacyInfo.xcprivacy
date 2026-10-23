@@ -15,7 +15,8 @@
             <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
             <key>NSPrivacyAccessedAPITypeReasons</key>
             <array>
-                <string>CA92.1</string>
+                <!-- Every preference lives in the App Group's defaults, shared with the widget
+                     (ADR 010); the app never uses the standard defaults. -->
                 <string>1C8F.1</string>
             </array>
         </dict>
