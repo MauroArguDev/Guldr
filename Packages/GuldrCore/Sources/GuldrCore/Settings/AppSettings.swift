@@ -29,6 +29,7 @@ public struct AppSettings {
         static let celebratedStreakRun = "celebratedStreakRun"
         static let celebratedStreakMilestone = "celebratedStreakMilestone"
         static let hasRecordedAchievementHistory = "hasRecordedAchievementHistory"
+        static let dismissedRecapMonth = "dismissedRecapMonth"
     }
 
     private let defaults: UserDefaults
@@ -139,6 +140,15 @@ public struct AppSettings {
         defaults.bool(forKey: Key.hasRecordedAchievementHistory)
     }
 
+    /// The month whose recap card the user closed on Home, so it stays closed until the next month.
+    public var dismissedRecapMonth: YearMonth? {
+        YearMonth(rawValue: defaults.integer(forKey: Key.dismissedRecapMonth))
+    }
+
+    public func setDismissedRecapMonth(_ month: YearMonth) {
+        defaults.set(month.rawValue, forKey: Key.dismissedRecapMonth)
+    }
+
     public func setHasRecordedAchievementHistory() {
         defaults.set(true, forKey: Key.hasRecordedAchievementHistory)
     }
@@ -191,7 +201,7 @@ public struct AppSettings {
                     Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys,
                     Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder, Key.hidesStreak,
                     Key.hasImportedStreakHistory, Key.celebratedStreakRun, Key.celebratedStreakMilestone,
-                    Key.hasRecordedAchievementHistory] {
+                    Key.hasRecordedAchievementHistory, Key.dismissedRecapMonth] {
             defaults.removeObject(forKey: key)
         }
     }
