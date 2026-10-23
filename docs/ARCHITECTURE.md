@@ -74,7 +74,7 @@ Guldr/
 │   ├── Lock/            Face ID lock: service, state machine, lock screen and its window
 │   ├── Notifications/   Budget alerts: the UserNotifications service and the alert center
 │   └── Settings/        Settings and About
-├── Resources/           Asset catalogs, String Catalog, privacy manifest
+├── Resources/           Asset catalogs, String Catalogs (strings and InfoPlist), privacy manifest
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
 └── Guldr.entitlements   Stays at the root: referenced by CODE_SIGN_ENTITLEMENTS
 GuldrWidget/             Widget extension: timeline provider, small and medium views, its String Catalog, privacy manifest and Info.plist
