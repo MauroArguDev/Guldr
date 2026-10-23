@@ -17,6 +17,10 @@ import SwiftUI
 struct AchievementsView: View {
 
     @Environment(AchievementCenter.self) private var center
+    @Environment(Preferences.self) private var preferences
+    @Environment(\.modelContext) private var context
+    @State private var sharing: SharedItem?
+    @State private var recapMonths: [YearMonth] = []
 
     var body: some View {
         ScrollView {
@@ -24,6 +28,9 @@ struct AchievementsView: View {
                 header
                 ForEach(AchievementFamily.allCases, id: \.self) { family in
                     section(family)
+                }
+                if !recapMonths.isEmpty {
+                    recaps
                 }
                 Text("Money achievements only count complete months, so every medal stands for data you can trust.")
                     .textRole(.meta)
@@ -35,7 +42,67 @@ struct AchievementsView: View {
         .background(Color(.appBackground))
         .navigationTitle(Text("Achievements"))
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { center.refresh() }
+        .onAppear {
+            center.refresh()
+            if let currencyCode = preferences.activeCurrencyCode {
+                recapMonths = RecapLibrary.availableMonths(in: context, currencyCode: currencyCode, now: .now,
+                                                           timeZone: .autoupdatingCurrent)
+            }
+        }
+        .sheet(item: $sharing) { item in
+            switch item {
+            case .achievement(let id):
+                if let progress = center.progress.first(where: { $0.id == id }), let tier = progress.tier {
+                    ShareCardSheet(content: .achievement(progress.achievement, tier))
+                }
+            case .recap(let month):
+                RecapSheet(month: month)
+            }
+        }
+    }
+
+    /// What the gallery shares, by identifier, so the sheet reads the current data.
+    private enum SharedItem: Identifiable, Hashable {
+        case achievement(AchievementID)
+        case recap(YearMonth)
+
+        var id: Self { self }
+    }
+
+    /// Past months in review, newest first (v1 plan, Phase 31).
+    private var recaps: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Monthly recaps")
+                .textRole(.sectionTitle)
+                .foregroundStyle(Color(.textPrimary))
+                .accessibilityAddTraits(.isHeader)
+            VStack(spacing: 0) {
+                ForEach(recapMonths, id: \.self) { month in
+                    Button {
+                        sharing = .recap(month)
+                    } label: {
+                        HStack {
+                            Text(verbatim: month.title())
+                                .textRole(.rowTitle)
+                                .foregroundStyle(Color(.textPrimary))
+                            Spacer()
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundStyle(Color(.gold))
+                        }
+                        .frame(minHeight: Size.touchTargetMin)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Opens the recap to share it"))
+                    if month != recapMonths.last {
+                        Divider().overlay(Color(.hairline))
+                    }
+                }
+            }
+            .padding(.horizontal, Spacing.cardPaddingCompact)
+            .padding(.vertical, 4)
+            .card(.standard)
+        }
     }
 
     private var header: some View {
@@ -64,7 +131,9 @@ struct AchievementsView: View {
             VStack(spacing: 0) {
                 let rows = center.progress.filter { $0.achievement.family == family }
                 ForEach(rows) { progress in
-                    AchievementRow(progress: progress)
+                    AchievementRow(progress: progress) {
+                        sharing = .achievement(progress.id)
+                    }
                     if progress.id != rows.last?.id {
                         Divider().overlay(Color(.hairline)).padding(.leading, 52 + Spacing.rowGap)
                     }
@@ -79,6 +148,8 @@ struct AchievementsView: View {
 private struct AchievementRow: View {
 
     let progress: AchievementProgress
+    /// Shares the tier earned; only offered once there is one.
+    let onShare: () -> Void
 
     @Environment(\.locale) private var locale
 
@@ -86,9 +157,23 @@ private struct AchievementRow: View {
         HStack(alignment: .top, spacing: Spacing.rowGap) {
             AchievementMedal(achievement: progress.achievement, tier: progress.tier)
             VStack(alignment: .leading, spacing: 4) {
-                Text(progress.id.title)
-                    .textRole(.rowTitle)
-                    .foregroundStyle(Color(.textPrimary))
+                HStack(alignment: .firstTextBaseline) {
+                    Text(progress.id.title)
+                        .textRole(.rowTitle)
+                        .foregroundStyle(Color(.textPrimary))
+                    Spacer(minLength: 8)
+                    if progress.tier != nil {
+                        Button(action: onShare) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(Color(.gold))
+                                .frame(width: Size.touchTargetMin, height: Size.touchTargetMin)
+                        }
+                        .buttonStyle(.plain)
+                        .frame(height: 20)
+                        .accessibilityLabel(Text("Share"))
+                    }
+                }
                 Text(progress.id.summary)
                     .textRole(.meta)
                     .foregroundStyle(Color(.textSecondary))
@@ -98,6 +183,11 @@ private struct AchievementRow: View {
         }
         .padding(.vertical, Spacing.summaryRowVertical)
         .accessibilityElement(children: .combine)
+        .accessibilityActions {
+            if progress.tier != nil {
+                Button("Share", action: onShare)
+            }
+        }
     }
 
     @ViewBuilder

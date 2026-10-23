@@ -10,14 +10,16 @@ import SwiftUI
 
 /// A brief moment of success: a streak milestone (Phase 29) or an achievement unlocked (Phase 30). A card
 /// drops in from the top once the sheet that caused it is gone, with the `emphasized` spring and the
-/// success haptic, then leaves after a few seconds or on a tap. It never blocks the app: only the card
-/// itself takes touches. With Reduce Motion it fades instead of dropping in.
+/// success haptic, then leaves after a few seconds or on a tap. An achievement's card also has Share
+/// (Phase 31). It never blocks the app: only the card itself takes touches. With Reduce Motion it fades
+/// instead of dropping in.
 struct MomentBanner<Icon: View>: View {
 
     let title: LocalizedStringResource
     let subtitle: LocalizedStringResource
     @ViewBuilder let icon: () -> Icon
     let onEnd: () -> Void
+    var onShare: (() -> Void)?
 
     @State private var isShown = false
 
@@ -44,30 +46,44 @@ struct MomentBanner<Icon: View>: View {
     private static var duration: Double { 3.5 }
 
     private var card: some View {
-        Button {
-            Task { await dismiss() }
-        } label: {
-            HStack(spacing: Spacing.rowGap) {
-                icon()
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .textRole(.rowTitle)
-                        .foregroundStyle(Color(.textPrimary))
-                    Text(subtitle)
-                        .textRole(.meta)
-                        .foregroundStyle(Color(.textSecondary))
+        HStack(spacing: 0) {
+            Button {
+                Task { await dismiss() }
+            } label: {
+                HStack(spacing: Spacing.rowGap) {
+                    icon()
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .textRole(.rowTitle)
+                            .foregroundStyle(Color(.textPrimary))
+                        Text(subtitle)
+                            .textRole(.meta)
+                            .foregroundStyle(Color(.textSecondary))
+                    }
+                    Spacer(minLength: 0)
                 }
-                Spacer(minLength: 0)
+                .padding(Spacing.cardPaddingCompact)
+                .contentShape(Rectangle())
             }
-            .padding(Spacing.cardPaddingCompact)
-            .card(.standard)
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(Text("Dismisses this message"))
+            if let onShare {
+                Button(action: onShare) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color(.gold))
+                        .frame(width: Size.touchTargetMin, height: Size.touchTargetMin)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 8)
+                .accessibilityLabel(Text("Share"))
+            }
         }
-        .buttonStyle(.plain)
+        .card(.standard)
         .padding(.horizontal, Spacing.screenHorizontal)
         .padding(.top, 8)
-        .accessibilityElement(children: .combine)
-        .accessibilityHint(Text("Dismisses this message"))
     }
 
     private func dismiss() async {

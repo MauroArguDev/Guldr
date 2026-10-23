@@ -68,6 +68,12 @@ struct RootView: View {
                 EditBudgetSheet(month: month)
             case .streak:
                 StreakSheet()
+            case .shareAchievement(let id):
+                if let progress = achievements.progress.first(where: { $0.id == id }), let tier = progress.tier {
+                    ShareCardSheet(content: .achievement(progress.achievement, tier))
+                }
+            case .recap(let month):
+                RecapSheet(month: month)
             }
         }
         // Moments wait for any sheet to close, so they never show behind one, and come one at a time: a
@@ -78,8 +84,14 @@ struct RootView: View {
                     MomentBanner(milestone: milestone) { streak.celebrationDidEnd() }
                         .id("streak-\(milestone)")
                 } else if let unlock = achievements.currentUnlock {
-                    MomentBanner(unlock: unlock) { achievements.unlockDidEnd() }
-                        .id("\(unlock.id.rawValue)-\(unlock.tier.rawValue)")
+                    MomentBanner(unlock: unlock) {
+                        achievements.unlockDidEnd()
+                    } onShare: {
+                        // The card leaves with the sheet; it isn't shown again afterwards.
+                        achievements.unlockDidEnd()
+                        router.present(.shareAchievement(unlock.id))
+                    }
+                    .id("\(unlock.id.rawValue)-\(unlock.tier.rawValue)")
                 }
             }
         }
