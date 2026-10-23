@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-/// Settings › About: the version, support by email and the licenses of what ships in the app. The
-/// privacy policy joins it once it is published (v1 plan, step 29.7), so it never links to a missing
-/// page (author's call, 2026-10-21). SwiftLint is not listed: it runs at build time and doesn't ship.
+/// Settings › About: the version, the privacy policy, support by email and the licenses of what ships in
+/// the app. The privacy policy row joined once the page was published (v1 plan, step 33.7), so it never
+/// linked to a missing page (author's call, 2026-10-21). SwiftLint is not listed: it runs at build time
+/// and doesn't ship.
 struct AboutView: View {
 
     var body: some View {
@@ -28,6 +29,12 @@ struct AboutView: View {
             .listRowBackground(Color.clear)
 
             Section {
+                if let url = SupportContact.privacyPolicyURL {
+                    Link(destination: url) {
+                        Label("Privacy policy", systemImage: "hand.raised")
+                    }
+                    .tint(Color(.gold))
+                }
                 if let url = SupportContact.mailURL(subject: "Guldr support", problem: "") {
                     Link(destination: url) {
                         Label("Contact support", systemImage: "envelope")

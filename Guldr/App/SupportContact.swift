@@ -12,6 +12,10 @@ enum SupportContact {
 
     static let email = "argudev@icloud.com"
 
+    /// The public privacy policy, published from `docs/PRIVACY.md` (v1 plan, 33.7). The same URL goes in
+    /// App Store Connect.
+    static let privacyPolicyURL = URL(string: "https://mauroargudev.github.io/Guldr/privacy/")
+
     /// A `mailto:` link prefilled with the app version, the iOS version and what went wrong, so a
     /// report is useful without asking the user for details.
     static func mailURL(subject: String, problem: String, bundle: Bundle = .main,

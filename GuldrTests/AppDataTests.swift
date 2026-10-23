@@ -41,6 +41,13 @@ struct AppDataTests {
         #expect(body.contains("Guldr 1.0.0"))
     }
 
+    @Test func privacyPolicyIsTheSecurePublishedPage() throws {
+        let url = try #require(SupportContact.privacyPolicyURL)
+        #expect(url.scheme == "https")
+        #expect(url.host() == "mauroargudev.github.io")
+        #expect(url.path() == "/Guldr/privacy/")
+    }
+
     @Test func dataChangesRefreshDependents() {
         var refreshes = 0
         let notifier = DataChangeNotifier { refreshes += 1 }
