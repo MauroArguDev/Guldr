@@ -1,0 +1,12 @@
+# Guldr's public pages, built by GitHub Pages from this branch only.
+# privacy.md and support.md are generated from docs/ on main by scripts/publish-pages.sh; edit them there.
+title: Guldr
+description: Your gold, in order. A local-first personal finance app for iPhone.
+baseurl: /Guldr
+url: https://mauroargudev.github.io
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+exclude:
+  - README.md
