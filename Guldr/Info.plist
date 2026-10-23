@@ -17,6 +17,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Guldr uses Face ID to keep your finances private.</string>
 	<key>UILaunchScreen</key>
