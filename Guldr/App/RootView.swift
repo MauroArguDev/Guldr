@@ -20,6 +20,7 @@ struct RootView: View {
     @Environment(DailyReminderCenter.self) private var reminder
     @Environment(NotificationInbox.self) private var inbox
     @Environment(StreakCenter.self) private var streak
+    @Environment(AchievementCenter.self) private var achievements
     @Environment(\.dataChangeNotifier) private var notifier
 
     var body: some View {
@@ -69,11 +70,17 @@ struct RootView: View {
                 StreakSheet()
             }
         }
-        // A milestone waits for any sheet to close, so it never shows behind one.
+        // Moments wait for any sheet to close, so they never show behind one, and come one at a time: a
+        // streak milestone first, then each achievement unlocked.
         .overlay(alignment: .top) {
-            if let milestone = streak.celebration, router.sheet == nil {
-                StreakMilestoneBanner(milestone: milestone) { streak.celebrationDidEnd() }
-                    .id(milestone)
+            if router.sheet == nil {
+                if let milestone = streak.celebration {
+                    MomentBanner(milestone: milestone) { streak.celebrationDidEnd() }
+                        .id("streak-\(milestone)")
+                } else if let unlock = achievements.currentUnlock {
+                    MomentBanner(unlock: unlock) { achievements.unlockDidEnd() }
+                        .id("\(unlock.id.rawValue)-\(unlock.tier.rawValue)")
+                }
             }
         }
         // The sheet is already closing when a save finishes, so its haptic plays here.

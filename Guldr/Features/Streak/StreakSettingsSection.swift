@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-/// Settings › "Show streak", on by default (author's call, 2026-10-23). Off hides the chip, the widget
-/// line and the reminder's streak copy; days are still recorded, so turning it back on loses nothing.
+/// Settings' habit section: "Achievements", which opens the gallery, and "Show streak", on by default
+/// (author's calls, 2026-10-23). Off hides the chip, the widget line and the reminder's streak copy; days
+/// are still recorded, so turning it back on loses nothing.
 struct StreakSettingsSection: View {
 
     @Environment(StreakCenter.self) private var streak
@@ -16,6 +17,11 @@ struct StreakSettingsSection: View {
 
     var body: some View {
         Section {
+            NavigationLink {
+                AchievementsView()
+            } label: {
+                Text("Achievements")
+            }
             Toggle("Show streak", isOn: isShown)
                 .tint(Color(.goldFill))
         } footer: {
