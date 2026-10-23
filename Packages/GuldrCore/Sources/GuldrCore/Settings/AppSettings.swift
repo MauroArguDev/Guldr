@@ -24,6 +24,10 @@ public struct AppSettings {
         static let dailyReminderEnabled = "dailyReminderEnabled"
         static let dailyReminderMinutes = "dailyReminderMinutes"
         static let hasOfferedDailyReminder = "hasOfferedDailyReminder"
+        static let hidesStreak = "hidesStreak"
+        static let hasImportedStreakHistory = "hasImportedStreakHistory"
+        static let celebratedStreakRun = "celebratedStreakRun"
+        static let celebratedStreakMilestone = "celebratedStreakMilestone"
     }
 
     private let defaults: UserDefaults
@@ -118,6 +122,35 @@ public struct AppSettings {
         defaults.set(true, forKey: Key.hasOfferedDailyReminder)
     }
 
+    /// Settings › "Show streak" turned off (ADR 012). Days are still recorded while it's hidden.
+    public var hidesStreak: Bool {
+        defaults.bool(forKey: Key.hidesStreak)
+    }
+
+    /// Whether the history was imported once into logged days (`LoggedDays.importHistory`).
+    public var hasImportedStreakHistory: Bool {
+        defaults.bool(forKey: Key.hasImportedStreakHistory)
+    }
+
+    /// The highest milestone celebrated in the run that started on `runStart`; 0 for another run.
+    public func celebratedMilestone(inRunStartingOn runStart: LocalDay) -> Int {
+        guard defaults.integer(forKey: Key.celebratedStreakRun) == runStart.rawValue else { return 0 }
+        return defaults.integer(forKey: Key.celebratedStreakMilestone)
+    }
+
+    public func setHidesStreak(_ hides: Bool) {
+        defaults.set(hides, forKey: Key.hidesStreak)
+    }
+
+    public func setHasImportedStreakHistory() {
+        defaults.set(true, forKey: Key.hasImportedStreakHistory)
+    }
+
+    public func setCelebratedMilestone(_ milestone: Int, inRunStartingOn runStart: LocalDay) {
+        defaults.set(runStart.rawValue, forKey: Key.celebratedStreakRun)
+        defaults.set(milestone, forKey: Key.celebratedStreakMilestone)
+    }
+
     public func setBudgetAlertsEnabled(_ isEnabled: Bool) {
         defaults.set(isEnabled, forKey: Key.budgetAlertsEnabled)
     }
@@ -151,7 +184,8 @@ public struct AppSettings {
     public func reset() {
         for key in [Key.activeCurrencyCode, Key.hasCompletedOnboarding, Key.isLockEnabled, Key.lockGracePeriod,
                     Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys,
-                    Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder] {
+                    Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder, Key.hidesStreak,
+                    Key.hasImportedStreakHistory, Key.celebratedStreakRun, Key.celebratedStreakMilestone] {
             defaults.removeObject(forKey: key)
         }
     }

@@ -140,6 +140,27 @@ struct AppSettingsTests {
         }
     }
 
+    @Test func streakPreferencesAreStoredAndReset() throws {
+        try withSettings { settings, _ in
+            let run = try #require(LocalDay(year: 2026, month: 10, day: 20))
+            let otherRun = try #require(LocalDay(year: 2026, month: 10, day: 1))
+            #expect(!settings.hidesStreak)
+            #expect(!settings.hasImportedStreakHistory)
+            #expect(settings.celebratedMilestone(inRunStartingOn: run) == 0)
+
+            settings.setHidesStreak(true)
+            settings.setHasImportedStreakHistory()
+            settings.setCelebratedMilestone(7, inRunStartingOn: run)
+            #expect(settings.celebratedMilestone(inRunStartingOn: run) == 7)
+            #expect(settings.celebratedMilestone(inRunStartingOn: otherRun) == 0)
+
+            settings.reset()
+            #expect(!settings.hidesStreak)
+            #expect(!settings.hasImportedStreakHistory)
+            #expect(settings.celebratedMilestone(inRunStartingOn: run) == 0)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")
