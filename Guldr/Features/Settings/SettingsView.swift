@@ -21,6 +21,7 @@ struct SettingsView: View {
     @Environment(BudgetAlertCenter.self) private var alerts
     @Environment(DailyReminderCenter.self) private var reminder
     @Environment(StreakCenter.self) private var streak
+    @Environment(AchievementCenter.self) private var achievements
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var context
@@ -150,6 +151,7 @@ struct SettingsView: View {
         lock.settingsDidReset()
         alerts.settingsDidReset()
         streak.settingsDidReset()
+        achievements.settingsDidReset()
         Task { await reminder.settingsDidReset() }
         // After the preferences are gone, so the widget reloads into its "Open Guldr" state.
         notifier.dataDidChange()

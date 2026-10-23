@@ -14,7 +14,8 @@ import WidgetKit
 /// everything below, and keeps the lock informed of the scene's phase: the grace period starts in the
 /// background and is checked on the way back, before anything is visible (ADR 011). The lock screen and
 /// the privacy cover live in a window above this one (`LockOverlayWindow`). The daily reminder is brought
-/// and the streak are brought up to date whenever the data, the scene or the clock changes.
+/// the streak and the achievements are brought up to date whenever the data, the scene or the clock
+/// changes.
 struct LaunchGate: View {
 
     @State var preferences: Preferences
@@ -22,6 +23,7 @@ struct LaunchGate: View {
     @State var alerts: BudgetAlertCenter
     @State var reminder: DailyReminderCenter
     @State var streak: StreakCenter
+    @State var achievements: AchievementCenter
     @State var inbox: NotificationInbox
     @State private var overlay = LockOverlayWindow()
     @Environment(\.scenePhase) private var scenePhase
@@ -51,19 +53,26 @@ struct LaunchGate: View {
         // A new day at midnight, a clock change or travel: today's reminder may need to come back or go.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             streak.refresh()
+            // A new day can end a month, which can complete it.
+            achievements.refresh()
             Task { await reminder.reschedule() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
             streak.refresh()
             Task { await reminder.reschedule() }
         }
-        // Imports the history once, before the first reminder is scheduled with the streak's copy.
-        .task { streak.start() }
+        // Imports the history once, before the first reminder is scheduled with the streak's copy; the
+        // achievements read those days.
+        .task {
+            streak.start()
+            achievements.refresh()
+        }
         .environment(preferences)
         .environment(lock)
         .environment(alerts)
         .environment(reminder)
         .environment(streak)
+        .environment(achievements)
         .environment(inbox)
         .environment(\.dataChangeNotifier, dataChangeNotifier)
     }
@@ -71,8 +80,9 @@ struct LaunchGate: View {
     /// Every save refreshes the streak and the widgets, checks budget alerts (ADR 007) and reschedules the
     /// daily reminder, since a logged today removes today's.
     private var dataChangeNotifier: DataChangeNotifier {
-        DataChangeNotifier { [alerts, reminder, streak] in
+        DataChangeNotifier { [alerts, reminder, streak, achievements] in
             streak.refresh()
+            achievements.refresh()
             WidgetCenter.shared.reloadAllTimelines()
             Task { await alerts.evaluate() }
             Task { await reminder.reschedule() }
@@ -91,6 +101,7 @@ struct LaunchGate: View {
             if old == .background { lock.willEnterForeground() }
             Task { await lock.sceneDidBecomeActive() }
             streak.refresh()
+            achievements.refresh()
             Task { await reminder.reschedule() }
         @unknown default:
             break

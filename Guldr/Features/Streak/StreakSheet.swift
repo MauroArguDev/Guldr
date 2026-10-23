@@ -32,6 +32,7 @@ struct StreakSheet: View {
                     noSpendingActions
                     StreakCalendarCard(streak: center.streak)
                     footer
+                    achievementsLink
                 }
                 .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.stackDefault)
@@ -144,6 +145,27 @@ struct StreakSheet: View {
                 .textRole(.meta)
                 .foregroundStyle(Color(.textSecondary))
         }
+    }
+
+    /// The gallery, at the bottom of the sheet (author's call, 2026-10-23).
+    private var achievementsLink: some View {
+        NavigationLink {
+            AchievementsView()
+        } label: {
+            HStack {
+                Label("Achievements", systemImage: "medal")
+                    .textRole(.rowTitle)
+                    .foregroundStyle(Color(.textPrimary))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color(.textSecondary))
+            }
+            .padding(Spacing.cardPaddingCompact)
+            .frame(minHeight: Size.touchTargetMin)
+            .card(.compact)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Helpers

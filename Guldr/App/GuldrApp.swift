@@ -25,6 +25,7 @@ struct GuldrApp: App {
                            reminder: DailyReminderCenter(container: container, settings: settings,
                                                          service: notifications),
                            streak: StreakCenter(container: container, settings: settings),
+                           achievements: AchievementCenter(container: container, settings: settings),
                            inbox: notifications.inbox)
                     .modelContainer(container)
             case .failed(let error):
