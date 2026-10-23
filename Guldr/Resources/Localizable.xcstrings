@@ -173,6 +173,35 @@
         }
       }
     },
+    "^[%lld transaction](inflect: true) will be exported." : {
+      "comment" : "The footer of the export range; the count of transactions included, inflected automatically.",
+      "localizations" : {
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se exportarán %lld movimientos."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se exportará %lld movimiento."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se exportarán %lld movimientos."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "1 month" : {
       "comment" : "VoiceOver label of the 1M period.",
       "localizations" : {
@@ -257,35 +286,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "6M"
-          }
-        }
-      }
-    },
-    "^[%lld transaction](inflect: true) will be exported." : {
-      "comment" : "The footer of the export range; the count of transactions included, inflected automatically.",
-      "localizations" : {
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Se exportarán %lld movimientos."
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Se exportará %lld movimiento."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Se exportarán %lld movimientos."
-                }
-              }
-            }
           }
         }
       }
@@ -381,17 +381,6 @@
         }
       }
     },
-    "After 15 minutes" : {
-      "comment" : "Lock grace period.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Después de 15 minutos"
-          }
-        }
-      }
-    },
     "After 5 minutes" : {
       "comment" : "Lock grace period.",
       "localizations" : {
@@ -399,6 +388,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Después de 5 minutos"
+          }
+        }
+      }
+    },
+    "After 15 minutes" : {
+      "comment" : "Lock grace period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Después de 15 minutos"
           }
         }
       }
@@ -2310,10 +2310,17 @@
     },
     "transaction.kind.income" : {
       "comment" : "The add sheet's type picker: the transaction is an income.",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Income"
+          }
+        },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ingreso"
           }
         }
@@ -2551,17 +2558,6 @@
         }
       }
     },
-    "You've reached your %@ budget." : {
-      "comment" : "Budget alert body at 100% while the Face ID lock is on: the month.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Llegaste al límite de tu presupuesto de %@."
-          }
-        }
-      }
-    },
     "You've reached your %@ budget: %@ of %@." : {
       "comment" : "Budget alert body at 100%: the month, the amount spent and the limit.",
       "localizations" : {
@@ -2573,13 +2569,13 @@
         }
       }
     },
-    "You've used %@ of your %@ budget." : {
-      "comment" : "Budget alert body at 80% while the Face ID lock is on: the share and the month.",
+    "You've reached your %@ budget." : {
+      "comment" : "Budget alert body at 100% while the Face ID lock is on: the month.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usaste el %1$@ de tu presupuesto de %2$@."
+            "value" : "Llegaste al límite de tu presupuesto de %@."
           }
         }
       }
@@ -2591,6 +2587,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usaste el %1$@ de tu presupuesto de %2$@: %3$@ de %4$@."
+          }
+        }
+      }
+    },
+    "You've used %@ of your %@ budget." : {
+      "comment" : "Budget alert body at 80% while the Face ID lock is on: the share and the month.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usaste el %1$@ de tu presupuesto de %2$@."
           }
         }
       }
