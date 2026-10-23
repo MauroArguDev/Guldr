@@ -153,33 +153,32 @@ private struct AchievementRow: View {
     let onShare: () -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.rowGap) {
             AchievementMedal(achievement: progress.achievement, tier: progress.tier)
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(progress.id.title)
-                        .textRole(.rowTitle)
-                        .foregroundStyle(Color(.textPrimary))
-                    Spacer(minLength: 8)
-                    if progress.tier != nil {
-                        Button(action: onShare) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(Color(.gold))
-                                .frame(width: Size.touchTargetMin, height: Size.touchTargetMin)
-                        }
-                        .buttonStyle(.plain)
-                        .frame(height: 20)
-                        .accessibilityLabel(Text("Share"))
-                    }
-                }
+                Text(progress.id.title)
+                    .textRole(.rowTitle)
+                    .foregroundStyle(Color(.textPrimary))
                 Text(progress.id.summary)
                     .textRole(.meta)
                     .foregroundStyle(Color(.textSecondary))
                 status
                     .padding(.top, 2)
+            }
+            // A full 44 pt target in its own column; on the title's line it was clipped to 20 pt (32.2).
+            if progress.tier != nil {
+                Button(action: onShare) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(Color(.gold))
+                        .frame(width: Size.touchTargetMin, height: Size.touchTargetMin)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Share"))
             }
         }
         .padding(.vertical, Spacing.summaryRowVertical)
@@ -191,9 +190,16 @@ private struct AchievementRow: View {
         }
     }
 
+    /// Side by side, or stacked at accessibility text sizes so nothing is cut (32.3).
+    private var statusLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+            : AnyLayout(HStackLayout(spacing: 8))
+    }
+
     @ViewBuilder
     private var status: some View {
-        HStack(spacing: 8) {
+        statusLayout {
             if let tier = progress.tier {
                 Text(tier.title)
                     .font(.caption.weight(.semibold))
