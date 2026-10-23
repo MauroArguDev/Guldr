@@ -142,10 +142,12 @@ struct BudgetAlertCenterTests {
         }
     }
 
-    @Test func tappingAnAlertAsksForBudget() async throws {
+    @Test func alertsOpenBudget() async throws {
         try await withFixture(enabled: true) { fixture in
-            fixture.service.onOpen?()
-            #expect(fixture.center.openRequests == 1)
+            try fixture.budget(10_000, "food")
+            try fixture.spend(10_000, "food")
+            await fixture.center.evaluate()
+            #expect(fixture.service.delivered.map(\.link) == [.budget])
         }
     }
 

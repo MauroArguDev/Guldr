@@ -17,6 +17,8 @@ struct RootView: View {
 
     @State private var router = AppRouter()
     @Environment(BudgetAlertCenter.self) private var alerts
+    @Environment(DailyReminderCenter.self) private var reminder
+    @Environment(NotificationInbox.self) private var inbox
 
     var body: some View {
         TabView(selection: tabSelection) {
@@ -53,7 +55,7 @@ struct RootView: View {
         }
         .tint(Color(.gold))
         // Offered once a sheet is fully gone, so the alert never meets a sheet on its way out.
-        .sheet(item: $router.sheet, onDismiss: offerBudgetAlerts) { sheet in
+        .sheet(item: $router.sheet, onDismiss: offerNotifications) { sheet in
             switch sheet {
             case .addTransaction:
                 AddTransactionSheet()
@@ -70,8 +72,9 @@ struct RootView: View {
         .onOpenURL { url in
             router.open(url)
         }
-        .onChange(of: alerts.openRequests) {
-            router.open(DeepLink.budget.url)
+        // `initial`: a tap that launched Guldr was recorded before this view existed.
+        .onChange(of: inbox.lastOpened, initial: true) { _, opened in
+            if let opened { router.open(opened.link.url) }
         }
         .alert("Get budget alerts?", isPresented: alertOffer) {
             Button("Turn on") {
@@ -81,6 +84,14 @@ struct RootView: View {
         } message: {
             Text("Guldr can tell you when a category reaches 80% and 100% of its monthly budget.")
         }
+        .alert("Get a daily reminder?", isPresented: reminderOffer) {
+            Button("Turn on") {
+                Task { await reminder.acceptOffer() }
+            }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text("Guldr can remind you once a day to log what you spent. You can change the time in Settings.")
+        }
         .environment(router)
     }
 
@@ -89,8 +100,18 @@ struct RootView: View {
         Binding { alerts.isOfferingAlerts } set: { alerts.isOfferingAlerts = $0 }
     }
 
-    private func offerBudgetAlerts() {
-        Task { await alerts.offerIfNeeded() }
+    /// The reminder's pre-prompt (author's call, 2026-10-23), after the first transaction is saved.
+    private var reminderOffer: Binding<Bool> {
+        Binding { reminder.isOfferingReminder } set: { reminder.isOfferingReminder = $0 }
+    }
+
+    /// One offer at a time: budget alerts after a budget is saved, otherwise the daily reminder.
+    private func offerNotifications() {
+        Task {
+            await alerts.offerIfNeeded()
+            guard !alerts.isOfferingAlerts else { return }
+            await reminder.offerIfNeeded()
+        }
     }
 
     /// iOS 27 adds `.prominent`, the role meant for a primary action beside the tab bar; from iOS 27 on,
