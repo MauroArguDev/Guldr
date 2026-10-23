@@ -2,7 +2,7 @@
 
 How Guldr is put together: targets, configuration, folder structure and the rules each layer follows. Decisions behind these choices are recorded in [`decisions/`](decisions/).
 
-> Status: foundations only. Sections marked **Planned** describe the agreed design for code that does not exist yet; they are completed as each phase lands.
+> Status: v1.0, feature complete. iCloud sync (v1.1) is the next planned change; see the [roadmap](ROADMAP.md).
 
 ## Overview
 
@@ -193,8 +193,8 @@ Everything about the store lives in `GuldrCore` ([ADR 007](decisions/007-persist
 
 Names: outside `GuldrCore`, `Transaction` collides with SwiftUI's and `Category` with the Objective-C runtime typedef re-exported by Foundation. Client modules declare module-level aliases (`typealias Category = GuldrCore.Category`), which win over imported names.
 
-### Widget — **Planned** (UI in Phase 24)
-The plumbing exists: `WidgetStore.open()` calls `PersistenceController.widgetAccess(infoDictionary:)` with the extension's own Info.plist and gets `.ready(container)`, `.noDataYet` or `.unavailable(error)`. The widget shows its empty state for the last two and never writes; SwiftData rejects a save on the read-only store. Timelines will be built with the same `GuldrCore` calculations as the app.
+### Widget store
+`WidgetStore.open()` calls `PersistenceController.widgetAccess(infoDictionary:)` with the extension's own Info.plist and gets `.ready(container)`, `.noDataYet` or `.unavailable(error)`. The widget shows its empty state for the last two and never writes; SwiftData rejects a save on the read-only store. Timelines use the same `GuldrCore` calculations as the app (see [Widgets](#widgets)).
 
 ## Concurrency
 
