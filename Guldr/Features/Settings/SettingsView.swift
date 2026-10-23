@@ -8,18 +8,18 @@
 import GuldrCore
 import SwiftData
 import SwiftUI
-import UIKit
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the Face ID lock and its grace period (ADR 011), budget alerts, the widgets' privacy, the
-/// categories, the CSV export, About and "Delete all data". Settings never shows a control that does
-/// nothing (author's call, 2026-10-20). Debug builds also link to the design system gallery from here.
+/// changed, the Face ID lock and its grace period (ADR 011), the daily reminder and budget alerts, the
+/// widgets' privacy, the categories, the CSV export, About and "Delete all data". Settings never shows a
+/// control that does nothing (author's call, 2026-10-20). Debug builds also link to the design system
+/// gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
     @Environment(AppLock.self) private var lock
     @Environment(BudgetAlertCenter.self) private var alerts
-    @Environment(\.openURL) private var openURL
+    @Environment(DailyReminderCenter.self) private var reminder
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var context
@@ -46,7 +46,7 @@ struct SettingsView: View {
 
             lockSection
 
-            notificationsSection
+            NotificationSettings()
 
             widgetsSection
 
@@ -126,7 +126,10 @@ struct SettingsView: View {
         }
         .onAppear { lock.refreshAvailability() }
         // Back from the Settings app, where notifications may have been turned on.
-        .task(id: scenePhase) { await alerts.refreshPermission() }
+        .task(id: scenePhase) {
+            await alerts.refreshPermission()
+            await reminder.refreshPermission()
+        }
         .alert("Couldn't save your currency", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -145,6 +148,7 @@ struct SettingsView: View {
         preferences.reset()
         lock.settingsDidReset()
         alerts.settingsDidReset()
+        Task { await reminder.settingsDidReset() }
         // After the preferences are gone, so the widget reloads into its "Open Guldr" state.
         notifier.dataDidChange()
     }
@@ -196,40 +200,6 @@ struct SettingsView: View {
                     lockError = error
                 }
             }
-        }
-    }
-
-    /// Budget alerts at 80 % and 100 % (v1 plan, Phase 25). When notifications are off for Guldr in the
-    /// Settings app, the toggle can't help, so a button opens that page instead.
-    private var notificationsSection: some View {
-        Section {
-            Toggle("Budget alerts", isOn: budgetAlertsSelection)
-                .tint(Color(.goldFill))
-                .disabled(alerts.permission == .denied)
-            if alerts.permission == .denied {
-                Button("Turn on notifications in Settings") {
-                    if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
-                        openURL(url)
-                    }
-                }
-                .tint(Color(.gold))
-            }
-        } header: {
-            Text("Notifications")
-        } footer: {
-            if alerts.permission == .denied {
-                Text("Notifications are off for Guldr in the Settings app.")
-            } else {
-                Text("A notification when a category reaches 80% and 100% of its monthly budget.")
-            }
-        }
-    }
-
-    private var budgetAlertsSelection: Binding<Bool> {
-        Binding {
-            alerts.isOn
-        } set: { isOn in
-            Task { await alerts.setEnabled(isOn) }
         }
     }
 
