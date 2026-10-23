@@ -75,6 +75,7 @@ Guldr/
 │   ├── Notifications/   Budget alerts and the daily reminder: the UserNotifications service and both centers
 │   ├── Streak/          The logging streak: its center, Home's chip, the sheet, the setting
 │   ├── Achievements/    The achievement center, medals, their words and the gallery
+│   ├── Share/           Share cards, their renderer and sheet, and the monthly recap's library and views
 │   └── Settings/        Settings and About
 ├── Resources/           Asset catalogs, String Catalogs (strings and InfoPlist), privacy manifest
 ├── Info.plist           Stays at the root: referenced by INFOPLIST_FILE
@@ -155,6 +156,16 @@ Achievements follow [ADR 013](decisions/013-achievements.md).
 - **`AchievementCenter`** evaluates after every save, on scene active and on a new day, stores new tiers and queues them; its first evaluation records the history silently.
 - **`RootView`** shows one `MomentBanner` at a time once no sheet is up: a streak milestone first, then each unlock.
 - **Words:** `GuldrCore` keeps no display text. Names, summaries, families and tiers live in the app (`Achievement+Text.swift`); tiers have their own keys, since "Gold" is already a category color.
+
+### Share cards and monthly recap
+- **`MonthlyRecap` (`GuldrCore`)** reviews a month with counts, percentages and identifiers only, never `Money`, so a card can't show an amount by construction. It reads the same days, budgets and tiers as the streak and achievements.
+- **`RecapLibrary`:**
+  - lists the past months with anything in them;
+  - decides whether Home offers last month (days 1–7, until closed in `Preferences`);
+  - builds a `RecapCard` with the top category's shown name.
+- **Rendering:** `ShareCardView` draws a card at a fixed size and Dynamic Type; `ShareCardRenderer` renders it with `ImageRenderer` at 3× in the app's appearance and language.
+- **Sharing:** `ShareCardSheet` hands the PNG over through `ShareLink` as `ShareImage` (`Transferable`, `nonisolated` like `ExportFile`), with a short text.
+- **Entry points:** the unlock moment goes through `AppRouter` (`shareAchievement`, `recap`); the gallery uses its own sheet, by identifier, so the sheet always reads current data.
 
 ### Export
 `ExportView` (`Features/Export/`) keeps one `@Query` of transactions; `ExportModel` copies them once into `CSVExporter.Row`s (plain values: SwiftData models can't leave their context) and filters the copies by range. `ExportFile` is the `Transferable` behind `ShareLink`: its `FileRepresentation` calls `CSVExporter.data(for:)`, which is `@concurrent`, only when the user picks a destination, and writes `Guldr-YYYY-MM-DD.csv` to the temporary directory. `CSVExporter` (`GuldrCore`) writes RFC 4180 with CRLF line endings, ISO 8601 dates with the offset, signed amounts from the minor units with the currency's digits, and English headers and `type`.

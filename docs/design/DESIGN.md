@@ -227,6 +227,24 @@ When `accessibilityReduceMotion` is on:
     - **Families:** one per family ("Consistency", "Ledger up to date", "Budget", "Reserve"), each a `sectionTitle` over a `.standard` card. Rows hold the medal, the name (`rowTitle`) and what it measures (13, `TextSecondary`), then the tier in `Gold` caption semibold with the month it was earned, "8 / 12" at the trailing edge, and a compact ProgressBar toward the next tier (none after gold). Nothing is hidden behind a "?".
     - **Footer:** "Money achievements only count complete months, so every medal stands for data you can trust."
   - **Unlock moment:** the streak's card (`MomentBanner`) with the 42 pt medal, "Saver · Gold" and what it measures. Tiers are queued one at a time after any sheet and any streak milestone; the history earned before the version is recorded without moments. No notification (decided by the author on 2026-10-23).
+- **Share cards and monthly recap** (v1 plan, Phase 31; decided by the author on 2026-10-23, drafted by Claude Code in the design system, no mockup yet):
+  - **Card** (`ShareCardView`): 360 × 640 pt (story) or 360 × 360 pt (square), rendered at 3× (1080 × 1920 or 1080 × 1080), on `AppBackground`, at a fixed Dynamic Type size, in the app's appearance and language. From the top:
+    - the wordmark (40 pt on a story, 26 pt square);
+    - the content;
+    - the centered ledger lines (120 pt);
+    - "Your gold, in order." (13, `TextSecondary`).
+  - **Achievement card:** the medal (150 / 104 pt), the tier as an overline in `Gold`, the name in New York 34 / 26, and what it measures (16, `TextSecondary`).
+  - **Recap card:**
+    - the month as an overline in `Gold`, "My month in Guldr" in New York 32 / 24, and "Complete month" with `checkmark.seal.fill` in `Gold` when it was;
+    - a `.standard` card of rows ("Days logged 28 / 31", "Budgets kept 5 / 6", "Saved 32%", "Best streak 14 days in a row", "Top spending Food · 34%"; rows without data are left out, a square keeps three);
+    - on a story, up to five 40 pt medals earned that month.
+  - **Never an amount:** the recap is built from `MonthlyRecap`, which holds no money.
+  - **Share sheet:** inline title, Done in `Gold`, a segmented "Story / Square", the exact image (radius 24, `Hairline` border; VoiceOver reads the shared text), and Share as the primary button. It shares a PNG with "Saver · Gold, earned in Guldr." or "My October in Guldr: 28 of 31 days logged.".
+  - **Where:**
+    - the unlock card's Share button (`Gold`, trailing);
+    - a Share button on each earned achievement in the gallery;
+    - "Monthly recaps" in the gallery, up to 12 past months with anything in them;
+    - on Home during days 1–7 of a month, a `.compact` card with `sparkles` on `GoldSoft`, "Your October in Guldr" and "See your month and share it.". Its × hides it until the next month.
 - **Daily reminder**: a native alert pre-prompt, once, after a sheet closes with the first transaction saved (not while the budget alerts offer shows): "Get a daily reminder?", "Guldr can remind you once a day to log what you spent. You can change the time in Settings.", "Turn on" / "Not now"; iOS's dialog follows only if it hasn't been asked yet (decided by the author on 2026-10-23). The notification is titled "Guldr" and reads "Anything to log today? It takes a few seconds."; it has no amounts, so it's the same with the lock on. It arrives at 20:00 by default, never on a day that already has a transaction dated that day, and a tap or its "Add expense" action opens the add sheet.
 - **Widgets** (Widgets mockup): `WidgetBackground` container. Small: "Balance" (12 semibold, `TextSecondary`) with the 18 pt glyph in `Gold` at the trailing edge; at the bottom the balance (New York 28, whole units), the two compact ledger lines and "Sep: −$1,759.50" (12, `TextSecondary`). Medium: a 128 pt left column (16 pt glyph and "Balance", a 24 pt `GoldFill` + that opens the add sheet, the balance in New York 26, ↑ income `Positive` and ↓ expenses `Negative` in 12, then the streak: a flame and the count in 12, `Gold` and filled once today is logged, `TextSecondary` otherwise, never redacted), a 1 pt `Hairline`, then the three newest transactions (13 semibold title over an 11 pt day, 13 semibold amount; income `Positive` with +) (decided by the author on 2026-10-21, over budget usage). Without transactions "Add your first transaction"; before first launch the glyph and "Open Guldr to get started". Amounts are privacy-sensitive (iOS hides them while the iPhone is locked) and redacted while "Hide amounts in widgets" is on, whether or not Guldr's lock is (decided by the author on 2026-10-23, replacing the 2026-10-21 rule that the lock always hid them). The glyph, the lines and the + follow the tinted home screen. Tapping opens Home.
 - **Charts** (Swift Charts): income bars `GoldFill`, expense bars `ChartExpense` (`#6B665E` light / `#6E6962` dark); category donut sorts categories by amount; each slice is a subtle gradient from its category's base color to that color mixed 12% with `Surface`; slices are separated by a 2 pt gap and the legend names every slice with its share. The 18 pt ring is too thin for labels on the slices, so touching a slice or its legend row selects it instead: the center shows its name, amount and share and the other slices dim (decided by the author on 2026-10-20).
@@ -266,5 +284,6 @@ Spanish is one neutral Latin American `es` that addresses the user as *tú* ("Ag
 | Passcode | Código |
 | Streak / freeze | Racha / protector |
 | Achievements / medal; bronze, silver, gold | Logros / medalla; bronce, plata, oro |
+| Share; story, square; monthly recap | Compartir; historia, cuadrada; resumen mensual |
 | Add | Agregar |
 | Delete | Eliminar |
