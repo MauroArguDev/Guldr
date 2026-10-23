@@ -88,18 +88,16 @@ struct AppSettingsTests {
         }
     }
 
-    @Test func widgetsHideAmountsWhileLockedOrWhenAsked() {
+    @Test func widgetAmountsFollowOnlyTheirSetting() {
         withSettings { settings, _ in
-            #expect(!settings.widgetHidesAmounts)
-            settings.setHidesWidgetAmounts(true)
-            #expect(settings.widgetHidesAmounts)
-            settings.setHidesWidgetAmounts(false)
-            settings.setLockEnabled(true)
-            // The lock hides them whatever the setting says (ADR 011).
             #expect(!settings.hidesWidgetAmounts)
-            #expect(settings.widgetHidesAmounts)
+            // The lock doesn't hide them (author's call, 2026-10-23).
+            settings.setLockEnabled(true)
+            #expect(!settings.hidesWidgetAmounts)
+            settings.setHidesWidgetAmounts(true)
+            #expect(settings.hidesWidgetAmounts)
             settings.reset()
-            #expect(!settings.widgetHidesAmounts)
+            #expect(!settings.hidesWidgetAmounts)
         }
     }
 
