@@ -44,7 +44,7 @@ Use the asset catalog names from SwiftUI (`Color("GoldFill")` or the generated s
 | `TextSecondary` | `#6B665E` | `#9C968C` | Metadata, captions, inactive tabs |
 | `Hairline` | `#E3DDD1` | `#2C2A27` | 1 pt card borders and separators |
 | `Track` | `#EFEAE0` | `#2C2A27` | Progress bar and ring tracks |
-| `Gold` | `#8A6A2E` | `#C8A96A` | Text and icons: active tab, links, highlighted % |
+| `Gold` | `#82642B` | `#C8A96A` | Text and icons: active tab, links, highlighted % (light darkened from `#8A6A2E` by the author on 2026-10-23, so gold text on `GoldSoft` reaches 4.6:1, WCAG AA) |
 | `GoldFill` | `#C8A96A` | `#C8A96A` | Fills: add button, progress, rings, motif lines |
 | `OnGold` | `#111111` | `#111111` | Content on `GoldFill` |
 | `GoldSoft` | `#F3EAD7` | `#2E271A` | Selected category chip background |
