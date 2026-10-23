@@ -123,13 +123,13 @@ struct CashFlowChart: View {
         }
         .motion(.standard, value: bars)
         .sensoryFeedback(Haptics.selection, trigger: selectedKey) { _, new in new != nil }
-        .onAppear {
+        // Only the marks' values animate, once layout has settled (`Motion.entranceDelay`, 32.5): a
+        // transaction-wide animation in `onAppear` also animated the chart measuring its axes and plot.
+        .motion(.reveal, value: revealed)
+        .task {
             guard !revealed else { return }
-            if reduceMotion {
-                revealed = true
-            } else {
-                withMotion(.reveal) { revealed = true }
-            }
+            if !reduceMotion { try? await Task.sleep(for: Motion.entranceDelay) }
+            revealed = true
         }
     }
 

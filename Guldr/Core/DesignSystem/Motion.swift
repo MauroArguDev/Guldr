@@ -46,6 +46,14 @@ enum Motion {
     /// The short fade between the caret's on and off beats.
     static let caretFade: Animation = .easeInOut(duration: 0.12)
 
+    // MARK: - Entrances
+
+    /// How long a fill waits after appearing before it starts (v1 plan, 32.5). Starting in the same frame
+    /// as the first layout let the reveal animate the layout settling too: the Budget ring flew up from
+    /// the bottom and the Analytics bars slid sideways. A tenth of a second later only the fill changes,
+    /// so it grows in place; the delay is too short to notice before a 0.6 s fill.
+    static let entranceDelay: Duration = .milliseconds(100)
+
     // MARK: - Stagger
 
     static let staggerStep: Double = 0.04
@@ -123,8 +131,9 @@ extension EnvironmentValues {
     @Entry var entranceReplay = 0
 }
 
-/// Runs an entrance: `content` first renders with `revealed == false`, then with `true` once it
-/// appears; the content animates that change with `.motion(.reveal, value:)`.
+/// Runs an entrance: `content` first renders with `revealed == false`, then with `true` shortly after it
+/// appears (`Motion.entranceDelay`, at once with Reduce Motion); the content animates that change with
+/// `.motion(.reveal, value:)`, which then animates the fill alone.
 ///
 /// When `entranceReplay` changes, only this content is recreated, so it starts over from `false`.
 /// Resetting a flag and setting it again would land in the same frame and never show the empty state.
@@ -143,10 +152,14 @@ struct Entrance<Content: View>: View {
 private struct EntranceInstance<Content: View>: View {
 
     let content: (Bool) -> Content
+    @ReduceMotion private var reduceMotion
     @State private var revealed = false
 
     var body: some View {
-        content(revealed).onAppear { revealed = true }
+        content(revealed).task {
+            if !reduceMotion { try? await Task.sleep(for: Motion.entranceDelay) }
+            revealed = true
+        }
     }
 }
 

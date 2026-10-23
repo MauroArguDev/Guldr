@@ -16,12 +16,16 @@ struct StreakChip: View {
     let streak: LoggingStreak
     let action: () -> Void
 
+    @ReduceMotion private var reduceMotion
+
     var body: some View {
         let isLogged = streak.isTodayLogged
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: isLogged ? "flame.fill" : "flame")
                     .symbolEffect(.bounce, options: .nonRepeating, value: isLogged)
+                    // DESIGN.md › Reduce Motion: symbol effects are off (32.4).
+                    .symbolEffectsRemoved(reduceMotion)
                 Text(streak.current, format: .number)
                     .monospacedDigit()
                     .contentTransition(.numericText(value: Double(streak.current)))

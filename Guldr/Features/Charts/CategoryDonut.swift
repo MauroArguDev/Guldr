@@ -76,13 +76,13 @@ struct CategoryDonut: View {
         .frame(width: 136, height: 136)
         .motion(.standard, value: slices)
         .motion(.standard, value: selectedID)
-        .onAppear {
+        // Only the marks' values animate, once layout has settled (`Motion.entranceDelay`, 32.5): a
+        // transaction-wide animation in `onAppear` also animated the chart measuring its axes and plot.
+        .motion(.reveal, value: revealed)
+        .task {
             guard !revealed else { return }
-            if reduceMotion {
-                revealed = true
-            } else {
-                withMotion(.reveal) { revealed = true }
-            }
+            if !reduceMotion { try? await Task.sleep(for: Motion.entranceDelay) }
+            revealed = true
         }
     }
 
