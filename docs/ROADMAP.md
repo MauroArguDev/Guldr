@@ -22,6 +22,8 @@ Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](pl
 - [ ] **Face ID lock** on launch and when returning from the background
 - [ ] **Budget notifications:** local alerts when a budget is close to or over its limit
 - [ ] **CSV export** of transactions
+- [ ] **Daily reminder:** one opt-in local notification a day, skipped once the day is logged
+- [ ] **Logging streak:** consecutive logged days with repair, earned freezes and milestones, on Home and in the widget
 
 ### Quality
 - [ ] English and Spanish
@@ -54,4 +56,5 @@ Ideas, not commitments:
 | Siri and App Shortcuts | Adds surface without improving the core flow. App Intents are used only where widgets need them. |
 | iPad and Mac | iPhone-first; a good iPad layout is its own project. |
 | Languages beyond English and Spanish | Two languages done well beat several done poorly. |
+| Paid streak freezes, leaderboards, social sharing | The streak exists to keep the user's own data complete; buying or comparing it would reward the streak instead of the logging. |
 | Networking, accounts, third-party analytics | Local-first and private by design: data never leaves the device (iCloud in v1.1 stays in the user's own account). |
