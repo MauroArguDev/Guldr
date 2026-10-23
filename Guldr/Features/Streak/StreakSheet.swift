@@ -19,6 +19,7 @@ struct StreakSheet: View {
 
     @Environment(StreakCenter.self) private var center
     @Environment(\.dataChangeNotifier) private var notifier
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @State private var failedToSave = false
     /// Bumped on every mark, for the haptic.
@@ -63,37 +64,53 @@ struct StreakSheet: View {
             Text("Current streak")
                 .textRole(.overline)
                 .foregroundStyle(Color(.textSecondary))
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(streak.current, format: .number)
-                    .displayFont(.balance)
-                    .foregroundStyle(Color(.textPrimary))
-                    .contentTransition(.numericText(value: Double(streak.current)))
-                // English and Spanish both use the singular for 1 only, the two languages Guldr ships.
-                Text(streak.current == 1 ? "day in a row" : "days in a row")
-                    .textRole(.rowTitle)
-                    .foregroundStyle(Color(.textSecondary))
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) { countAndUnit }
+                VStack(alignment: .leading, spacing: 2) { countAndUnit }
             }
             .accessibilityElement(children: .combine)
             Text(status)
                 .textRole(.meta)
                 .foregroundStyle(streak.isTodayLogged ? Color(.gold) : Color(.textSecondary))
             Divider().overlay(Color(.hairline))
-            HStack {
-                Label {
-                    Text("Best: \(streak.best) days")
-                } icon: {
-                    Image(systemName: "trophy")
-                }
-                Spacer(minLength: 8)
-                freezes
-            }
-            .textRole(.meta)
-            .foregroundStyle(Color(.textSecondary))
+            bestAndFreezes
+                .textRole(.meta)
+                .foregroundStyle(Color(.textSecondary))
         }
         .padding(Spacing.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card(.hero)
         .motion(.standard, value: streak.current)
+    }
+
+    /// The count in serif and "days in a row", side by side or stacked, whichever fits.
+    @ViewBuilder
+    private var countAndUnit: some View {
+        let streak = center.streak
+        Text(streak.current, format: .number)
+            .displayFont(.balance)
+            .foregroundStyle(Color(.textPrimary))
+            .contentTransition(.numericText(value: Double(streak.current)))
+        // English and Spanish both use the singular for 1 only, the two languages Guldr ships.
+        Text(streak.current == 1 ? "day in a row" : "days in a row")
+            .textRole(.rowTitle)
+            .foregroundStyle(Color(.textSecondary))
+    }
+
+    /// The best streak and the freezes, side by side, or stacked at accessibility text sizes (32.3).
+    private var bestAndFreezes: some View {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+            : AnyLayout(HStackLayout())
+        return layout {
+            Label {
+                Text("Best: \(center.streak.best) days")
+            } icon: {
+                Image(systemName: "trophy")
+            }
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
+            freezes
+        }
     }
 
     /// Two snowflakes, filled for each freeze held.
@@ -228,6 +245,9 @@ private struct StreakCalendarCard: View {
                     }
                 }
             }
+            // Seven columns of day circles don't fit an iPhone SE past this size; VoiceOver reads each
+            // day's date and state, so the calendar caps its text instead of breaking the grid (32.3).
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         }
         .padding(Spacing.cardPaddingCompact)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -266,7 +286,9 @@ private struct DayCell: View {
                     .foregroundStyle(numberColor)
             }
         }
-        .frame(width: side, height: side)
+        // At most `side`, but never wider than its column: on an iPhone SE seven circles share ~260 pt.
+        .frame(maxWidth: side, maxHeight: side)
+        .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: dateText))

@@ -180,8 +180,16 @@ struct DashboardView: View {
     }
 
     /// "guldr" over "October 2026".
+    /// The chip beside the month, or under it at accessibility text sizes, where they don't fit side by
+    /// side on an iPhone SE (32.3).
+    private var headerLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: 12))
+    }
+
     private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
+        headerLayout {
             VStack(alignment: .leading, spacing: 2) {
                 Wordmark()
                 Text(verbatim: model.month.title(locale: locale))
@@ -190,7 +198,7 @@ struct DashboardView: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: 0)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 0) }
             if streak.isShown {
                 StreakChip(streak: streak.streak) {
                     router.present(.streak)
