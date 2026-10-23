@@ -9,8 +9,9 @@ import GuldrCore
 import SwiftUI
 
 /// The share sheet for a card (v1 plan, Phase 31): the format (Story or Square), a preview of the exact
-/// image, and Share, which hands over the PNG with a short text. The image follows the app's appearance
-/// and language. The preview reads the shared text to VoiceOver, since the image itself can't be read.
+/// image, and Share, which opens the system share sheet with the image and a short text
+/// (`ActivitySharing`). The image follows the app's appearance and language. The preview reads the
+/// shared text to VoiceOver, since the image itself can't be read.
 struct ShareCardSheet: View {
 
     let content: ShareCardContent
@@ -35,9 +36,11 @@ struct ShareCardSheet: View {
                 preview
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if let image, let png = image.pngData() {
-                    ShareLink(item: ShareImage(png: png), message: Text(verbatim: content.message),
-                              preview: SharePreview(Text(content.title), image: Image(uiImage: image))) {
+                if let image {
+                    Button {
+                        ActivitySharing.present(image: image, text: content.message,
+                                                title: String(localized: content.title))
+                    } label: {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }
                     .buttonStyle(.primary)

@@ -5,11 +5,9 @@
 //  Created by Mauricio Argumedo on 23/10/26.
 //
 
-import CoreTransferable
 import Foundation
 import GuldrCore
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// The two image sizes (author's call, 2026-10-23): stories and square. Laid out in points and rendered
 /// at 3×, so a story is 1080 × 1920 pixels.
@@ -112,16 +110,5 @@ struct RecapCard {
 
     private func percent(_ value: Int) -> String {
         (Double(value) / 100).formatted(.percent.precision(.fractionLength(0)).locale(locale))
-    }
-}
-
-/// The PNG that `ShareLink` hands over, rendered before the sheet offers it.
-nonisolated struct ShareImage: Transferable {
-
-    let png: Data
-
-    static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(exportedContentType: .png) { $0.png }
-            .suggestedFileName("Guldr.png")
     }
 }
