@@ -85,6 +85,13 @@ struct ShareCardTests {
         #expect(card.monthTitle == "Septiembre de 2026")
     }
 
+    @Test func theSharedTextEndsWithTheAppStoreLink() throws {
+        let content = ShareCardContent.achievement(AchievementCatalog.achievement(.saver), .gold)
+        let url = try #require(SupportContact.appStoreURL)
+        #expect(content.sharedText == content.message + "\n" + url.absoluteString)
+        #expect(!content.message.contains("apps.apple.com"))
+    }
+
     private func date(_ text: String) throws -> Date {
         try #require(ISO8601DateFormatter().date(from: text))
     }

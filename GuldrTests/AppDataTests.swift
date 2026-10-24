@@ -48,6 +48,11 @@ struct AppDataTests {
         #expect(url.path() == "/Guldr/privacy/")
     }
 
+    @Test func appStoreURLIsTheAppRecord() throws {
+        let url = try #require(SupportContact.appStoreURL)
+        #expect(url.absoluteString == "https://apps.apple.com/app/id6826453592")
+    }
+
     @Test func dataChangesRefreshDependents() {
         var refreshes = 0
         let notifier = DataChangeNotifier { refreshes += 1 }
