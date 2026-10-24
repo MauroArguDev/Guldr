@@ -10,6 +10,16 @@
 
 **Status:** v1.0.0, preparing the App Store release · [Changelog](CHANGELOG.md)
 
+<p align="center">
+  <img src="docs/readme/demo.gif" width="280" alt="Adding a $16 food expense from Home with the keypad, then opening Analytics">
+</p>
+
+| Home | Add | Analytics | Widgets |
+|:---:|:---:|:---:|:---:|
+| <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/home-dark.png"><img src="docs/readme/home-light.png" width="200" alt="Home: the balance, this month's income, expenses and savings rate, the budget and recent transactions"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/add-dark.png"><img src="docs/readme/add-light.png" width="200" alt="The add sheet: a $12.50 amount, Food selected and the keypad"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/analytics-dark.png"><img src="docs/readme/analytics-light.png" width="200" alt="Analytics: six months of income against expenses and spending by category"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="docs/readme/widgets-dark.png"><img src="docs/readme/widgets-light.png" width="200" alt="The medium and small Home Screen widgets with the balance, the month and the streak"></picture> |
+
+<sub>Screenshots follow your GitHub theme, light or dark. Demo data from `-demoData`.</sub>
+
 ## Features
 
 - **Transactions:**
