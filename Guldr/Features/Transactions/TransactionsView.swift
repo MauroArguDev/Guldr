@@ -44,6 +44,8 @@ private struct TransactionsList: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pendingDelete: TransactionsListModel.Row?
     @State private var failedToDelete = false
+    /// Whether rows have scrolled under the bars, which is when the top scroll edge effect should show.
+    @State private var isScrolled = false
 
     var body: some View {
         // The list stays in place even when empty, with the empty state over it: the navigation bar
@@ -55,12 +57,21 @@ private struct TransactionsList: View {
                 }
             }
             .background(Color(.appBackground))
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top > 1
+            } action: { _, scrolled in
+                isScrolled = scrolled
+            }
         .safeAreaBar(edge: .top) {
             // A new user has nothing to filter; the picker appears with the first transaction.
             if !transactions.isEmpty {
                 kindPicker
             }
         }
+        // iOS 26.1 draws the top scroll edge effect over the large title even at rest when the picker sits
+        // under the search field, so the title opened faded (v1 plan, 34.6). Shown only once rows scroll
+        // under the bars, the effect still blurs them there, and iOS 27 looks the same as before.
+        .scrollEdgeEffectHidden(!isScrolled, for: .top)
         // Revealed by pulling the list down, as in Mail: always showing it left the large title collapsed
         // whenever the tab opened on iOS 27 (author's call, 2026-10-15).
         .searchable(text: $model.searchText, placement: .navigationBarDrawer(displayMode: .automatic),
