@@ -30,7 +30,7 @@ Captions are New York, like the app's brand moments, and use the same Spanish te
 | # | Screen | Mode | State | Caption (English) | Caption (Spanish) |
 |---|---|---|---|---|---|
 | 1 | Home | Light | Top of Home: balance, the month, budget, recent rows | Your month at a glance | Tu mes de un vistazo |
-| 2 | Add sheet | Light | An amount typed (12.50 / 125.00 / 12,50) with Food selected | Log it in seconds | Anótalo en segundos |
+| 2 | Add sheet | Light | An amount typed ($12.50 / $125.00 / 12,50 €) with Food selected, not saved | Log it in seconds | Anótalo en segundos |
 | 3 | Analytics | Dark | 6 months, cash flow and the category donut | See where it goes | Mira a dónde se va |
 | 4 | Budget | Light | The ring and the categories, one over its limit | Budgets that keep you honest | Presupuestos que te avisan |
 | 5 | Transactions | Light | The list grouped by day, top of the list | Every transaction, by day | Cada movimiento, por día |
@@ -68,12 +68,20 @@ The **iPhone 17 Pro Max** simulator, with the Debug build installed from Xcode. 
    xcrun simctl shutdown <device> && xcrun simctl boot <device>
    ```
 2. **Status bar:** `xcrun simctl status_bar <device> override --time 9:41 --batteryState discharging --batteryLevel 100 --wifiBars 3 --cellularBars 4 --operatorName ""`
-3. **Empty store:** Settings › Delete all data if a previous set is there. Deleting the app isn't enough, since the App Group container survives it on the simulator.
+3. **Empty store:** a set needs fresh data in its own currency. Either use Settings › Delete all data, or:
+   - terminate the app;
+   - empty the App Group container's `Library/Application Support` and `Library/Preferences` (`xcrun simctl get_app_container <device> com.argudev.guldr group.com.argudev.guldr`);
+   - reinstall the app.
+
+   Deleting the app alone isn't enough, since the App Group container survives it on the simulator. Reinstalling can remove the widgets from the Home Screen; add them back (small first, then medium, so the medium one sits on top).
 4. **Demo data:** `xcrun simctl launch --terminate-running-process <device> com.argudev.guldr -demoData`
 5. **Each shot:**
    - `xcrun simctl ui <device> appearance light|dark`;
    - navigate to the screen;
    - `xcrun simctl io <device> screenshot raw/NN-name.png`.
 6. **Compose** the eight images with the script.
+7. **Restore** the simulator: `xcrun simctl status_bar <device> clear`, and its original language and region.
+
+After the onboarding's Get started, the first Add sheet that's dismissed offers budget alerts; answer Not now before the next shot.
 
 The data ends on the day of the capture, so the screens show the current month.
