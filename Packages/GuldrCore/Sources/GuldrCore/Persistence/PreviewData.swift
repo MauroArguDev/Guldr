@@ -19,6 +19,45 @@ public enum PreviewData {
 
     public static let currencyCode = "USD"
 
+    /// How the data reads in each App Store localization's screenshots (v1 plan, 34.6): the titles' language,
+    /// the currency, and a scale that keeps the amounts realistic in it. Previews and tests use `mockups`.
+    public struct Flavor: Sendable, Equatable {
+
+        public enum Titles: Sendable {
+            case english
+            case mexicanSpanish
+            case spainSpanish
+        }
+
+        public let currencyCode: String
+        public let amountScale: Int64
+        public let titles: Titles
+
+        public static let mockups = Flavor(currencyCode: PreviewData.currencyCode, amountScale: 1, titles: .english)
+
+        /// Titles follow the language and the currency follows the region (author's call, 2026-10-23):
+        /// Mexico in pesos at ten times the amounts, so rent reads $8,500; Spain in euros at the same amounts;
+        /// everywhere else in dollars.
+        public static func matching(_ locale: Locale) -> Flavor {
+            let spanish = locale.language.languageCode == .spanish
+            if locale.region == .mexico {
+                return Flavor(currencyCode: "MXN", amountScale: 10, titles: spanish ? .mexicanSpanish : .english)
+            }
+            if locale.region == .spain {
+                return Flavor(currencyCode: "EUR", amountScale: 1, titles: spanish ? .spainSpanish : .english)
+            }
+            return Flavor(currencyCode: "USD", amountScale: 1, titles: spanish ? .mexicanSpanish : .english)
+        }
+
+        func title(_ english: String) -> String {
+            switch titles {
+            case .english: english
+            case .mexicanSpanish: PreviewData.mexicanTitles[english] ?? english
+            case .spainSpanish: PreviewData.spainTitles[english] ?? PreviewData.mexicanTitles[english] ?? english
+            }
+        }
+    }
+
     /// Sept 28, 2026, 9:41 in `timeZone`.
     public static func referenceDate(in timeZone: TimeZone = .autoupdatingCurrent) -> Date {
         date(month: 9, day: 28, hour: 9, minute: 41, timeZone: timeZone)
@@ -43,13 +82,13 @@ public enum PreviewData {
     /// The same data moved so September becomes the month containing `now`, for screenshots of the running
     /// app (Debug's `-demoData`). Earlier months keep their days, capped at the month's length. The current
     /// month's days are spread over the days so far, so its totals still match the mockups and nothing
-    /// lands in the future.
+    /// lands in the future. `flavor` sets the titles' language, the currency and the amounts' scale.
     public static func populate(_ context: ModelContext, endingAt now: Date,
-                                timeZone: TimeZone = .autoupdatingCurrent) throws {
+                                timeZone: TimeZone = .autoupdatingCurrent, flavor: Flavor = .mockups) throws {
         let calendar = YearMonth.calendar(timeZone)
         let current = YearMonth(containing: now, timeZone: timeZone)
         let today = calendar.component(.day, from: now)
-        try insert(into: context, budgetMonth: current, now: now, timeZone: timeZone) { entry in
+        try insert(into: context, budgetMonth: current, now: now, timeZone: timeZone, flavor: flavor) { entry in
             let month = current.adding(months: entry.month - 9)
             let day = if month == current {
                 1 + (entry.day - 1) * (today - 1) / 27
@@ -64,20 +103,20 @@ public enum PreviewData {
     }
 
     private static func insert(into context: ModelContext, budgetMonth: YearMonth, now: Date, timeZone: TimeZone,
-                               dateFor: (Entry) -> Date) throws {
+                               flavor: Flavor = .mockups, dateFor: (Entry) -> Date) throws {
         let categories = try context.fetch(FetchDescriptor<Category>())
         let byKey = Dictionary(categories.compactMap { category in category.systemKey.map { ($0, category) } },
                                uniquingKeysWith: { first, _ in first })
 
         for entry in entries {
-            let amount = try Money(minorUnits: entry.cents, currencyCode: currencyCode)
+            let amount = try Money(minorUnits: entry.cents * flavor.amountScale, currencyCode: flavor.currencyCode)
             let category = byKey[entry.categoryKey]
-            context.insert(Transaction(amount: amount, kind: category?.kind ?? .expense, title: entry.title,
+            context.insert(Transaction(amount: amount, kind: category?.kind ?? .expense, title: flavor.title(entry.title),
                                        date: dateFor(entry), category: category))
         }
         for (key, cents) in septemberBudgets {
-            context.insert(Budget(month: budgetMonth, limit: try Money(minorUnits: cents, currencyCode: currencyCode),
-                                  category: byKey[key]))
+            let limit = try Money(minorUnits: cents * flavor.amountScale, currencyCode: flavor.currencyCode)
+            context.insert(Budget(month: budgetMonth, limit: limit, category: byKey[key]))
         }
         for (offset, source) in streakDays {
             context.insert(LoggedDay(day: LocalDay(containing: now, timeZone: timeZone).adding(days: offset),
@@ -167,6 +206,28 @@ public enum PreviewData {
     /// The Budget mockup: limits for September.
     private static let septemberBudgets: [(String, Int64)] = [
         ("entertainment", 8_000), ("food", 40_000), ("transport", 20_000), ("housing", 120_000), ("health", 15_000)
+    ]
+
+    /// Every title in Spanish as said in Mexico, which also serves Spanish outside Mexico and Spain.
+    static let mexicanTitles: [String: String] = [
+        "Groceries": "Despensa", "Coffee": "Café", "Pharmacy": "Farmacia",
+        "Streaming subscription": "Suscripción de streaming", "Salary": "Sueldo", "Gas": "Gasolina",
+        "Rent": "Renta", "Supermarket": "Supermercado", "Dinner out": "Cena fuera", "Farmers market": "Mercado",
+        "Running shoes": "Tenis para correr", "Books": "Libros", "Transit pass": "Tarjeta de transporte",
+        "Ride home": "Taxi a casa", "Concert tickets": "Boletos del concierto", "Vitamins": "Vitaminas",
+        "Gift": "Regalo", "Spring clothes": "Ropa de primavera", "Movies and dinner": "Cine y cena",
+        "Logo design": "Diseño de logo", "Online course": "Curso en línea", "Dentist": "Dentista",
+        "Weekend trip": "Viaje de fin de semana", "Headphones": "Audífonos", "Website project": "Proyecto web",
+        "Festival tickets": "Boletos del festival", "School supplies": "Útiles escolares",
+        "Birthday present": "Regalo de cumpleaños"
+    ]
+
+    /// Only the titles said differently in Spain; the rest come from `mexicanTitles`.
+    static let spainTitles: [String: String] = [
+        "Groceries": "Compra", "Salary": "Nómina", "Rent": "Alquiler", "Running shoes": "Zapatillas de running",
+        "Transit pass": "Abono de transporte", "Concert tickets": "Entradas del concierto",
+        "Online course": "Curso online", "Headphones": "Auriculares", "Festival tickets": "Entradas del festival",
+        "School supplies": "Material escolar"
     ]
 
     private static func date(year: Int = 2026, month: Int, day: Int, hour: Int, minute: Int,

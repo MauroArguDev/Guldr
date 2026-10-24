@@ -15,8 +15,9 @@ import SwiftData
 /// and two years of logged days (every 13th missed), to try the screens, the streak and the achievements
 /// with a heavy history. Pass the launch argument `-seedTransactions 5000`
 /// (Xcode › Scheme › Arguments, or `xcrun simctl launch … -seedTransactions 5000`). For screenshots,
-/// `-demoData` loads the mockups' six months instead, moved to end this month (`PreviewData`). A store
-/// that already has transactions is left alone, so relaunching never duplicates them.
+/// `-demoData` loads the mockups' six months instead, moved to end this month, in the language and currency
+/// of the device's locale (`PreviewData.Flavor`). A store that already has transactions is left alone, so
+/// relaunching never duplicates them.
 enum DebugSeed {
 
     static func applyIfRequested(to container: ModelContainer,
@@ -29,7 +30,7 @@ enum DebugSeed {
         do {
             guard try context.fetchCount(FetchDescriptor<Transaction>()) == 0 else { return }
             if isDemo {
-                try PreviewData.populate(context, endingAt: .now)
+                try PreviewData.populate(context, endingAt: .now, flavor: .matching(.autoupdatingCurrent))
                 logger.info("Loaded the demo data")
             } else {
                 try insert(count, into: context)

@@ -108,4 +108,45 @@ struct PreviewDataTests {
         let days = try context.fetch(FetchDescriptor<LoggedDay>())
         #expect(days.map(\.dayKey).max() == LocalDay(containing: now, timeZone: timeZone).rawValue)
     }
+
+    // MARK: - Flavors (-demoData in each App Store localization)
+
+    @Test func flavorFollowsTheLocale() {
+        #expect(PreviewData.Flavor.matching(Locale(identifier: "en_US")) == .mockups)
+        let mexico = PreviewData.Flavor.matching(Locale(identifier: "es_MX"))
+        #expect(mexico.currencyCode == "MXN" && mexico.amountScale == 10 && mexico.titles == .mexicanSpanish)
+        let spain = PreviewData.Flavor.matching(Locale(identifier: "es_ES"))
+        #expect(spain.currencyCode == "EUR" && spain.amountScale == 1 && spain.titles == .spainSpanish)
+        // Titles follow the language, the currency the region.
+        #expect(PreviewData.Flavor.matching(Locale(identifier: "en_MX")).titles == .english)
+        #expect(PreviewData.Flavor.matching(Locale(identifier: "es_US")).currencyCode == "USD")
+    }
+
+    @Test(arguments: ["es_MX", "es_ES"])
+    func spanishDataTranslatesEveryTitleAndScalesEveryAmount(localeID: String) throws {
+        let flavor = PreviewData.Flavor.matching(Locale(identifier: localeID))
+        let now = try #require(YearMonth.calendar(timeZone).date(from: DateComponents(year: 2027, month: 2, day: 10,
+                                                                                      hour: 8)))
+        let english = try populated(endingAt: now, flavor: .mockups)
+        let spanish = try populated(endingAt: now, flavor: flavor)
+
+        #expect(Set(english.transactions.map(\.title)).isDisjoint(with: spanish.transactions.map(\.title)))
+        #expect(spanish.transactions.allSatisfy { $0.currencyCode == flavor.currencyCode })
+        #expect(spanish.budgets.allSatisfy { $0.currencyCode == flavor.currencyCode })
+        #expect(sum(spanish.transactions.map(\.amountMinorUnits))
+                == sum(english.transactions.map(\.amountMinorUnits)) * flavor.amountScale)
+        #expect(sum(spanish.budgets.map(\.limitMinorUnits)) == 203_000 * flavor.amountScale)
+    }
+
+    private func populated(endingAt now: Date,
+                           flavor: PreviewData.Flavor) throws -> (transactions: [Transaction], budgets: [Budget]) {
+        let controller = try PersistenceController(mode: .inMemory)
+        let context = ModelContext(controller.container)
+        try PreviewData.populate(context, endingAt: now, timeZone: timeZone, flavor: flavor)
+        return (try context.fetch(FetchDescriptor<Transaction>()), try context.fetch(FetchDescriptor<Budget>()))
+    }
+
+    private func sum(_ values: [Int64]) -> Int64 {
+        values.reduce(0, +)
+    }
 }
