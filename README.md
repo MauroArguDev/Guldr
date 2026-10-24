@@ -78,7 +78,7 @@ All the logic that can be pure lives in `GuldrCore`: money, month calculations, 
 1. Clone the repo and open `Guldr.xcodeproj`.
 2. Run `git config core.hooksPath .githooks` once.
 3. Select your team in Signing & Capabilities for both targets (App Group: `group.com.argudev.guldr`).
-4. Run the `Guldr` scheme. To try it with a heavy history, add the launch argument `-seedTransactions 5000` (Debug builds only).
+4. Run the `Guldr` scheme. To try it with a heavy history, add the launch argument `-seedTransactions 5000`, or `-demoData` for the mockups' realistic six months (Debug builds only, on an empty store).
 
 Tests: `swift test --package-path Packages/GuldrCore` for the domain, and the `Guldr` scheme's test action for the app.
 
