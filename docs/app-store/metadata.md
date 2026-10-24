@@ -36,9 +36,11 @@ The same in every language.
 
 The name and subtitle are indexed for search together with the keywords, so no word appears twice across them.
 
+Store names are unique per localization, and another app already uses "Guldr" in Spanish (Mexico). Both Spanish localizations therefore use "Guldr: Finanzas personales" (author's call, 2026-10-23). The name under the icon on the Home Screen stays Guldr in every language.
+
 | | English | Spanish |
 |---|---|---|
-| Name (30) | Guldr (5) | Guldr (5) |
+| Name (30) | Guldr (5) | Guldr: Finanzas personales (26) |
 | Subtitle (30) | Private budget & expenses (25) | Gastos y presupuesto privados (29) |
 
 ## Promotional text (170)
@@ -67,10 +69,10 @@ Comma-separated with no spaces after the commas. They leave out the name, the su
 money,spending,tracker,finance,income,savings,habit,streak,offline,no account,widget,csv,ledger,cash
 ```
 
-**Spanish** (99)
+**Spanish** (100)
 
 ```text
-dinero,finanzas,ahorro,ingresos,control,racha,hábito,sin cuenta,offline,widget,csv,cuentas,registro
+dinero,billetera,ahorro,ingresos,control,racha,hábito,sin cuenta,offline,widget,csv,cuentas,registro
 ```
 
 ## Description (4000)
