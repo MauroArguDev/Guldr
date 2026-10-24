@@ -38,7 +38,7 @@ struct ShareCardSheet: View {
 
                 if let image {
                     Button {
-                        ActivitySharing.present(image: image, text: content.message,
+                        ActivitySharing.present(image: image, text: content.sharedText,
                                                 title: String(localized: content.title))
                     } label: {
                         Label("Share", systemImage: "square.and.arrow.up")

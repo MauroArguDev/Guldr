@@ -57,6 +57,12 @@ enum ShareCardContent {
             String(localized: "My \(card.monthName) in Guldr: \(card.recap.daysLogged) of \(card.recap.daysInMonth) days logged.")
         }
     }
+
+    /// What goes to the share sheet: the message, then the App Store link on its own line (author's call,
+    /// 2026-10-23), so Messages shows the app's preview. VoiceOver keeps reading `message` alone.
+    var sharedText: String {
+        [message, SupportContact.appStoreURL?.absoluteString].compactMap(\.self).joined(separator: "\n")
+    }
 }
 
 /// A month in review in words, for the recap card. Every value is a count, a percentage or a name.
