@@ -26,3 +26,4 @@ Each file records one decision that shapes the project: the context, what was ch
 | [011](011-lock-policy.md) | Optional Face ID lock with passcode fallback, grace period and privacy cover | Accepted |
 | [012](012-logging-streak.md) | Logging streak from stored logged days, with a one-day repair and earned freezes | Accepted |
 | [013](013-achievements.md) | Achievements from a fixed catalog; money ones only count complete months; earned tiers are kept | Accepted |
+| [014](014-monetization.md) | Monetization from v1.2: a one-time Gold unlock and optional tips, no subscription | Accepted |
