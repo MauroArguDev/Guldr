@@ -1,6 +1,6 @@
 # App Store metadata
 
-What goes into App Store Connect for Guldr 1.0, in English (U.S.), the primary language, and in Spanish. The same Spanish text goes in both **Spanish (Mexico)** and **Spanish (Spain)** (author's call, 2026-10-23); it uses the app's own words ("monto", "anotar", "Movimientos") and avoids regional ones such as "celular" or "móvil".
+What goes into App Store Connect for Guldr 1.0, in English (U.S.), the primary language, and in Spanish. The same Spanish text goes in both **Spanish (Mexico)** and **Spanish (Spain)** (author's call, 2026-10-23), except the name and the keywords; it uses the app's own words ("monto", "anotar", "Movimientos") and avoids regional ones such as "celular" or "móvil".
 
 Each field shows its limit and the current length. App Store Connect counts characters, not bytes. Text blocks are plain text: the App Store doesn't render Markdown, so lists use "•".
 
@@ -36,12 +36,12 @@ The same in every language.
 
 The name and subtitle are indexed for search together with the keywords, so no word appears twice across them.
 
-Store names are unique per localization, and another app already uses "Guldr" in Spanish (Mexico). Both Spanish localizations therefore use "Guldr: Finanzas personales" (author's call, 2026-10-23). The name under the icon on the Home Screen stays Guldr in every language.
+App Store Connect wouldn't save "Guldr" in both Spanish localizations: Spanish (Mexico) kept it, and Spanish (Spain) is "Guldr: Finanzas personales" (author's call, 2026-10-23). Add a localization and save before adding the next one; two new ones saved together with the same name were rejected as already in use. The name under the icon on the Home Screen stays Guldr in every language.
 
-| | English | Spanish |
-|---|---|---|
-| Name (30) | Guldr (5) | Guldr: Finanzas personales (26) |
-| Subtitle (30) | Private budget & expenses (25) | Gastos y presupuesto privados (29) |
+| | English (U.S.) | Spanish (Mexico) | Spanish (Spain) |
+|---|---|---|---|
+| Name (30) | Guldr (5) | Guldr (5) | Guldr: Finanzas personales (26) |
+| Subtitle (30) | Private budget & expenses (25) | Gastos y presupuesto privados (29) | Gastos y presupuesto privados (29) |
 
 ## Promotional text (170)
 
@@ -69,7 +69,13 @@ Comma-separated with no spaces after the commas. They leave out the name, the su
 money,spending,tracker,finance,income,savings,habit,streak,offline,no account,widget,csv,ledger,cash
 ```
 
-**Spanish** (100)
+**Spanish (Mexico)** (99)
+
+```text
+dinero,finanzas,ahorro,ingresos,control,racha,hábito,sin cuenta,offline,widget,csv,cuentas,registro
+```
+
+**Spanish (Spain)** (100): "finanzas" is already in its name, so it becomes "billetera".
 
 ```text
 dinero,billetera,ahorro,ingresos,control,racha,hábito,sin cuenta,offline,widget,csv,cuentas,registro
