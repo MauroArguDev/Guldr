@@ -19,15 +19,16 @@ public enum PreviewData {
 
     public static let currencyCode = "USD"
 
+    /// The language of the demo titles.
+    public enum Titles: Sendable {
+        case english
+        case mexicanSpanish
+        case spainSpanish
+    }
+
     /// How the data reads in each App Store localization's screenshots (v1 plan, 34.6): the titles' language,
     /// the currency, and a scale that keeps the amounts realistic in it. Previews and tests use `mockups`.
     public struct Flavor: Sendable, Equatable {
-
-        public enum Titles: Sendable {
-            case english
-            case mexicanSpanish
-            case spainSpanish
-        }
 
         public let currencyCode: String
         public let amountScale: Int64
