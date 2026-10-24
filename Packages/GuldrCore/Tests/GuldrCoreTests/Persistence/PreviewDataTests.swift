@@ -79,4 +79,33 @@ struct PreviewDataTests {
         #expect(YearMonth(containing: now, timeZone: timeZone).rawValue == 202_609)
         #expect(formatter.label(for: now, relativeTo: now) == "Today")
     }
+
+    // MARK: - Ending at another month (Debug's -demoData)
+
+    /// Moved to end on Feb 10, 2027 at 8:00: a short month, early in the day and early in the month.
+    @Test func movedDataEndsInTheCurrentMonthWithTheSameTotals() throws {
+        let now = try #require(YearMonth.calendar(timeZone).date(from: DateComponents(year: 2027, month: 2, day: 10,
+                                                                                      hour: 8)))
+        let controller = try PersistenceController(mode: .inMemory)
+        let context = ModelContext(controller.container)
+        try PreviewData.populate(context, endingAt: now, timeZone: timeZone)
+        let all = try context.fetch(FetchDescriptor<Transaction>())
+
+        #expect(all.allSatisfy { $0.date < now })
+        func totals(_ year: Int, _ month: Int) -> (Int64, Int64) {
+            guard let yearMonth = YearMonth(year: year, month: month) else { return (-1, -1) }
+            let inMonth = all.filter { yearMonth.contains($0.date, timeZone: timeZone) }
+            return (inMonth.filter { $0.kind == .income }.reduce(0) { $0 + $1.amountMinorUnits },
+                    inMonth.filter { $0.kind == .expense }.reduce(0) { $0 + $1.amountMinorUnits })
+        }
+        // September becomes February, August becomes January, April becomes September 2026.
+        #expect(totals(2027, 2) == (500_000, 175_950))
+        #expect(totals(2027, 1) == (500_000, 220_500))
+        #expect(totals(2026, 9) == (500_000, 231_000))
+
+        let budgets = try context.fetch(FetchDescriptor<Budget>())
+        #expect(budgets.allSatisfy { $0.yearMonth == 202_702 })
+        let days = try context.fetch(FetchDescriptor<LoggedDay>())
+        #expect(days.map(\.dayKey).max() == LocalDay(containing: now, timeZone: timeZone).rawValue)
+    }
 }

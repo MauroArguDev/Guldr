@@ -33,6 +33,38 @@ public enum PreviewData {
 
     /// Inserts the preview transactions, budgets and logged days. Expects the default categories to be seeded.
     public static func populate(_ context: ModelContext, timeZone: TimeZone = .autoupdatingCurrent) throws {
+        let september = YearMonth(year: 2026, month: 9) ?? YearMonth(containing: referenceDate(in: timeZone))
+        try insert(into: context, budgetMonth: september, now: .now, timeZone: timeZone) { entry in
+            date(year: 2026, month: entry.month, day: entry.day, hour: entry.hour, minute: entry.minute,
+                 timeZone: timeZone)
+        }
+    }
+
+    /// The same data moved so September becomes the month containing `now`, for screenshots of the running
+    /// app (Debug's `-demoData`). Earlier months keep their days, capped at the month's length. The current
+    /// month's days are spread over the days so far, so its totals still match the mockups and nothing
+    /// lands in the future.
+    public static func populate(_ context: ModelContext, endingAt now: Date,
+                                timeZone: TimeZone = .autoupdatingCurrent) throws {
+        let calendar = YearMonth.calendar(timeZone)
+        let current = YearMonth(containing: now, timeZone: timeZone)
+        let today = calendar.component(.day, from: now)
+        try insert(into: context, budgetMonth: current, now: now, timeZone: timeZone) { entry in
+            let month = current.adding(months: entry.month - 9)
+            let day = if month == current {
+                1 + (entry.day - 1) * (today - 1) / 27
+            } else {
+                min(entry.day, calendar.range(of: .day, in: .month,
+                                              for: month.dateInterval(in: timeZone).start)?.count ?? 28)
+            }
+            let shifted = date(year: month.year, month: month.month, day: day, hour: entry.hour,
+                               minute: entry.minute, timeZone: timeZone)
+            return min(shifted, now.addingTimeInterval(-60))
+        }
+    }
+
+    private static func insert(into context: ModelContext, budgetMonth: YearMonth, now: Date, timeZone: TimeZone,
+                               dateFor: (Entry) -> Date) throws {
         let categories = try context.fetch(FetchDescriptor<Category>())
         let byKey = Dictionary(categories.compactMap { category in category.systemKey.map { ($0, category) } },
                                uniquingKeysWith: { first, _ in first })
@@ -40,20 +72,15 @@ public enum PreviewData {
         for entry in entries {
             let amount = try Money(minorUnits: entry.cents, currencyCode: currencyCode)
             let category = byKey[entry.categoryKey]
-            context.insert(Transaction(
-                amount: amount, kind: category?.kind ?? .expense, title: entry.title,
-                date: date(month: entry.month, day: entry.day, hour: entry.hour, minute: entry.minute, timeZone: timeZone),
-                category: category
-            ))
+            context.insert(Transaction(amount: amount, kind: category?.kind ?? .expense, title: entry.title,
+                                       date: dateFor(entry), category: category))
         }
-
-        let september = YearMonth(year: 2026, month: 9) ?? YearMonth(containing: referenceDate(in: timeZone))
         for (key, cents) in septemberBudgets {
-            context.insert(Budget(month: september, limit: try Money(minorUnits: cents, currencyCode: currencyCode),
+            context.insert(Budget(month: budgetMonth, limit: try Money(minorUnits: cents, currencyCode: currencyCode),
                                   category: byKey[key]))
         }
         for (offset, source) in streakDays {
-            context.insert(LoggedDay(day: LocalDay(containing: .now, timeZone: timeZone).adding(days: offset),
+            context.insert(LoggedDay(day: LocalDay(containing: now, timeZone: timeZone).adding(days: offset),
                                      source: source))
         }
         try context.save()
@@ -142,8 +169,9 @@ public enum PreviewData {
         ("entertainment", 8_000), ("food", 40_000), ("transport", 20_000), ("housing", 120_000), ("health", 15_000)
     ]
 
-    private static func date(month: Int, day: Int, hour: Int, minute: Int, timeZone: TimeZone) -> Date {
-        let components = DateComponents(year: 2026, month: month, day: day, hour: hour, minute: minute)
+    private static func date(year: Int = 2026, month: Int, day: Int, hour: Int, minute: Int,
+                             timeZone: TimeZone) -> Date {
+        let components = DateComponents(year: year, month: month, day: day, hour: hour, minute: minute)
         return YearMonth.calendar(timeZone).date(from: components) ?? .distantPast
     }
 }

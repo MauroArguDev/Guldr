@@ -14,20 +14,27 @@ import SwiftData
 /// Debug builds only: fills an empty store with generated transactions, budgets for the current month
 /// and two years of logged days (every 13th missed), to try the screens, the streak and the achievements
 /// with a heavy history. Pass the launch argument `-seedTransactions 5000`
-/// (Xcode › Scheme › Arguments, or `xcrun simctl launch … -seedTransactions 5000`). A store that already has transactions is left alone,
-/// so relaunching never duplicates them.
+/// (Xcode › Scheme › Arguments, or `xcrun simctl launch … -seedTransactions 5000`). For screenshots,
+/// `-demoData` loads the mockups' six months instead, moved to end this month (`PreviewData`). A store
+/// that already has transactions is left alone, so relaunching never duplicates them.
 enum DebugSeed {
 
     static func applyIfRequested(to container: ModelContainer,
                                  arguments: [String] = ProcessInfo.processInfo.arguments) {
-        guard let flag = arguments.firstIndex(of: "-seedTransactions"),
-              arguments.indices.contains(flag + 1),
-              let count = Int(arguments[flag + 1]), count > 0 else { return }
+        let isDemo = arguments.contains("-demoData")
+        let count = arguments.firstIndex(of: "-seedTransactions")
+            .flatMap { arguments.indices.contains($0 + 1) ? Int(arguments[$0 + 1]) : nil } ?? 0
+        guard isDemo || count > 0 else { return }
         let context = ModelContext(container)
         do {
             guard try context.fetchCount(FetchDescriptor<Transaction>()) == 0 else { return }
-            try insert(count, into: context)
-            logger.info("Seeded \(count) transactions")
+            if isDemo {
+                try PreviewData.populate(context, endingAt: .now)
+                logger.info("Loaded the demo data")
+            } else {
+                try insert(count, into: context)
+                logger.info("Seeded \(count) transactions")
+            }
         } catch {
             logger.error("Seeding failed: \(error)")
         }
