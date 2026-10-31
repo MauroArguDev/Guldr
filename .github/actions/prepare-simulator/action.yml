@@ -1,5 +1,7 @@
 name: Prepare simulator
-description: Select a pinned Xcode and boot an iPhone simulator on the newest installed iOS runtime.
+description: >
+  Select a pinned Xcode and start booting an iPhone simulator on the newest installed iOS runtime,
+  without waiting for it. Pair with wait-for-simulator before running tests.
 
 inputs:
   xcode-version:
@@ -8,16 +10,10 @@ inputs:
   simulator-name:
     description: Simulator device name, e.g. "iPhone 17".
     required: true
-  project:
-    description: Xcode project used to confirm the simulator is a valid destination.
-    required: true
-  scheme:
-    description: Scheme used to confirm the simulator is a valid destination.
-    required: true
 
 outputs:
   udid:
-    description: UDID of the booted simulator, used as the xcodebuild destination.
+    description: UDID of the simulator being booted, used as the xcodebuild destination.
     value: ${{ steps.boot.outputs.udid }}
 
 runs:
@@ -32,9 +28,9 @@ runs:
         sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
         xcodebuild -version
 
-    # Booting before xcodebuild runs keeps the cold-boot cost in its own, measurable step
-    # and lets the build start against a simulator that is already up.
-    - name: Boot simulator
+    # A cold boot takes about 2.5 minutes on macos-26. Starting it in the background lets the
+    # build run meanwhile; wait-for-simulator boots the device itself if this attempt failed.
+    - name: Start booting simulator
       id: boot
       shell: bash
       env:
@@ -54,32 +50,6 @@ runs:
           xcrun simctl list devices available
           exit 1
         fi
-        echo "Booting $SIMULATOR_NAME ($udid)"
-        # -b boots the device if needed and waits until it has finished booting.
-        xcrun simctl bootstatus "$udid" -b
+        echo "Booting $SIMULATOR_NAME ($udid) in the background"
+        nohup xcrun simctl boot "$udid" > "$RUNNER_TEMP/simulator-boot.log" 2>&1 &
         echo "udid=$udid" >> "$GITHUB_OUTPUT"
-
-    # On a cold runner CoreSimulator can report the device as booted before xcodebuild
-    # lists it as a destination, and xcodebuild then fails with "Unable to find a device".
-    # Wait until the scheme's destinations include the simulator before building.
-    # Observed on macos-26: up to ~6 min after boot, so allow up to ~10 min (30 attempts).
-    - name: Wait for xcodebuild to see the simulator
-      shell: bash
-      env:
-        UDID: ${{ steps.boot.outputs.udid }}
-        PROJECT: ${{ inputs.project }}
-        SCHEME: ${{ inputs.scheme }}
-      run: |
-        set -euo pipefail
-        for attempt in $(seq 1 30); do
-          destinations="$(xcodebuild -showdestinations -project "$PROJECT" -scheme "$SCHEME" 2>/dev/null || true)"
-          if grep -q "id:$UDID" <<< "$destinations"; then
-            echo "Simulator $UDID is available to xcodebuild (attempt $attempt)."
-            exit 0
-          fi
-          echo "Simulator not listed yet (attempt $attempt/30); retrying in 15 s."
-          sleep 15
-        done
-        echo "::error::xcodebuild never listed simulator $UDID as a destination."
-        xcrun simctl list devices booted
-        exit 1

@@ -1,0 +1,64 @@
+name: Wait for simulator
+description: >
+  Wait until the simulator started by prepare-simulator has finished booting and xcodebuild
+  lists it as a destination.
+
+inputs:
+  udid:
+    description: UDID of the simulator, from prepare-simulator.
+    required: true
+  project:
+    description: Xcode project used to confirm the simulator is a valid destination.
+    required: true
+  scheme:
+    description: Scheme used to confirm the simulator is a valid destination.
+    required: true
+  cloned-source-packages-path:
+    description: Folder the build resolved Swift packages into, so listing destinations does not fetch them again.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Wait for boot
+      shell: bash
+      env:
+        UDID: ${{ inputs.udid }}
+      run: |
+        set -euo pipefail
+        if [ -s "$RUNNER_TEMP/simulator-boot.log" ]; then
+          echo "Background boot output:"
+          cat "$RUNNER_TEMP/simulator-boot.log"
+        fi
+        # -b boots the device if the background boot never started, then waits until it has finished.
+        xcrun simctl bootstatus "$UDID" -b
+
+    # On a cold runner CoreSimulator can report the device as booted before xcodebuild
+    # lists it as a destination, and xcodebuild then fails with "Unable to find a device".
+    # Wait until the scheme's destinations include the simulator before testing.
+    # Observed on macos-26: up to ~6 min after boot, so allow up to ~10 min (30 attempts).
+    - name: Wait for xcodebuild to see the simulator
+      shell: bash
+      env:
+        UDID: ${{ inputs.udid }}
+        PROJECT: ${{ inputs.project }}
+        SCHEME: ${{ inputs.scheme }}
+        SOURCE_PACKAGES: ${{ inputs.cloned-source-packages-path }}
+      run: |
+        set -euo pipefail
+        errors="$RUNNER_TEMP/showdestinations.err"
+        for attempt in $(seq 1 30); do
+          destinations="$(xcodebuild -showdestinations -project "$PROJECT" -scheme "$SCHEME" \
+            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" -skipPackageUpdates 2>"$errors" || true)"
+          if grep -q "id:$UDID" <<< "$destinations"; then
+            echo "Simulator $UDID is available to xcodebuild (attempt $attempt)."
+            exit 0
+          fi
+          echo "Simulator not listed yet (attempt $attempt/30); retrying in 15 s."
+          sleep 15
+        done
+        echo "::error::xcodebuild never listed simulator $UDID as a destination."
+        echo "Last xcodebuild error output:"
+        cat "$errors"
+        xcrun simctl list devices booted
+        exit 1

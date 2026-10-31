@@ -85,7 +85,7 @@ Examples: `feat/budget-ring`, `fix/widget-refresh`, `chore/swiftlint`.
 
 ## Continuous integration
 
-The `test` job uses the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode, boots the simulator and waits until `xcodebuild` lists it as a destination before anything is built. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 30 attempts, about 10 minutes; ~6 minutes observed) and `-destination-timeout 120` absorb that race.
+The `test` job starts the simulator's cold boot with the [`prepare-simulator`](../.github/actions/prepare-simulator/action.yml) action, which selects a pinned Xcode and boots the device in the background, and compiles the app meanwhile: `build-for-testing` targets any simulator, so it does not need the device. Before testing, [`wait-for-simulator`](../.github/actions/wait-for-simulator/action.yml) waits for the boot to finish and until `xcodebuild` lists the simulator as a destination. On a cold runner the simulator can report as booted before `xcodebuild` sees it; the wait (up to 30 attempts, about 10 minutes; ~6 minutes observed) and `-destination-timeout 120` absorb that race.
 
 ### `CI` — required on every pull request
 
@@ -94,14 +94,15 @@ The `test` job uses the [`prepare-simulator`](../.github/actions/prepare-simulat
 | Job | Runner | What it does |
 |---|---|---|
 | `changes` | `ubuntu-latest` | Lists the files the PR changes. If they are only Markdown or under `docs/`, the macOS jobs are skipped. |
-| `core-tests` | `macos-26`, Xcode 26.6 | Runs `swift test` for `GuldrCore` with no simulator and fails if zero tests ran, then SwiftLint in strict mode over the whole repository with the binary the package pins, so any warning fails. Timeout: 15 minutes. About 1 minute. |
-| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator, runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran, then builds the Release configuration (no tests, no signing) so code that only compiles in Debug, such as previews using `#if DEBUG` helpers, fails in CI. Timeout: 25 minutes. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
+| `core-tests` | `macos-26`, Xcode 26.6 | Runs `swift test` for `GuldrCore` with no simulator and fails if zero tests ran, then SwiftLint in strict mode over the whole repository with the binary the package pins, so any warning fails, then builds the Release configuration (no tests, no signing) so code that only compiles in Debug, such as previews using `#if DEBUG` helpers, fails in CI. Timeout: 20 minutes. |
+| `test` | `macos-26`, Xcode 26.6 | Boots the iPhone 17 simulator while it runs `build-for-testing`, then `test-without-building` for `GuldrTests`, and fails if zero tests ran. Timeout: 25 minutes. On failure it uploads the `.xcresult` bundle as an artifact for 7 days. |
 
 - **Required:** the `main` ruleset blocks merging until `test` and `core-tests` succeed. Jobs skipped for a docs-only PR report success, so documentation changes are not blocked.
 - **Pushes to `main` always run both jobs**, whatever changed.
 - **Concurrency:** a new push to a PR cancels its run in progress; runs on `main` always finish.
-- **Speed:** code coverage, indexing and parallel simulator clones are disabled in CI.
-- **Security:** the workflow token is read-only (`contents: read`), checkout does not persist credentials, third-party actions are pinned to a commit SHA, and [Dependabot](../.github/dependabot.yml) proposes weekly updates for them.
+- **Speed:** the Release build runs in `core-tests`, in parallel with `test`, which is the longer job. Both builds compile arm64 only; a generic simulator destination would also compile x86_64. Code coverage, indexing and parallel simulator clones are disabled in CI.
+- **Package cache:** Swift packages are resolved into `SourcePackages/` (gitignored) and cached with a key built from the Xcode version and both `Package.resolved` files. Only runs on `main` save the cache; pull requests restore it but never write it, so a PR can't change what another run gets.
+- **Security:** the workflow token is read-only (`contents: read`), checkout does not persist credentials, third-party actions are pinned to a commit SHA, pull requests only read the package cache, and [Dependabot](../.github/dependabot.yml) proposes weekly updates for them.
 
 ### Reproduce CI locally
 
