@@ -159,9 +159,14 @@ struct AddTransactionView: View {
                 .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, minHeight: Size.amountRow)
+        // While the system keyboard types the description, tapping the amount brings the keypad back;
+        // otherwise only the keyboard's Done key would.
+        .contentShape(.rect)
+        .onTapGesture { isDescriptionFocused = false }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("Amount"))
         .accessibilityValue(Text(verbatim: model.amount.formattedText(locale: locale)))
+        .accessibilityAddTraits(isDescriptionFocused ? .isButton : [])
     }
 
     private var fieldGroup: some View {
@@ -204,6 +209,8 @@ struct AddTransactionView: View {
 
     private var dateChip: some View {
         Button {
+            // The popover only gets the space above the keyboard, which squeezes the calendar.
+            isDescriptionFocused = false
             showsDatePicker = true
         } label: {
             Text(verbatim: DayLabelFormatter(locale: locale).chipLabel(for: model.date))
