@@ -79,6 +79,15 @@ struct SettingsView: View {
                 Button("Delete all data", role: .destructive) {
                     confirmingDelete = true
                 }
+                // Two confirmations, as the plan asks for: the dialog says what goes, the alert that it's
+                // final. The dialog is on the button, so iOS points it there instead of at the whole form.
+                .confirmationDialog("Delete all data?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                    Button("Delete all data", role: .destructive) {
+                        confirmingDeleteAgain = true
+                    }
+                } message: {
+                    deleteAllMessage
+                }
             } footer: {
                 Text("Deletes your transactions, budgets and custom categories, and starts Guldr over.")
             }
@@ -103,14 +112,6 @@ struct SettingsView: View {
         .background(Color(.appBackground))
         .navigationTitle(Text("Settings"))
         .navigationBarTitleDisplayMode(.inline)
-        // Two confirmations, as the plan asks for: the dialog says what goes, the alert that it's final.
-        .confirmationDialog("Delete all data?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("Delete all data", role: .destructive) {
-                confirmingDeleteAgain = true
-            }
-        } message: {
-            Text("Every transaction, budget and custom category on this iPhone is deleted, and Guldr returns to the welcome screen.")
-        }
         .alert("Are you sure?", isPresented: $confirmingDeleteAgain) {
             Button("Delete everything", role: .destructive, action: deleteAllData)
             Button("Cancel", role: .cancel) {}
@@ -139,6 +140,11 @@ struct SettingsView: View {
         } message: {
             Text("Choose another currency and try again.")
         }
+    }
+
+    /// What "Delete all data" erases, in its confirmation.
+    private var deleteAllMessage: Text {
+        Text("Every transaction, budget and custom category on this iPhone is deleted, and Guldr returns to the welcome screen.")
     }
 
     /// The data goes first: if it fails, the currency and first launch stay as they were.
