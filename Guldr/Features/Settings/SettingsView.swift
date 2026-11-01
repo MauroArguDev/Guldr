@@ -10,10 +10,10 @@ import SwiftData
 import SwiftUI
 
 /// Settings, pushed from the Dashboard's toolbar: a native `Form` with the active currency, which can be
-/// changed, the Face ID lock and its grace period (ADR 011), the daily reminder and budget alerts, the
-/// streak, the widgets' privacy, the categories, the CSV export, About and "Delete all data". Settings
-/// never shows a control that does nothing (author's call, 2026-10-20). Debug builds also link to the
-/// design system gallery from here.
+/// changed, the balance the user has today (ADR 016), the Face ID lock and its grace period (ADR 011), the
+/// daily reminder and budget alerts, the streak, the widgets' privacy, the categories, the CSV export,
+/// About and "Delete all data". Settings never shows a control that does nothing (author's call,
+/// 2026-10-20). Debug builds also link to the design system gallery from here.
 struct SettingsView: View {
 
     @Environment(Preferences.self) private var preferences
@@ -45,6 +45,8 @@ struct SettingsView: View {
             } footer: {
                 Text("Totals, budgets and charts use this currency. Transactions keep the currency they were saved in.")
             }
+
+            BalanceSettingsSection()
 
             lockSection
 

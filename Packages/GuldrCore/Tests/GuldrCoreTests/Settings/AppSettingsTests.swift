@@ -164,6 +164,48 @@ struct AppSettingsTests {
         }
     }
 
+    // MARK: - Starting balance (ADR 016)
+
+    @Test func onboardingStoresTheStartingBalanceAndOffersItOnlyThere() throws {
+        try withSettings { settings, _ in
+            #expect(!settings.hasOfferedStartingBalance)
+            try settings.completeOnboarding(currencyCode: "mxn", startingBalance: 500_000)
+            #expect(settings.openingBalance(for: "MXN") == 500_000)
+            #expect(settings.openingBalance(for: "USD") == 0)
+            #expect(settings.hasOfferedStartingBalance)
+        }
+    }
+
+    @Test func startingFromZeroStoresNothing() throws {
+        try withSettings { settings, _ in
+            try settings.completeOnboarding(currencyCode: "USD")
+            #expect(settings.openingBalances.isEmpty)
+            #expect(settings.hasOfferedStartingBalance)
+        }
+    }
+
+    @Test func startingBalancesAreKeptPerCurrency() throws {
+        try withSettings { settings, _ in
+            try settings.setOpeningBalance(125_000, for: "usd")
+            try settings.setOpeningBalance(-4_000, for: "EUR")
+            #expect(settings.openingBalances == ["USD": 125_000, "EUR": -4_000])
+            try settings.setOpeningBalance(0, for: "USD")
+            #expect(settings.openingBalances == ["EUR": -4_000])
+            #expect(throws: MoneyError.unknownCurrency("XYZ")) {
+                try settings.setOpeningBalance(1, for: "XYZ")
+            }
+        }
+    }
+
+    @Test func startingBalancePreferencesAreReset() throws {
+        try withSettings { settings, _ in
+            try settings.completeOnboarding(currencyCode: "EUR", startingBalance: 9_900)
+            settings.reset()
+            #expect(settings.openingBalances.isEmpty)
+            #expect(!settings.hasOfferedStartingBalance)
+        }
+    }
+
     @Test func resetForgetsTheCurrencyAndFirstLaunch() throws {
         try withSettings { settings, defaults in
             try settings.completeOnboarding(currencyCode: "EUR")

@@ -19,6 +19,14 @@ extension Money {
     }
 }
 
+extension AmountInput {
+    /// Previews only: `cents` typed in `currencyCode`, empty at zero. The codes previews pass are valid.
+    static func preview(_ cents: Int64 = 0, _ currencyCode: String = "USD") -> AmountInput {
+        // swiftlint:disable:next force_try
+        try! AmountInput(money: Money(minorUnits: cents, currencyCode: currencyCode)) // Valid code, debug-only previews.
+    }
+}
+
 extension BudgetStatus.Line {
     /// Previews only: a USD budget line with `spent` of `limit` cents.
     static func preview(_ spent: Int64, of limit: Int64) -> BudgetStatus.Line {

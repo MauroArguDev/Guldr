@@ -9,8 +9,8 @@ import Foundation
 
 /// The Dashboard's numbers for one month, in the active currency (ADR 005).
 ///
-/// - `balance` is the all-time net: every income minus every expense ever recorded, whatever its
-///   date. It does not depend on `month`.
+/// - `balance` is the starting balance (ADR 016) plus the all-time net: every income minus every
+///   expense ever recorded, whatever its date. It does not depend on `month`.
 /// - `income`, `expenses` and `savingsRate` cover `month` in `timeZone`.
 ///
 /// Transactions in other currencies are ignored: v1 totals only the active currency.
@@ -28,11 +28,13 @@ public struct MonthSummary: Equatable, Sendable {
         Money.unchecked(income.minorUnits - expenses.minorUnits, income.currencyCode)
     }
 
+    /// `openingBalance` is the currency's starting balance in minor units; only `balance` includes it.
     public init(transactions: some Sequence<Transaction>, month: YearMonth, currencyCode: String,
-                timeZone: TimeZone = .autoupdatingCurrent) throws(MoneyError) {
+                openingBalance: Int64 = 0, timeZone: TimeZone = .autoupdatingCurrent) throws(MoneyError) {
         let code = try Currency.validatedCode(currencyCode)
         let interval = month.dateInterval(in: timeZone)
         var balance = Tally()
+        try balance.add(openingBalance)
         var income = Tally()
         var expenses = Tally()
 

@@ -8,8 +8,9 @@
 import Foundation
 
 /// Small preferences shared by the app and the widget, kept in the App Group's `UserDefaults`: the
-/// active currency (ADR 005), which the widget needs to total the right transactions, and whether first
-/// launch was completed. Data lives in SwiftData; only these few values live here.
+/// active currency (ADR 005), which the widget needs to total the right transactions, the starting
+/// balances (ADR 016) and whether first launch was completed. Data lives in SwiftData; only these few
+/// values live here.
 public struct AppSettings {
 
     enum Key {
@@ -30,6 +31,8 @@ public struct AppSettings {
         static let celebratedStreakMilestone = "celebratedStreakMilestone"
         static let hasRecordedAchievementHistory = "hasRecordedAchievementHistory"
         static let dismissedRecapMonth = "dismissedRecapMonth"
+        static let openingBalances = "openingBalances"
+        static let hasOfferedStartingBalance = "hasOfferedStartingBalance"
     }
 
     private let defaults: UserDefaults
@@ -56,6 +59,36 @@ public struct AppSettings {
 
     public var hasCompletedOnboarding: Bool {
         defaults.bool(forKey: Key.hasCompletedOnboarding)
+    }
+
+    /// The starting balance per currency code, in minor units (ADR 016). Only the balance adds it; it can
+    /// be negative, since it's what the user has today minus what they had already logged.
+    public var openingBalances: [String: Int64] {
+        guard let stored = defaults.dictionary(forKey: Key.openingBalances) else { return [:] }
+        return stored.compactMapValues { ($0 as? NSNumber)?.int64Value }
+    }
+
+    /// Zero for a currency without one.
+    public func openingBalance(for currencyCode: String) -> Int64 {
+        openingBalances[currencyCode] ?? 0
+    }
+
+    /// Validates the code and stores the starting balance; zero removes it.
+    public func setOpeningBalance(_ minorUnits: Int64, for currencyCode: String) throws(MoneyError) {
+        let code = try Currency.validatedCode(currencyCode)
+        var balances = openingBalances
+        balances[code] = minorUnits == 0 ? nil : minorUnits
+        defaults.set(balances.mapValues { NSNumber(value: $0) }, forKey: Key.openingBalances)
+    }
+
+    /// Whether the starting balance was asked for, in onboarding or by Home's card, so the card shows once
+    /// to users who finished onboarding before it existed.
+    public var hasOfferedStartingBalance: Bool {
+        defaults.bool(forKey: Key.hasOfferedStartingBalance)
+    }
+
+    public func setHasOfferedStartingBalance() {
+        defaults.set(true, forKey: Key.hasOfferedStartingBalance)
     }
 
     /// Whether the app asks for Face ID or the passcode on launch and after the grace period (ADR 011).
@@ -201,15 +234,19 @@ public struct AppSettings {
                     Key.hidesWidgetAmounts, Key.budgetAlertsEnabled, Key.hasOfferedBudgetAlerts, Key.budgetAlertKeys,
                     Key.dailyReminderEnabled, Key.dailyReminderMinutes, Key.hasOfferedDailyReminder, Key.hidesStreak,
                     Key.hasImportedStreakHistory, Key.celebratedStreakRun, Key.celebratedStreakMilestone,
-                    Key.hasRecordedAchievementHistory, Key.dismissedRecapMonth] {
+                    Key.hasRecordedAchievementHistory, Key.dismissedRecapMonth, Key.openingBalances,
+                    Key.hasOfferedStartingBalance] {
             defaults.removeObject(forKey: key)
         }
     }
 
-    /// Ends first launch. The currency is stored before the flag, so a completed onboarding always has
-    /// a currency; an invalid code throws and leaves both untouched.
-    public func completeOnboarding(currencyCode: String) throws(MoneyError) {
+    /// Ends first launch with what the user has today, which becomes the currency's starting balance: no
+    /// transaction exists yet. The currency is stored before the flag, so a completed onboarding always
+    /// has a currency; an invalid code throws and leaves everything untouched.
+    public func completeOnboarding(currencyCode: String, startingBalance: Int64 = 0) throws(MoneyError) {
         try setActiveCurrency(currencyCode)
+        try setOpeningBalance(startingBalance, for: currencyCode)
+        setHasOfferedStartingBalance()
         defaults.set(true, forKey: Key.hasCompletedOnboarding)
     }
 }

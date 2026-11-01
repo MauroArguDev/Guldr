@@ -58,6 +58,18 @@ struct DashboardModelTests {
         #expect(model.balance?.savingsRate == 0)
     }
 
+    @Test func theStartingBalanceOnlyMovesTheTotal() throws {
+        let fixture = try Fixture()
+        try fixture.add(300_000, "salary", "2026-10-01T09:00:00Z")
+        try fixture.add(4_280, "food", "2026-10-15T09:41:00Z")
+        let model = fixture.model(openingBalance: 100_000)
+        let balance = try #require(model.balance)
+        #expect(balance.total.minorUnits == 100_000 + 300_000 - 4_280)
+        #expect(balance.income.minorUnits == 300_000)
+        #expect(balance.expenses.minorUnits == 4_280)
+        #expect(abs((balance.savingsRate ?? 0) - 295_720.0 / 300_000) < 0.000_1)
+    }
+
     @Test func emptyStoreShowsTheCardAtZero() throws {
         let fixture = try Fixture()
         let model = fixture.model()
@@ -155,19 +167,19 @@ private struct Fixture {
     }
 
     /// A model already fed with the store, as the view does on appear.
-    func model() -> DashboardModel {
+    func model(openingBalance: Int64 = 0) -> DashboardModel {
         let model = DashboardModel(locale: locale, timeZone: timeZone, now: { [now] in now })
-        refresh(model)
+        refresh(model, openingBalance: openingBalance)
         return model
     }
 
     /// What the view does when its queries' results change or after a save.
-    func refresh(_ model: DashboardModel) {
+    func refresh(_ model: DashboardModel, openingBalance: Int64 = 0) {
         let transactions = (try? context.fetch(FetchDescriptor<Transaction>())) ?? []
         var newest = FetchDescriptor<Transaction>(sortBy: [SortDescriptor(\.date, order: .reverse)])
         newest.fetchLimit = DashboardModel.recentLimit
         model.update(transactions: transactions, budgets: (try? context.fetch(FetchDescriptor<Budget>())) ?? [],
-                     recent: (try? context.fetch(newest)) ?? [], currencyCode: "USD")
+                     recent: (try? context.fetch(newest)) ?? [], currencyCode: "USD", openingBalance: openingBalance)
     }
 
     func category(_ systemKey: String) throws -> Category {

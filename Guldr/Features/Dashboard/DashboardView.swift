@@ -12,7 +12,8 @@ import SwiftUI
 /// The Home tab: the Dashboard mockup. The header is the wordmark and the current month as the first
 /// row of the content, with no large title, and Settings as a native toolbar button (author's call,
 /// 2026-10-16), with the streak chip on the right (author's call, 2026-10-23). Below it: the balance card,
-/// the month's budget summary and the latest transactions, or an invitation to add the first one.
+/// the month's budget summary and the latest transactions, or an invitation to add the first one. Users
+/// who finished onboarding before the starting balance existed get one card asking for it (ADR 016).
 struct DashboardView: View {
 
     @Environment(AppRouter.self) private var router
@@ -43,6 +44,14 @@ struct DashboardView: View {
                         }
                         .motionTransition(.opacity)
                     }
+                    if !preferences.hasOfferedStartingBalance {
+                        StartingBalanceHomeCard {
+                            router.present(.adjustBalance)
+                        } onClose: {
+                            withMotion(.standard) { preferences.dismissStartingBalanceOffer() }
+                        }
+                        .motionTransition(.opacity)
+                    }
                     if let balance = model.balance {
                         BalanceCard(balance: balance.total, income: balance.income, expenses: balance.expenses,
                                     savingsRate: balance.savingsRate,
@@ -70,6 +79,7 @@ struct DashboardView: View {
             .onChange(of: budgets, initial: true) { refresh() }
             .onChange(of: recentTransactions) { refresh() }
             .onChange(of: currencyCode) { refresh() }
+            .onChange(of: preferences.openingBalances) { refresh() }
             // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
             .onChange(of: router.lastSave) { refresh() }
             .background(Color(.appBackground))
@@ -98,7 +108,7 @@ struct DashboardView: View {
     private func refresh() {
         refreshRecapMonth()
         model.update(transactions: transactions, budgets: budgets, recent: recentTransactions,
-                     currencyCode: currencyCode)
+                     currencyCode: currencyCode, openingBalance: preferences.openingBalance(for: currencyCode))
     }
 
     /// Last month's recap during the first days of this one (v1 plan, Phase 31), if last month has anything

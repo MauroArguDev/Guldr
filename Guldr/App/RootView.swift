@@ -74,6 +74,8 @@ struct RootView: View {
                 }
             case .recap(let month):
                 RecapSheet(month: month)
+            case .adjustBalance:
+                AdjustBalanceSheet()
             }
         }
         // Moments wait for any sheet to close, so they never show behind one, and come one at a time: a

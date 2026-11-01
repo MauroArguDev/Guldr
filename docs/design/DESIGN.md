@@ -210,6 +210,27 @@ When `accessibilityReduceMotion` is on:
 - **Lock screen** (Lock mockup): `AppBackground`; the upper group (18 pt apart) is an 84 pt tile on `Surface` with a 1 pt `Hairline` border and the glyph in `Gold` (the icon grid's 228/1024 radius), the 40 pt wordmark and "Your finances, just for you." (16 pt, `TextSecondary`); the lower group (22 pt apart) is the centered ledger lines, a 56 pt ultralight `faceid` symbol in `TextPrimary`, the primary button "Unlock with Face ID" and "Use iPhone passcode" (16 medium, `Gold`, 44 pt tall). Wording and symbol follow the device (Touch ID; "Unlock with passcode" alone without biometry). The prompt opens on its own when the screen appears; a failed attempt plays `.error`. It fades in and out with `standard` and covers sheets and alerts (ADR 011).
 - **Privacy cover**: while the lock is on and the app is not in front, a picture of the app taken at that moment, blurred (radius 28) over `AppBackground`, so the app switcher shows the screen recognizably with no readable amount (decided by the author on 2026-10-21). A material in the overlay window rendered as a flat color in the switcher, so the blur is applied to the picture itself. No animation: it must be in place before iOS takes the snapshot.
 - **Welcome lock opt-in**: under the currency row, a toggle row in the same `Field` style ("Lock with Face ID", off by default, `GoldFill` tint); hidden on a device without a passcode.
+- **Starting balance** ([ADR 016](../decisions/016-starting-balance.md); decided by the author on 2026-11-01, drafted by Claude Code in existing tokens, no mockup yet):
+  - **Meaning:** the user always types what they have today, never a negative amount. Guldr keeps the difference from what's already logged as the starting balance, so Home's balance and the widget's show exactly that amount. Income, expenses and every other figure don't change.
+  - **Onboarding step:** "Get started" on the welcome screen pushes a second screen in its navigation stack; the native back button returns to the currency. On `AppBackground`, from the top:
+    - "How much do you have today?" (`sectionTitle`, centered);
+    - "Add up your cash and accounts in MXN. You can change it later in Settings." (16, `TextSecondary`, centered), with the chosen currency's code;
+    - the add sheet's amount (`AmountEntryLine`), 58 pt serif with its caret, "$0" in `TextSecondary` until a key is pressed;
+    - pinned to the bottom: the add sheet's keypad, the primary button "Continue" (disabled at zero) and "Start from zero" (16 medium, `Gold`, 44 pt tall, like the lock screen's passcode button).
+
+    Either button completes onboarding. The lock opt-in stays on the welcome screen.
+  - **Home card:** shown once, to users who finished onboarding before this version.
+    - **Look:** a `.compact` card like the recap card, above the BalanceCard and under the recap card when both show. `banknote` in `Gold` on `GoldSoft`, "Set your balance" (`rowTitle`) and "Tell Guldr what you have today so Home matches your accounts." (13, `TextSecondary`).
+    - **Actions:** a tap opens the sheet; its × ("Don't show again" for VoiceOver) hides it for good, and Settings still has the row.
+  - **Sheet:** opened from the card and from Settings, on `SheetBackground`.
+    - **Bar:** inline title "Adjust balance", with Cancel and Save in `Gold`.
+    - **Amount:** it starts at today's balance, or empty when that's negative. The first key replaces it, and delete clears it.
+    - **Below the amount:** "Guldr changes your starting balance, never your income or expenses." (13, `TextSecondary`).
+    - **Keypad:** pinned to the bottom.
+    - Save is disabled until the amount changes.
+  - **Settings:** a "Balance" section after Currency.
+    - **Row:** "Adjust balance", with today's balance trailing in `TextSecondary`; it opens the sheet.
+    - **Footer:** "Set what you have today in USD. Your income and expenses don't change."
 - **Export**: native `Form`, inline title "Export". A native segmented "All time" / "Date range" on the background, From and To date pickers for a range, a footer with the number of transactions ("12 transactions will be exported.", or "No transactions in this range."), then "Export CSV" (`square.and.arrow.up`) in `Gold` as a `ShareLink`, `TextSecondary` while nothing is included; its footer lists the columns and says expenses are negative (decided by the author on 2026-10-21).
 - **Budget alerts**: a native alert pre-prompt, once, after the first budgets are saved: "Get budget alerts?", "Guldr can tell you when a category reaches 80% and 100% of its monthly budget.", "Turn on" / "Not now"; only "Turn on" shows iOS's dialog (decided by the author on 2026-10-21). Notifications are titled with the category ("Food") and read "You've used 80% of your October budget: $320.00 of $400.00." or "You've reached your October budget: $412.00 of $400.00."; without amounts while the Face ID lock is on. They show as a banner even while Guldr is open; a tap opens Budget.
 - **Streak** (ADR 012; decided by the author on 2026-10-23, drafted by Claude Code in existing tokens, no mockup yet):

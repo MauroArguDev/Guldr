@@ -82,6 +82,6 @@ The **iPhone 17 Pro Max** simulator, with the Debug build installed from Xcode. 
 6. **Compose** the eight images with the script.
 7. **Restore** the simulator: `xcrun simctl status_bar <device> clear`, and its original language and region.
 
-After the onboarding's Get started, the first Add sheet that's dismissed offers budget alerts; answer Not now before the next shot.
+After the onboarding's Get started, answer **Start from zero** on the starting balance screen, so the balance is the demo data's own. The first Add sheet that's dismissed offers budget alerts; answer Not now before the next shot.
 
 The data ends on the day of the capture, so the screens show the current month.
