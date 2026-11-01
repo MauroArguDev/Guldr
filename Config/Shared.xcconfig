@@ -3,6 +3,6 @@
 
 // Versioning rules: docs/WORKFLOW.md › Versioning. The build number goes up by one for every upload.
 MARKETING_VERSION = 1.0.0
-CURRENT_PROJECT_VERSION = 1
+CURRENT_PROJECT_VERSION = 3
 IPHONEOS_DEPLOYMENT_TARGET = 26.0
 APP_GROUP_ID = group.com.argudev.guldr
