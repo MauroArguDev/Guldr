@@ -1,6 +1,6 @@
 # 014 — Monetization: a one-time Gold unlock and optional tips
 
-- **Status:** Accepted
+- **Status:** Superseded by [015](015-gold-accounts-cards-receipts.md)
 - **Date:** 2026-10-23
 
 ## Context
