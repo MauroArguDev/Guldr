@@ -28,3 +28,4 @@ Each file records one decision that shapes the project: the context, what was ch
 | [013](013-achievements.md) | Achievements from a fixed catalog; money ones only count complete months; earned tiers are kept | Accepted |
 | [014](014-monetization.md) | Monetization from v1.2: a one-time Gold unlock and optional tips, no subscription | Superseded by 015 |
 | [015](015-gold-accounts-cards-receipts.md) | Gold adds unlimited accounts, credit cards and receipt scanning; two accounts and subscriptions stay free | Accepted |
+| [016](016-starting-balance.md) | Starting balance as a setting per currency, entered as what the user has today | Accepted |

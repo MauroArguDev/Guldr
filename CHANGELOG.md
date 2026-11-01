@@ -11,6 +11,7 @@ The first release: a local-first personal finance app for iPhone, on iOS 26 and 
 - **Categories:** a default set, plus your own with a name, a symbol and a color; a category in use is archived instead of lost.
 - **Currencies:** every transaction keeps its currency. Totals, budgets and charts use the active one, which you can change at any time.
 - **Home:** the balance; this month's income, expenses and savings rate; the budget at a glance; recent transactions.
+- **Starting balance:** onboarding asks what you have today, so the balance doesn't start from zero; Settings › Adjust balance changes it at any time. It never counts as income.
 - **Budgets:** a monthly limit per category with a ring and per-category progress, over-budget alerts, and last month's budgets copied in one tap.
 - **Analytics:** income against expenses over 1, 3, 6 or 12 months, and spending by category, with Audio Graphs for VoiceOver.
 - **CSV export** of all transactions or a date range, ready for any spreadsheet.

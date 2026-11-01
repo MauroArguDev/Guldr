@@ -8,8 +8,8 @@
 import Foundation
 
 /// What the home screen widgets show, computed from the shared store with the same calculations as the
-/// app's Dashboard (ADR 007): the all-time balance and the month's income and expenses in the active
-/// currency, and the newest transactions in any currency, as Recent shows them.
+/// app's Dashboard (ADR 007): the balance, with its starting balance (ADR 016), and the month's income
+/// and expenses in the active currency, and the newest transactions in any currency, as Recent shows them.
 public struct WidgetSummary: Equatable, Sendable {
 
     /// One row of the medium widget: "Groceries", "Today", −$42.80.
@@ -52,13 +52,13 @@ public struct WidgetSummary: Equatable, Sendable {
     }
 
     /// `categoryName` names a transaction without a description: the app passes its translated name, and
-    /// `nil` stands for no category.
-    public init(transactions: [Transaction], currencyCode: String, now: Date,
+    /// `nil` stands for no category. `openingBalance` is the currency's starting balance in minor units.
+    public init(transactions: [Transaction], currencyCode: String, openingBalance: Int64 = 0, now: Date,
                 timeZone: TimeZone = .autoupdatingCurrent, locale: Locale = .autoupdatingCurrent,
                 categoryName: (Category?) -> String) throws(MoneyError) {
         let month = YearMonth(containing: now, timeZone: timeZone)
         let summary = try MonthSummary(transactions: transactions, month: month, currencyCode: currencyCode,
-                                       timeZone: timeZone)
+                                       openingBalance: openingBalance, timeZone: timeZone)
         balance = summary.balance
         monthIncome = summary.income
         monthExpenses = summary.expenses

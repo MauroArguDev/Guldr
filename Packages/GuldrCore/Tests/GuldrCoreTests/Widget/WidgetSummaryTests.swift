@@ -32,6 +32,18 @@ struct WidgetSummaryTests {
         #expect(!summary.isEmpty)
     }
 
+    @Test func theBalanceIncludesTheStartingBalance() throws {
+        let context = try seededContext()
+        try add(4_280, "food", "2026-10-21T08:00:00Z", in: context)
+        let transactions = try context.fetch(FetchDescriptor<Transaction>())
+        let summary = try WidgetSummary(transactions: transactions, currencyCode: "USD", openingBalance: 100_000,
+                                        now: try date("2026-10-21T12:00:00Z"), timeZone: utc,
+                                        locale: locale) { _ in "" }
+        #expect(summary.balance.minorUnits == 100_000 - 4_280)
+        #expect(summary.monthExpenses.minorUnits == 4_280)
+        #expect(summary.monthIncome.isZero)
+    }
+
     @Test func recentShowsTheNewestThreeInAnyCurrency() throws {
         let context = try seededContext()
         try add(500_000, "salary", "2026-10-01T09:00:00Z", in: context)

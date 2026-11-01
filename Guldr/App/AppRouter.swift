@@ -24,6 +24,8 @@ enum AppSheet: Identifiable, Hashable {
     case shareAchievement(AchievementID)
     /// A month in review, from Home's recap card.
     case recap(YearMonth)
+    /// What the user has today, from Home's starting balance card and Settings (ADR 016).
+    case adjustBalance
 
     var id: Self { self }
 }

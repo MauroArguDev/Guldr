@@ -18,7 +18,8 @@ final class DashboardModel {
 
     /// What `BalanceCard` shows.
     struct Balance: Equatable {
-        /// Every income minus every expense ever recorded, in the active currency (ADR 005).
+        /// The starting balance plus every income minus every expense ever recorded, in the active
+        /// currency (ADR 005, ADR 016).
         let total: Money
         let income: Money
         let expenses: Money
@@ -71,13 +72,15 @@ final class DashboardModel {
     }
 
     /// Recomputes everything from the latest transactions and budgets in the active currency. `recent` is
-    /// the newest transactions, already limited and sorted by the view's query.
-    func update(transactions: [Transaction], budgets: [Budget], recent: [Transaction], currencyCode: String) {
+    /// the newest transactions, already limited and sorted by the view's query; `openingBalance` is the
+    /// currency's starting balance in minor units.
+    func update(transactions: [Transaction], budgets: [Budget], recent: [Transaction], currencyCode: String,
+                openingBalance: Int64 = 0) {
         month = YearMonth(containing: now(), timeZone: timeZone)
         hasTransactions = !transactions.isEmpty
         self.recent = recent.prefix(Self.recentLimit).map(recentRow(for:))
         guard let summary = try? MonthSummary(transactions: transactions, month: month, currencyCode: currencyCode,
-                                              timeZone: timeZone) else {
+                                              openingBalance: openingBalance, timeZone: timeZone) else {
             balance = nil
             budget = nil
             return

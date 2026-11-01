@@ -67,7 +67,8 @@ nonisolated struct SummaryProvider: TimelineProvider {
         }
         let context = ModelContext(container)
         let transactions = (try? context.fetch(FetchDescriptor<GuldrCore.Transaction>())) ?? []
-        guard let summary = try? WidgetSummary(transactions: transactions, currencyCode: currencyCode, now: now,
+        guard let summary = try? WidgetSummary(transactions: transactions, currencyCode: currencyCode,
+                                               openingBalance: settings.openingBalance(for: currencyCode), now: now,
                                                categoryName: Self.name(of:)) else {
             return SummaryEntry(date: now, content: .notStarted, hidesAmounts: hidesAmounts)
         }

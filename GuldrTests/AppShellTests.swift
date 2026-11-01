@@ -115,13 +115,46 @@ struct PreferencesTests {
         }
     }
 
+    @Test func onboardingKeepsTheStartingBalanceAndDoesntOfferItAgain() throws {
+        try withSuite { settings in
+            let preferences = Preferences(settings: settings)
+            #expect(!preferences.hasOfferedStartingBalance)
+            try preferences.completeOnboarding(currencyCode: "MXN", startingBalance: 500_000)
+            #expect(preferences.openingBalance(for: "MXN") == 500_000)
+            #expect(preferences.hasOfferedStartingBalance)
+            #expect(settings.openingBalance(for: "MXN") == 500_000)
+        }
+    }
+
+    /// Users who finished onboarding before this version see Home's card until they save or close it.
+    @Test func earlierUsersAreOfferedTheStartingBalanceUntilTheyAnswer() throws {
+        try withSuite { settings in
+            // Before this version, nothing recorded the offer.
+            try settings.setActiveCurrency("USD")
+            let saving = Preferences(settings: settings)
+            #expect(!saving.hasOfferedStartingBalance)
+            try saving.setOpeningBalance(-25_000, for: "USD")
+            #expect(saving.hasOfferedStartingBalance)
+            #expect(saving.openingBalance(for: "USD") == -25_000)
+
+            settings.reset()
+            let closing = Preferences(settings: settings)
+            closing.dismissStartingBalanceOffer()
+            #expect(closing.hasOfferedStartingBalance)
+            #expect(closing.openingBalances.isEmpty)
+        }
+    }
+
     @Test func resettingReturnsToFirstLaunch() throws {
         try withSuite { settings in
             let preferences = Preferences(settings: settings)
             try preferences.completeOnboarding(currencyCode: "USD")
+            try preferences.setOpeningBalance(9_900, for: "USD")
             preferences.reset()
             #expect(!preferences.hasCompletedOnboarding)
             #expect(preferences.activeCurrencyCode == nil)
+            #expect(preferences.openingBalances.isEmpty)
+            #expect(!preferences.hasOfferedStartingBalance)
             #expect(!settings.hasCompletedOnboarding)
             #expect(settings.activeCurrencyCode == nil)
         }

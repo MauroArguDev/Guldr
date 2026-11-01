@@ -106,6 +106,23 @@ struct MonthSummaryTests {
             .savingsRate == 1)
     }
 
+    @Test func theStartingBalanceOnlyMovesTheBalance() throws {
+        let transactions = [
+            try transaction(50_000, .income, "2026-09-25T09:00:00Z"),
+            try transaction(20_000, .expense, "2026-09-26T09:00:00Z")
+        ]
+        let plain = try MonthSummary(transactions: transactions, month: september, currencyCode: "USD", timeZone: utc)
+        let started = try MonthSummary(transactions: transactions, month: september, currencyCode: "USD",
+                                       openingBalance: 125_000, timeZone: utc)
+        #expect(started.balance.minorUnits == plain.balance.minorUnits + 125_000)
+        #expect(started.income == plain.income && started.expenses == plain.expenses)
+        #expect(started.savingsRate == plain.savingsRate)
+
+        // Without any transaction, the balance is the starting balance itself.
+        #expect(try MonthSummary(transactions: [], month: september, currencyCode: "USD", openingBalance: 125_000,
+                                 timeZone: utc).balance.minorUnits == 125_000)
+    }
+
     @Test func anUnknownCurrencyIsATypedError() {
         #expect(throws: MoneyError.unknownCurrency("XYZ")) {
             try MonthSummary(transactions: [], month: september, currencyCode: "XYZ", timeZone: utc)
@@ -119,6 +136,11 @@ struct MonthSummaryTests {
         ]
         #expect(throws: MoneyError.overflow) {
             try MonthSummary(transactions: huge, month: september, currencyCode: "USD", timeZone: utc)
+        }
+        let largest = [try transaction(.max, .income, "2026-09-01T09:00:00Z")]
+        #expect(throws: MoneyError.overflow) {
+            try MonthSummary(transactions: largest, month: september, currencyCode: "USD", openingBalance: 1,
+                             timeZone: utc)
         }
     }
 }
