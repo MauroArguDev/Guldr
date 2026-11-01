@@ -112,6 +112,13 @@ struct CategoryEditorView: View {
                         Button("Delete category", role: .destructive) {
                             confirmingDelete = true
                         }
+                        // On the button, so iOS points the confirmation there instead of at the whole form.
+                        .confirmationDialog("Delete this category?", isPresented: $confirmingDelete,
+                                            titleVisibility: .visible) {
+                            Button("Delete category", role: .destructive, action: delete)
+                        } message: {
+                            Text("Its budgets are deleted too. This can't be undone.")
+                        }
                     }
                 }
             }
@@ -130,11 +137,6 @@ struct CategoryEditorView: View {
             }
         }
         .interactiveDismissDisabled(model.hasChanges)
-        .confirmationDialog("Delete this category?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("Delete category", role: .destructive, action: delete)
-        } message: {
-            Text("Its budgets are deleted too. This can't be undone.")
-        }
         .alert("Couldn't save this category", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
