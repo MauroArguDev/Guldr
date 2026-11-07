@@ -23,8 +23,9 @@ struct TransactionsView: View {
     }
 }
 
-/// The Transactions mockup: native search under the title, a pinned All/Income/Expenses filter, a category menu in the
-/// toolbar and day sections with their net. Tapping a row edits it; swiping deletes it after a confirmation.
+/// The Transactions mockup: native search under the title, an All/Income/Expenses filter as the list's first row, a
+/// category menu in the toolbar and day sections with their net. Tapping a row edits it; swiping deletes it after a
+/// confirmation.
 private struct TransactionsList: View {
 
     @Bindable var model: TransactionsListModel
@@ -44,34 +45,17 @@ private struct TransactionsList: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pendingDelete: TransactionsListModel.Row?
     @State private var failedToDelete = false
-    /// Whether rows have scrolled under the bars, which is when the top scroll edge effect should show.
-    @State private var isScrolled = false
 
     var body: some View {
         // The list stays in place even when empty, with the empty state over it: the navigation bar
         // tracks its scroll view, and swapping it for another view left the large title collapsed.
         list(model.sections)
-            .overlay {
-                if let emptyState = model.emptyState {
-                    emptyView(emptyState)
-                }
-            }
-            .background(Color(.appBackground))
-            .onScrollGeometryChange(for: Bool.self) { geometry in
-                geometry.contentOffset.y + geometry.contentInsets.top > 1
-            } action: { _, scrolled in
-                isScrolled = scrolled
-            }
-        .safeAreaBar(edge: .top) {
-            // A new user has nothing to filter; the picker appears with the first transaction.
-            if !transactions.isEmpty {
-                kindPicker
+        .overlay {
+            if let emptyState = model.emptyState {
+                emptyView(emptyState)
             }
         }
-        // iOS 26.1 draws the top scroll edge effect over the large title even at rest when the picker sits
-        // under the search field, so the title opened faded (v1 plan, 34.6). Shown only once rows scroll
-        // under the bars, the effect still blurs them there, and iOS 27 looks the same as before.
-        .scrollEdgeEffectHidden(!isScrolled, for: .top)
+        .background(Color(.appBackground))
         // Revealed by pulling the list down, as in Mail: always showing it left the large title collapsed
         // whenever the tab opened on iOS 27 (author's call, 2026-10-15).
         .searchable(text: $model.searchText, placement: .navigationBarDrawer(displayMode: .automatic),
@@ -103,6 +87,10 @@ private struct TransactionsList: View {
 
     private func list(_ sections: [TransactionsListModel.Section]) -> some View {
         List {
+            // A new user has nothing to filter; the picker appears with the first transaction.
+            if !transactions.isEmpty {
+                kindPicker
+            }
             ForEach(sections) { section in
                 Section {
                     ForEach(section.rows) { row in
@@ -188,6 +176,7 @@ private struct TransactionsList: View {
 
     // MARK: - Filters
 
+    /// A row of the list, so it scrolls away with the rows instead of staying over them.
     private var kindPicker: some View {
         Picker("Filter", selection: $model.kindFilter) {
             Text("All").tag(TransactionsListModel.KindFilter.all)
@@ -196,8 +185,10 @@ private struct TransactionsList: View {
         }
         .pickerStyle(.segmented)
         .sensoryFeedback(Haptics.selection, trigger: model.kindFilter)
-        .padding(.horizontal, Spacing.screenHorizontal)
-        .padding(.vertical, Spacing.rowVertical)
+        .listRowInsets(EdgeInsets(top: Spacing.rowVertical, leading: Spacing.screenHorizontal,
+                                  bottom: Spacing.rowVertical, trailing: Spacing.screenHorizontal))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color(.appBackground))
     }
 
     @ToolbarContentBuilder
@@ -238,12 +229,16 @@ private struct TransactionsList: View {
                 router.present(.addTransaction)
             }
         case .noResults:
-            if model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                EmptyStateView(title: "No matching transactions", symbol: "line.3.horizontal.decrease.circle",
-                               message: "Try another filter.")
-            } else {
-                ContentUnavailableView.search(text: model.searchText)
+            // It has nothing to tap and sits over the list, whose picker must stay reachable.
+            Group {
+                if model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    EmptyStateView(title: "No matching transactions", symbol: "line.3.horizontal.decrease.circle",
+                                   message: "Try another filter.")
+                } else {
+                    ContentUnavailableView.search(text: model.searchText)
+                }
             }
+            .allowsHitTesting(false)
         }
     }
 
