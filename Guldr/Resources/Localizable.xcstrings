@@ -1,6 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ available" : {
+      "comment" : "Under a category's budget bar: the amount still available.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ disponible"
+          }
+        }
+      }
+    },
     "%@ budget" : {
       "localizations" : {
         "es" : {
@@ -2655,6 +2666,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otros ingresos"
+          }
+        }
+      }
+    },
+    "Over by %@" : {
+      "comment" : "Under a category's budget bar: how far spending went past the limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excedido por %@"
           }
         }
       }
