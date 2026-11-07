@@ -120,6 +120,8 @@ final class CategoryEditorModel {
                                     sortOrder: last + 1))
         }
         try saveContext()
+        // The widgets name the category of a transaction without a description; a new one has none yet.
+        if category != nil { notifier.dataDidChange() }
     }
 
     /// Deletes a custom category without transactions, and its budgets (ADR 008).

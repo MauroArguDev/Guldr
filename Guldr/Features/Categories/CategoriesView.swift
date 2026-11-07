@@ -16,6 +16,7 @@ import SwiftUI
 struct CategoriesView: View {
 
     @Environment(\.modelContext) private var context
+    @Environment(AppRouter.self) private var router
     @Query(sort: [SortDescriptor(\Category.sortOrder), SortDescriptor(\Category.name)])
     private var categories: [Category]
     @State private var model = CategoriesModel()
@@ -91,10 +92,17 @@ struct CategoriesView: View {
             CategoryEditorSheet(target: target, onCancel: { editing = nil }, onSaved: {
                 editing = nil
                 saveCount += 1
+                router.noteCategoryChange()
+            }, onDeleted: {
+                // The query drops it; refreshing from the results it still holds would read a deleted model.
+                editing = nil
+                saveCount += 1
             })
         }
         .sensoryFeedback(Haptics.saved, trigger: saveCount)
         .onChange(of: categories, initial: true) { model.update(categories: categories) }
+        // An edit keeps the category's identity, so the query's results compare equal.
+        .onChange(of: router.categoryChanges) { model.update(categories: categories) }
         .alert("Couldn't save your categories", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -131,6 +139,7 @@ struct CategoriesView: View {
     private func perform(_ change: () throws -> Void) {
         do {
             try change()
+            router.noteCategoryChange()
         } catch {
             failedToSave = true
         }

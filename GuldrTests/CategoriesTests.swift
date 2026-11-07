@@ -36,6 +36,24 @@ struct CategoriesModelTests {
         #expect(model.archived.isEmpty)
     }
 
+    /// The view calls `update` when `AppRouter.categoryChanges` moves: an edit leaves the query's results equal.
+    @Test func anEditedCategoryShowsOnTheNextUpdate() throws {
+        let fixture = try Fixture()
+        let categories = try fixture.context.fetch(FetchDescriptor<Category>())
+        let model = CategoriesModel()
+        model.update(categories: categories)
+
+        let editor = try fixture.editor("food")
+        editor.name = "Groceries"
+        editor.symbolName = "cart"
+        try editor.save()
+        #expect(model.active.first?.name == "Food")
+
+        model.update(categories: categories)
+        #expect(model.active.first?.name == "Groceries")
+        #expect(model.active.first?.symbol == "cart")
+    }
+
     @Test func reorderingRenumbersTheKind() throws {
         let fixture = try Fixture()
         let model = fixture.model()
@@ -149,6 +167,7 @@ struct CategoryEditorModelTests {
         #expect(!food.usesDefaultName)
         #expect(food.color == .green)
         #expect(food.systemKey == "food")
+        #expect(fixture.changes.calls == 1)
     }
 
     @Test func defaultsAndCategoriesInUseCannotBeDeleted() throws {

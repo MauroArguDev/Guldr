@@ -46,6 +46,9 @@ final class AppRouter {
     /// The last successful save from the add sheet. `RootView` plays its haptic, because the sheet is
     /// already closing when the save finishes.
     private(set) var lastSave: SaveEvent?
+    /// Counts saved category changes. An edit keeps the category's identity, so `@Query` results compare
+    /// equal: screens that cache its name or symbol refresh on this.
+    private(set) var categoryChanges = 0
 
     /// The tab bar's selection. `.add` is the Add button, not a destination: it opens the add sheet and
     /// leaves the selected tab as it was.
@@ -69,6 +72,11 @@ final class AppRouter {
     func finishSave(_ outcome: AddTransactionViewModel.SaveOutcome) {
         lastSave = SaveEvent(outcome: outcome)
         dismissSheet()
+    }
+
+    /// Tells the screens that show categories that one changed.
+    func noteCategoryChange() {
+        categoryChanges += 1
     }
 
     /// Handles a `guldr://` URL. Returns `false` for a URL that is not a known deep link, which is ignored.

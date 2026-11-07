@@ -61,6 +61,14 @@ struct AppRouterTests {
         #expect(router.sheet == nil)
     }
 
+    @Test func eachCategoryChangeIsCounted() {
+        let router = AppRouter()
+        #expect(router.categoryChanges == 0)
+        router.noteCategoryChange()
+        router.noteCategoryChange()
+        #expect(router.categoryChanges == 2)
+    }
+
     @Test func unknownLinksChangeNothing() throws {
         let router = AppRouter()
         router.select(.analytics)

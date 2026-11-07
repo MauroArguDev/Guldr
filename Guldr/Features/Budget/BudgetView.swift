@@ -48,8 +48,9 @@ struct BudgetView: View {
             .onChange(of: budgets) { refresh() }
             .onChange(of: model.month) { refresh() }
             .onChange(of: currencyCode) { refresh() }
-            // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+            // An edit keeps the model's identity, so the queries' results compare equal; a save says when.
             .onChange(of: router.lastSave) { refresh() }
+            .onChange(of: router.categoryChanges) { refresh() }
             .background(Color(.appBackground))
             .navigationTitle(Text(AppTab.budget.title))
             .toolbar {
