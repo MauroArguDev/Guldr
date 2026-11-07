@@ -71,7 +71,7 @@ struct AddTransactionView: View {
 
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @FocusState private var isDescriptionFocused: Bool
+    @State private var isDescriptionFocused = false
     @State private var showsDatePicker = false
     @State private var failedToSave = false
     @State private var confirmsDelete = false
@@ -175,11 +175,9 @@ struct AddTransactionView: View {
                 Text("Description")
                     .foregroundStyle(Color(.textSecondary))
                 // The prompt is what an empty description shows as: the category's name, or nothing yet.
-                TextField("Description", text: $model.title, prompt: Text(verbatim: model.titlePrompt ?? ""))
-                    .multilineTextAlignment(stacksFieldRows ? .leading : .trailing)
-                    .foregroundStyle(Color(.textPrimary))
-                    .focused($isDescriptionFocused)
-                    .submitLabel(.done)
+                DescriptionField(text: $model.title, isFocused: $isDescriptionFocused, prompt: model.titlePrompt ?? "",
+                                 hugsTrailingEdge: !stacksFieldRows)
+                    .accessibilityLabel(Text("Description"))
             }
             .fieldRow(stacked: stacksFieldRows)
             Rectangle()
