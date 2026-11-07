@@ -55,15 +55,15 @@ struct BudgetModelTests {
         try fixture.addBudget(20_000, "transport")
         let model = try fixture.model(refreshed: true)
 
-        let overview = try #require(model.overview)
+        let overview = try #require(model.page.overview)
         #expect(overview.spent.minorUnits == 10_000)
         #expect(overview.limit.minorUnits == 60_000)
         #expect(overview.remaining.minorUnits == 50_000)
         #expect(abs(overview.usage - 1.0 / 6) < 0.000_1)
         #expect(overview.detail == "17% used · 15 days left")
-        #expect(model.alerts.isEmpty)
-        #expect(model.rows.map(\.name) == ["Food", "Transport"])
-        #expect(model.rows.first?.symbol == (try fixture.category("food")).symbolName)
+        #expect(model.page.alerts.isEmpty)
+        #expect(model.page.rows.map(\.name) == ["Food", "Transport"])
+        #expect(model.page.rows.first?.symbol == (try fixture.category("food")).symbolName)
     }
 
     @Test func overBudgetCategoriesGetAnAlert() throws {
@@ -76,10 +76,10 @@ struct BudgetModelTests {
         let model = try fixture.model(refreshed: true)
 
         // Highest usage first: food 125 %, transport 105 %.
-        #expect(model.alerts.map(\.categoryName) == ["Food", "Transport"])
-        #expect(model.alerts.map(\.overAmount.minorUnits) == [10_000, 1_000])
-        #expect(model.rows.map(\.name) == ["Food", "Transport", "Housing"])
-        #expect(model.overview?.detail == "79% used · 15 days left")
+        #expect(model.page.alerts.map(\.categoryName) == ["Food", "Transport"])
+        #expect(model.page.alerts.map(\.overAmount.minorUnits) == [10_000, 1_000])
+        #expect(model.page.rows.map(\.name) == ["Food", "Transport", "Housing"])
+        #expect(model.page.overview?.detail == "79% used · 15 days left")
     }
 
     @Test func pastMonthsShowOnlyTheUsageAndNextMonthCountsAllItsDays() throws {
@@ -91,32 +91,73 @@ struct BudgetModelTests {
 
         model.showPreviousMonth()
         fixture.refresh(model)
-        #expect(model.overview?.detail == "50% used")
+        #expect(model.page.overview?.detail == "50% used")
 
         model.showNextMonth()
         model.showNextMonth()
         fixture.refresh(model)
-        #expect(model.overview?.detail == "0% used · 30 days left")
+        #expect(model.page.overview?.detail == "0% used · 30 days left")
+    }
+
+    @Test func theMonthsBesideTheOneOnScreenAreReadyForASwipe() throws {
+        let fixture = try Fixture()
+        try fixture.addBudget(40_000, "food", month: october.previous)
+        try fixture.addBudget(30_000, "food", month: october.next)
+        let model = try fixture.model(refreshed: true)
+
+        #expect(model.visibleMonths == [october.previous, october, october.next])
+        #expect(model.page(for: october.previous).overview?.limit.minorUnits == 40_000)
+        #expect(model.page.overview == nil)
+        #expect(model.page.canCopyLastMonth)
+        #expect(model.page(for: october.next).overview?.limit.minorUnits == 30_000)
+
+        model.showNextMonth()
+        #expect(model.visibleMonths == [october, october.next])
+    }
+
+    @Test(arguments: [
+        (-300.0, 0.0, 1), // Past half a page.
+        (-100.0, 0.0, 0), // Short of it.
+        (-60.0, -1_000.0, 1), // A flick.
+        (100.0, -1_000.0, 0), // A flick back cancels it.
+        (300.0, 0.0, -1),
+        (60.0, 1_000.0, -1)
+    ])
+    func aSwipeLandsPastHalfAPage(translation: Double, velocity: Double, months: Int) throws {
+        let model = try Fixture().model()
+        model.showPreviousMonth()
+        let start = model.month
+        model.finishSwipe(translation: translation, velocity: velocity, pageWidth: 400)
+        let expected = months == 0 ? start : months > 0 ? start.next : start.previous
+        #expect(model.month == expected)
+    }
+
+    @Test func aSwipeStopsAtNextMonth() throws {
+        let model = try Fixture().model()
+        model.showNextMonth()
+        let last = model.month
+        model.finishSwipe(translation: -300, velocity: 0, pageWidth: 400)
+        #expect(model.month == last)
     }
 
     @Test func otherCurrenciesAreLeftOut() throws {
         let fixture = try Fixture()
         try fixture.addBudget(40_000, "food", currency: "EUR")
         let model = try fixture.model(refreshed: true)
-        #expect(model.overview == nil)
-        #expect(model.rows.isEmpty)
+        #expect(model.page.overview == nil)
+        #expect(model.page.rows.isEmpty)
     }
 
     @Test func anEmptyMonthOffersToCopyLastMonth() throws {
         let fixture = try Fixture()
         let model = try fixture.model(refreshed: true)
-        #expect(model.overview == nil)
-        #expect(!model.canCopyLastMonth)
+        #expect(model.page.overview == nil)
+        #expect(!model.page.canCopyLastMonth)
 
         try fixture.addBudget(40_000, "food", month: october.previous)
         fixture.refresh(model)
-        #expect(model.overview == nil)
-        #expect(model.canCopyLastMonth)
+        #expect(model.page.overview == nil)
+        #expect(model.page.canCopyLastMonth)
     }
 
     // MARK: - Edit sheet
