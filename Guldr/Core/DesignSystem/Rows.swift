@@ -102,8 +102,8 @@ struct BudgetSummaryRow: View {
     }
 }
 
-/// One category on the Budget screen: chip, name, "spent of limit" and a 5 pt bar that turns
-/// `Negative` when over (DESIGN.md › CategoryBudgetRow).
+/// One category on the Budget screen: chip, name, "spent of limit", a 5 pt bar that turns `Negative`
+/// when over and what is still available, or how far over it went (DESIGN.md › CategoryBudgetRow).
 struct CategoryBudgetRow: View {
 
     let name: String
@@ -128,10 +128,20 @@ struct CategoryBudgetRow: View {
                         .textRole(.meta).monospacedDigit().foregroundStyle(Color(.textSecondary))
                 }
                 ProgressBar(value: line.usage, height: .compact, tone: line.isOver ? .over : .standard)
+                balance(formatter)
+                    .textRole(.meta)
+                    .monospacedDigit()
+                    .foregroundStyle(line.isOver ? Color(.negative) : Color(.textSecondary))
             }
         }
         .padding(.vertical, 7)
         .accessibilityElement(children: .combine)
+    }
+
+    private func balance(_ formatter: MoneyFormatter) -> Text {
+        line.isOver
+            ? Text("Over by \(formatter.string(from: line.overAmount))")
+            : Text("\(formatter.string(from: line.remaining)) available")
     }
 }
 

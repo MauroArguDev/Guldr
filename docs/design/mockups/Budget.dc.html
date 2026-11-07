@@ -67,6 +67,7 @@ a{color:#8A6A2E}a:hover{color:#6E5424}
 <span style="font-size: 13px; font-variant-numeric: tabular-nums; color: {{k.c.text2}}"><span style="font-weight: 600; color: {{k.amountColor}}">{{k.spent}}</span> of {{k.limit}}</span>
 </div>
 <div style="height: 5px; border-radius: 3px; background: {{k.c.track}}; overflow: hidden"><div style="height: 5px; border-radius: 3px; width: {{k.width}}; background: {{k.barColor}}"></div></div>
+<span style="font-size: 13px; font-variant-numeric: tabular-nums; color: {{k.balanceColor}}">{{k.balance}}</span>
 </div>
 </div>
 </sc-for>
@@ -126,7 +127,7 @@ class Component extends DCLogic {
       tabs: tabDefs.map(([label, icon, href], i) => ({ label, icon, href, color: i === active ? t.gold : t.text2, bg: i === active ? t.tabOn : 'transparent' })),
       cats: cats.map(([name, icon, spent, limit]) => {
         const over = spent > limit;
-        return { name, icon, c: t, spent: fmt(spent), limit: fmt(limit), width: Math.min(100, spent / limit * 100).toFixed(1) + '%', barColor: over ? t.neg : t.goldFill, amountColor: over ? t.neg : t.text };
+        return { name, icon, c: t, spent: fmt(spent), limit: fmt(limit), width: Math.min(100, spent / limit * 100).toFixed(1) + '%', barColor: over ? t.neg : t.goldFill, amountColor: over ? t.neg : t.text, balance: over ? 'Over by ' + fmt(spent - limit) : fmt(limit - spent) + ' available', balanceColor: over ? t.neg : t.text2 };
       })
     }));
     return { themes };
