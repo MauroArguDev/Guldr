@@ -80,8 +80,9 @@ struct DashboardView: View {
             .onChange(of: recentTransactions) { refresh() }
             .onChange(of: currencyCode) { refresh() }
             .onChange(of: preferences.openingBalances) { refresh() }
-            // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+            // An edit keeps the model's identity, so the queries' results compare equal; a save says when.
             .onChange(of: router.lastSave) { refresh() }
+            .onChange(of: router.categoryChanges) { refresh() }
             .background(Color(.appBackground))
             // The tab keeps its name for the back button and VoiceOver; the wordmark replaces the title,
             // so the bar shows it inline and hides it (removing it alone still drew the large title).

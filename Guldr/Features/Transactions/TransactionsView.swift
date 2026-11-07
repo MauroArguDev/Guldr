@@ -63,8 +63,9 @@ private struct TransactionsList: View {
         .toolbar { categoryMenu }
         .onChange(of: transactions, initial: true) { refresh() }
         .onChange(of: currencyCode) { refresh() }
-        // An edit keeps the transaction's identity, so the query's results compare equal; a save says when.
+        // An edit keeps the model's identity, so the queries' results compare equal; a save says when.
         .onChange(of: router.lastSave) { refresh() }
+        .onChange(of: router.categoryChanges) { refresh() }
         .motion(.standard, value: model.kindFilter)
         .motion(.standard, value: model.selectedCategoryIDs)
         .alert("Couldn't delete this transaction", isPresented: $failedToDelete) {

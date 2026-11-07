@@ -23,6 +23,7 @@ struct CategoryEditorSheet: View {
     let target: Target
     let onCancel: () -> Void
     let onSaved: () -> Void
+    var onDeleted: () -> Void = {}
 
     @Environment(\.modelContext) private var context
     @Environment(\.dataChangeNotifier) private var notifier
@@ -32,7 +33,7 @@ struct CategoryEditorSheet: View {
     var body: some View {
         Group {
             if let model {
-                CategoryEditorView(model: model, onCancel: onCancel, onSaved: onSaved)
+                CategoryEditorView(model: model, onCancel: onCancel, onSaved: onSaved, onDeleted: onDeleted)
             } else if failedToOpen {
                 NavigationStack {
                     ContentUnavailableView("Couldn't open this category", systemImage: "exclamationmark.triangle",
@@ -73,6 +74,7 @@ struct CategoryEditorView: View {
     @Bindable var model: CategoryEditorModel
     let onCancel: () -> Void
     let onSaved: () -> Void
+    var onDeleted: () -> Void = {}
 
     @State private var confirmingDelete = false
     @State private var failedToSave = false
@@ -213,7 +215,7 @@ struct CategoryEditorView: View {
     private func delete() {
         do {
             try model.delete()
-            onSaved()
+            onDeleted()
         } catch {
             failedToSave = true
         }

@@ -14,7 +14,7 @@ import SwiftData
 /// archived ones (ADR 008). Like the other screen models, the view owns the `@Query` and calls `update`;
 /// changes take the view's context, save it themselves and roll back on failure.
 ///
-/// Reordering and archiving never change a total, so they don't notify `DataChangeNotifier`.
+/// Reordering and archiving change nothing a widget shows, so they don't notify `DataChangeNotifier`.
 @Observable
 final class CategoriesModel {
 
