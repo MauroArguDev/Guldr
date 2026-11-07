@@ -22,7 +22,7 @@ struct CategoryEditorSheet: View {
 
     let target: Target
     let onCancel: () -> Void
-    let onSaved: () -> Void
+    let onSaved: (Category) -> Void
     var onDeleted: () -> Void = {}
 
     @Environment(\.modelContext) private var context
@@ -73,7 +73,7 @@ struct CategoryEditorView: View {
 
     @Bindable var model: CategoryEditorModel
     let onCancel: () -> Void
-    let onSaved: () -> Void
+    let onSaved: (Category) -> Void
     var onDeleted: () -> Void = {}
 
     @State private var confirmingDelete = false
@@ -205,8 +205,7 @@ struct CategoryEditorView: View {
 
     private func save() {
         do {
-            try model.save()
-            onSaved()
+            onSaved(try model.save())
         } catch {
             failedToSave = true
         }
@@ -225,12 +224,12 @@ struct CategoryEditorView: View {
 // Previews use debug-only helpers (PreviewSupport.swift), so they are compiled out of release builds.
 #if DEBUG
 #Preview("Light") {
-    PreviewEnvironment { CategoryEditorSheet(target: .new(.expense), onCancel: {}, onSaved: {}) }
+    PreviewEnvironment { CategoryEditorSheet(target: .new(.expense), onCancel: {}, onSaved: { _ in }) }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    PreviewEnvironment { CategoryEditorSheet(target: .new(.expense), onCancel: {}, onSaved: {}) }
+    PreviewEnvironment { CategoryEditorSheet(target: .new(.expense), onCancel: {}, onSaved: { _ in }) }
         .preferredColorScheme(.dark)
 }
 #endif

@@ -61,6 +61,18 @@ struct AddTransactionViewModelTests {
         #expect(model.canSave == (hasAmount && hasCategory))
     }
 
+    @Test func aCategoryCreatedFromTheSheetIsSelected() throws {
+        let fixture = try Fixture()
+        let model = try fixture.newModel()
+        let editor = CategoryEditorModel(kind: .expense, context: fixture.context, notifier: fixture.notifier)
+        editor.name = "Pets"
+        let pets = try editor.save()
+
+        model.selectNew(pets)
+        #expect(model.category == pets)
+        #expect(model.categories.last == pets)
+    }
+
     @Test func keypadIgnoresLeadingZerosAndExtraDecimals() throws {
         let model = try Fixture().newModel()
         let leadingZeros = [model.pressDigit(0), model.pressDigit(0)]

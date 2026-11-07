@@ -89,7 +89,7 @@ struct CategoriesView: View {
             }
         }
         .sheet(item: $editing) { target in
-            CategoryEditorSheet(target: target, onCancel: { editing = nil }, onSaved: {
+            CategoryEditorSheet(target: target, onCancel: { editing = nil }, onSaved: { _ in
                 editing = nil
                 saveCount += 1
                 router.noteCategoryChange()
