@@ -76,6 +76,7 @@ struct AddTransactionView: View {
     @State private var failedToSave = false
     @State private var confirmsDelete = false
     @State private var failedToDelete = false
+    @State private var addsCategory = false
 
     var body: some View {
         NavigationStack {
@@ -106,6 +107,12 @@ struct AddTransactionView: View {
         }
         .presentationBackground(Color(.sheetBackground))
         .interactiveDismissDisabled(model.hasChanges)
+        .sheet(isPresented: $addsCategory) {
+            CategoryEditorSheet(target: .new(model.kind), onCancel: { addsCategory = false }, onSaved: { category in
+                model.selectNew(category)
+                addsCategory = false
+            })
+        }
         .alert("Couldn't save this transaction", isPresented: $failedToSave) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -248,8 +255,21 @@ struct AddTransactionView: View {
                         model.select(category)
                     }
                 }
+                newCategoryChip
             }
         }
+    }
+
+    /// Last in the grid: a missing category shouldn't cost the user the form they are filling in.
+    private var newCategoryChip: some View {
+        CategoryChip(name: String(localized: "category.new.chip", defaultValue: "New",
+                                  comment: "The add sheet's chip that creates a category. Keep it short."),
+                     symbol: "plus", isSelected: false) {
+            // The category sheet has its own name field.
+            isDescriptionFocused = false
+            addsCategory = true
+        }
+        .accessibilityLabel(Text("New category"))
     }
 
     /// Not in the mockup, which only shows adding: a plain destructive button after the categories,

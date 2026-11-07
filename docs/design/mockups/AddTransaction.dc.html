@@ -52,7 +52,7 @@ a{color:#8A6A2E}a:hover{color:#6E5424}
 <div style="display: flex; flex-direction: column; gap: 8px">
 <div style="font-size: 13px; font-weight: 600; color: {{t.text2}}; padding: 0 2px">Category</div>
 <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
-<sc-for list="{{t.cats}}" as="k" hint-placeholder-count="8">
+<sc-for list="{{t.cats}}" as="k" hint-placeholder-count="9">
 <button style="height: 62px; border-radius: 14px; border: 1.5px solid {{k.border}}; background: {{k.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 2px; font: inherit; color: {{k.color}}">
 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{k.icon}}"></path></svg>
 <span style="font-size: 10.5px; font-weight: 600; letter-spacing: -0.01em">{{k.name}}</span>
@@ -90,7 +90,7 @@ class Component extends DCLogic {
       { name: 'Light', dim: '#9C978F', sheet: '#F7F4EE', field: '#FFFFFF', chip: '#EFEAE0', segBg: '#EFEAE0', segOn: '#FFFFFF', segShadow: '0 1px 2px rgba(20,19,18,0.08)', text: '#141312', text2: '#6B665E', line: '#E3DDD1', gold: '#8A6A2E', goldFill: '#C8A96A', goldSoft: '#F3EAD7', key: '#FFFFFF', frame: '#D8D3C9' },
       { name: 'Dark', dim: '#050505', sheet: '#1B1A18', field: '#242220', chip: '#35322E', segBg: '#242220', segOn: '#3A3733', segShadow: 'none', text: '#F2EEE6', text2: '#9C968C', line: '#35322E', gold: '#C8A96A', goldFill: '#C8A96A', goldSoft: '#2E271A', key: '#2A2826', frame: '#2A2826' }
     ];
-    const cats = [['Food', icons.food], ['Transport', icons.car], ['Housing', icons.house], ['Health', icons.health], ['Shopping', icons.bag], ['Entertain.', icons.play], ['Education', icons.book], ['Other', icons.pin]];
+    const cats = [['Food', icons.food], ['Transport', icons.car], ['Housing', icons.house], ['Health', icons.health], ['Shopping', icons.bag], ['Entertain.', icons.play], ['Education', icons.book], ['Other', icons.pin], ['New', 'M12 5v14M5 12h14']];
     const keyLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
     const themes = TH.map((t) => ({
       ...t,

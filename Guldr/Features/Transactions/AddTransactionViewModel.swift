@@ -130,6 +130,12 @@ final class AddTransactionViewModel {
         self.category = category
     }
 
+    /// Picks a category just created from the sheet, which `categories` doesn't have yet.
+    func selectNew(_ category: Category) {
+        reloadCategories()
+        select(category)
+    }
+
     /// Each returns whether the key was accepted, so the keypad can skip the haptic for a rejected one.
     @discardableResult
     func pressDigit(_ digit: Int) -> Bool { amount.appendDigit(digit) }

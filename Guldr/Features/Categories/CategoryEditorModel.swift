@@ -104,24 +104,29 @@ final class CategoryEditorModel {
             : [original.symbolName] + CategorySymbols.all
     }
 
-    func save() throws(EditorError) {
+    /// Returns the saved category, so the add sheet can select one it just created.
+    @discardableResult
+    func save() throws(EditorError) -> Category {
         guard !trimmedName.isEmpty, !isNameTaken else { throw .invalidName }
+        let saved: Category
         if let category {
             if name != original.name { category.name = trimmedName }
             category.symbolName = symbolName
             category.color = color
+            saved = category
         } else {
             let kindRawValue = kind.rawValue
             let descriptor = FetchDescriptor<Category>(predicate: #Predicate {
                 $0.kindRawValue == kindRawValue && !$0.isArchived
             })
             let last = ((try? context.fetch(descriptor)) ?? []).map(\.sortOrder).max() ?? -1
-            context.insert(Category(name: trimmedName, symbolName: symbolName, color: color, kind: kind,
-                                    sortOrder: last + 1))
+            saved = Category(name: trimmedName, symbolName: symbolName, color: color, kind: kind, sortOrder: last + 1)
+            context.insert(saved)
         }
         try saveContext()
         // The widgets name the category of a transaction without a description; a new one has none yet.
         if category != nil { notifier.dataDidChange() }
+        return saved
     }
 
     /// Deletes a custom category without transactions, and its budgets (ADR 008).
