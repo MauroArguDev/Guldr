@@ -42,16 +42,20 @@ final class BudgetModel {
         let line: BudgetStatus.Line
     }
 
+    /// What one month shows.
+    struct Page: Equatable {
+        /// `nil` when the month has no budgets in the active currency, or before the first `update`.
+        var overview: Overview?
+        /// Over-budget categories, the furthest over first.
+        var alerts: [Alert] = []
+        /// Every budgeted category, highest usage first (`BudgetStatus`'s order).
+        var rows: [Row] = []
+        /// Whether the month before has budgets to copy, so an empty month can offer it.
+        var canCopyLastMonth = false
+    }
+
     /// The month on screen; starts at the current one.
     private(set) var month: YearMonth
-    /// `nil` when the month has no budgets in the active currency, or before the first `update`.
-    private(set) var overview: Overview?
-    /// Over-budget categories, the furthest over first.
-    private(set) var alerts: [Alert] = []
-    /// Every budgeted category, highest usage first (`BudgetStatus`'s order).
-    private(set) var rows: [Row] = []
-    /// Whether the month before the one on screen has budgets to copy, so an empty month can offer it.
-    private(set) var canCopyLastMonth = false
 
     init(locale: Locale = .autoupdatingCurrent, timeZone: TimeZone = .autoupdatingCurrent,
          now: @escaping () -> Date = { .now }) {
@@ -81,38 +85,36 @@ final class BudgetModel {
         month = month.next
     }
 
-    /// Recomputes the month on screen from the latest transactions and budgets in the active currency.
+    /// The month on screen and the ones a swipe reaches, oldest first.
+    var visibleMonths: [YearMonth] {
+        canShowNextMonth ? [month.previous, month, month.next] : [month.previous, month]
+    }
+
+    /// The month on screen's page.
+    var page: Page { page(for: month) }
+
+    /// A month in `visibleMonths`; empty until the first `update`, or for any other month.
+    func page(for month: YearMonth) -> Page {
+        pages[month] ?? Page()
+    }
+
+    /// Moves to the month a swipe lands on: past half a page, counting how far its speed would carry it.
+    func finishSwipe(translation: Double, velocity: Double, pageWidth: Double) {
+        let landing = translation + velocity * 0.2
+        guard abs(landing) > pageWidth / 2 else { return }
+        if landing < 0 {
+            showNextMonth()
+        } else {
+            showPreviousMonth()
+        }
+    }
+
+    /// Recomputes `visibleMonths` from the latest transactions and budgets in the active currency.
     /// The view calls it when they, the currency, a save or the month change.
     func update(transactions: [Transaction], budgets: [Budget], currencyCode: String) {
-        let previousKey = month.previous.rawValue
-        canCopyLastMonth = budgets.contains { budget in
-            budget.yearMonth == previousKey && budget.currencyCode == currencyCode
-                && budget.category.map { !$0.isArchived && $0.kind == .expense } == true
-        }
-        guard let status = try? BudgetStatus(budgets: budgets, transactions: transactions, month: month,
-                                             currencyCode: currencyCode, now: now(), timeZone: timeZone),
-              !status.lines.isEmpty else {
-            overview = nil
-            alerts = []
-            rows = []
-            return
-        }
-        overview = Overview(remaining: status.totalRemaining, spent: status.totalSpent, limit: status.totalLimit,
-                            usage: status.overallUsage, detail: detail(for: status))
-
-        var categories: [UUID: Category] = [:]
-        for budget in budgets {
-            if let category = budget.category { categories[category.id] = category }
-        }
-        let fallbackName = String(localized: "Uncategorized", locale: locale)
-        rows = status.lines.map { line in
-            let category = categories[line.categoryID]
-            return Row(id: line.id, name: category?.displayName ?? fallbackName,
-                       symbol: category?.symbolName ?? "questionmark", line: line)
-        }
-        alerts = rows.filter(\.line.isOver).map { row in
-            Alert(id: row.id, categoryName: row.name, overAmount: row.line.overAmount)
-        }
+        pages = Dictionary(uniqueKeysWithValues: visibleMonths.map { month in
+            (month, makePage(for: month, transactions: transactions, budgets: budgets, currencyCode: currencyCode))
+        })
     }
 
     // MARK: - Private
@@ -120,13 +122,45 @@ final class BudgetModel {
     @ObservationIgnored private let locale: Locale
     @ObservationIgnored private let timeZone: TimeZone
     @ObservationIgnored private let now: () -> Date
+    private var pages: [YearMonth: Page] = [:]
+
+    private func makePage(for month: YearMonth, transactions: [Transaction], budgets: [Budget],
+                          currencyCode: String) -> Page {
+        let previousKey = month.previous.rawValue
+        let canCopyLastMonth = budgets.contains { budget in
+            budget.yearMonth == previousKey && budget.currencyCode == currencyCode
+                && budget.category.map { !$0.isArchived && $0.kind == .expense } == true
+        }
+        guard let status = try? BudgetStatus(budgets: budgets, transactions: transactions, month: month,
+                                             currencyCode: currencyCode, now: now(), timeZone: timeZone),
+              !status.lines.isEmpty else {
+            return Page(canCopyLastMonth: canCopyLastMonth)
+        }
+        let overview = Overview(remaining: status.totalRemaining, spent: status.totalSpent, limit: status.totalLimit,
+                                usage: status.overallUsage, detail: detail(for: status))
+
+        var categories: [UUID: Category] = [:]
+        for budget in budgets {
+            if let category = budget.category { categories[category.id] = category }
+        }
+        let fallbackName = String(localized: "Uncategorized", locale: locale)
+        let rows = status.lines.map { line in
+            let category = categories[line.categoryID]
+            return Row(id: line.id, name: category?.displayName ?? fallbackName,
+                       symbol: category?.symbolName ?? "questionmark", line: line)
+        }
+        let alerts = rows.filter(\.line.isOver).map { row in
+            Alert(id: row.id, categoryName: row.name, overAmount: row.line.overAmount)
+        }
+        return Page(overview: overview, alerts: alerts, rows: rows, canCopyLastMonth: canCopyLastMonth)
+    }
 
     /// "71% used · 2 days left". Days left mean nothing once the month is over, so a past month shows
     /// only the percentage; a future month counts all its days.
     private func detail(for status: BudgetStatus) -> String {
         let percent = status.overallUsage.formatted(.percent.precision(.fractionLength(0)).locale(locale))
         let used = String(localized: "\(percent) used", locale: locale)
-        guard month >= YearMonth(containing: now(), timeZone: timeZone) else { return used }
+        guard status.month >= YearMonth(containing: now(), timeZone: timeZone) else { return used }
         return used + " · " + String(localized: "\(status.daysLeft) days left", locale: locale)
     }
 

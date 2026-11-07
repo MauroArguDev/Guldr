@@ -11,8 +11,8 @@ import SwiftUI
 
 /// The Budget tab: the Budget mockup. A native large title, then the month with previous and next
 /// buttons as the first row of the content, the ring card, an alert per over-budget category and every
-/// budgeted category's row. A month without budgets shows the empty state. Edit opens the month's
-/// limits in a sheet.
+/// budgeted category's row. A month without budgets shows the empty state. Swiping sideways moves between
+/// months with the content following the finger. Edit opens the month's limits in a sheet.
 struct BudgetView: View {
 
     @Environment(AppRouter.self) private var router
@@ -24,26 +24,31 @@ struct BudgetView: View {
     @Query private var budgets: [Budget]
     @State private var model = BudgetModel()
     @State private var failedToCopy = false
+    /// How far the finger has moved the pages.
+    @State private var swipeOffset: CGFloat = 0
+    @State private var pageWidth: CGFloat = 0
+    @State private var viewportHeight: CGFloat = 0
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.stackCompact) {
                     monthSwitcher
-                    if let overview = model.overview {
-                        BudgetOverviewCard(overview: overview)
-                        ForEach(model.alerts) { alert in
-                            OverBudgetAlert(categoryName: alert.categoryName, overAmount: alert.overAmount)
-                        }
-                        categoryRows
-                    } else {
-                        emptyState
-                            .padding(.top, Spacing.stackDefault)
-                    }
+                        .padding(.horizontal, Spacing.screenHorizontal)
+                    monthPages
                 }
-                .padding(.horizontal, Spacing.screenHorizontal)
                 .padding(.bottom, Spacing.stackDefault)
+                // Fills the screen, so a swipe also works below a short month.
+                .frame(minHeight: viewportHeight, alignment: .top)
+                .contentShape(.rect)
+                .gesture(HorizontalPan(onChanged: followSwipe, onEnded: finishSwipe))
             }
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.containerSize.height - geometry.contentInsets.top - geometry.contentInsets.bottom
+            } action: { _, height in
+                viewportHeight = max(height, 0)
+            }
+            .sensoryFeedback(Haptics.selection, trigger: model.month)
             .onChange(of: transactions, initial: true) { refresh() }
             .onChange(of: budgets) { refresh() }
             .onChange(of: model.month) { refresh() }
@@ -79,11 +84,65 @@ struct BudgetView: View {
         model.update(transactions: transactions, budgets: budgets, currencyCode: currencyCode)
     }
 
+    // MARK: - Pages
+
+    /// The month on screen with the ones beside it past the edges, all moving with the finger. Only the month
+    /// on screen takes up height. Each page keeps its identity as it moves, so landing a swipe redraws nothing.
+    private var monthPages: some View {
+        ZStack(alignment: .top) {
+            // The neighbors wait for the width: until then they would sit on top of the month.
+            ForEach(model.visibleMonths.filter { $0 == model.month || pageWidth > 0 }, id: \.self) { month in
+                let isOnScreen = month == model.month
+                pageContent(model.page(for: month))
+                    .padding(.horizontal, Spacing.screenHorizontal)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(height: isOnScreen ? nil : 0, alignment: .top)
+                    .offset(x: offset(of: month))
+                    .accessibilityHidden(!isOnScreen)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { pageWidth = $0 }
+    }
+
+    private func offset(of month: YearMonth) -> CGFloat {
+        let position: CGFloat = month < model.month ? -1 : month > model.month ? 1 : 0
+        return position * pageWidth + swipeOffset
+    }
+
+    private func pageContent(_ page: BudgetModel.Page) -> some View {
+        VStack(spacing: Spacing.stackCompact) {
+            if let overview = page.overview {
+                BudgetOverviewCard(overview: overview)
+                ForEach(page.alerts) { alert in
+                    OverBudgetAlert(categoryName: alert.categoryName, overAmount: alert.overAmount)
+                }
+                categoryRows(page.rows)
+            } else {
+                emptyState(canCopyLastMonth: page.canCopyLastMonth)
+                    .padding(.top, Spacing.stackDefault)
+            }
+        }
+    }
+
+    /// Nothing waits past next month, so the page only gives a little there.
+    private func followSwipe(_ translation: CGFloat) {
+        swipeOffset = translation < 0 && !model.canShowNextMonth ? translation / 3 : translation
+    }
+
+    /// One animation carries both: the offsets depend on the month, so the pages slide to their new places.
+    private func finishSwipe(translation: CGFloat, velocity: CGFloat) {
+        withMotion(.snappy) {
+            model.finishSwipe(translation: translation, velocity: velocity, pageWidth: pageWidth)
+            swipeOffset = 0
+        }
+    }
+
     /// A month without budgets (author's call, 2026-10-20): copying last month's is the primary action
     /// when it has any, with setting them by hand as the secondary one; otherwise only the latter.
     @ViewBuilder
-    private var emptyState: some View {
-        if model.canCopyLastMonth {
+    private func emptyState(canCopyLastMonth: Bool) -> some View {
+        if canCopyLastMonth {
             EmptyStateView(title: "No budgets this month", symbol: "chart.pie",
                            message: "Start from last month's limits, or set new ones.",
                            actionTitle: "Copy last month's budgets", action: copyLastMonth,
@@ -116,9 +175,9 @@ struct BudgetView: View {
     }
 
     /// The mockup's rows sit straight on the background, 2 pt apart, highest usage first.
-    private var categoryRows: some View {
+    private func categoryRows(_ rows: [BudgetModel.Row]) -> some View {
         VStack(spacing: 2) {
-            ForEach(model.rows) { row in
+            ForEach(rows) { row in
                 CategoryBudgetRow(name: row.name, symbol: row.symbol, line: row.line)
                     .padding(.horizontal, 2)
             }
@@ -130,7 +189,7 @@ struct BudgetView: View {
     private var monthSwitcher: some View {
         HStack(spacing: 0) {
             monthButton("Previous month", symbol: "chevron.left", alignment: .leading) {
-                model.showPreviousMonth()
+                withMotion(.standard) { model.showPreviousMonth() }
             }
             Text(verbatim: model.monthTitle)
                 .textRole(.cardTitle)
@@ -139,7 +198,7 @@ struct BudgetView: View {
                 .frame(maxWidth: .infinity)
                 .accessibilityAddTraits(.isHeader)
             monthButton("Next month", symbol: "chevron.right", alignment: .trailing) {
-                model.showNextMonth()
+                withMotion(.standard) { model.showNextMonth() }
             }
             .disabled(!model.canShowNextMonth)
             .opacity(model.canShowNextMonth ? 1 : 0.4)
