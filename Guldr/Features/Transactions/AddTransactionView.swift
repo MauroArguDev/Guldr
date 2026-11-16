@@ -73,6 +73,10 @@ struct AddTransactionView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var isDescriptionFocused = false
     @State private var showsDatePicker = false
+    /// What the open popover's calendar shows. It reaches the model when the popover closes.
+    @State private var draftDate = Date.now
+    /// Set when the date popover opened from the keyboard; the keypad waits for the popover to close.
+    @State private var hidesKeypadForDatePicker = false
     @State private var failedToSave = false
     @State private var confirmsDelete = false
     @State private var failedToDelete = false
@@ -95,11 +99,17 @@ struct AddTransactionView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .safeAreaInset(edge: .bottom) {
-                // The system keyboard replaces the keypad while the description is being typed.
-                if !isDescriptionFocused {
-                    keypad
-                }
+                // The system keyboard replaces the keypad while the description is being typed. The keypad stays
+                // in place under it, hidden: inserted on unfocus, it sat on top of the keyboard until the keyboard
+                // began to hide, a flash over the categories.
+                keypad
+                    .opacity(showsKeypad ? 1 : 0)
+                    .motion(.standard, value: showsKeypad)
+                    .allowsHitTesting(showsKeypad)
+                    .accessibilityHidden(!showsKeypad)
             }
+            // The keyboard covers the keypad instead of pushing the layout up.
+            .ignoresSafeArea(.keyboard, edges: .bottom)
             .background(Color(.sheetBackground))
             .navigationTitle(Text(title))
             .navigationBarTitleDisplayMode(.inline)
@@ -124,6 +134,8 @@ struct AddTransactionView: View {
             Text("It's still saved. Try again in a moment.")
         }
     }
+
+    private var showsKeypad: Bool { !isDescriptionFocused && !hidesKeypadForDatePicker }
 
     private var title: LocalizedStringResource {
         switch (model.isEditing, model.kind) {
@@ -161,8 +173,8 @@ struct AddTransactionView: View {
                 .fill(Color(.goldFill))
                 .frame(width: Size.amountCaret.width, height: Size.amountCaret.height)
                 // The keypad types into the amount, so the caret blinks there, except while the system
-                // keyboard is typing the description.
-                .caretBlink(isActive: !isDescriptionFocused, restart: model.amount)
+                // keyboard is typing the description or the calendar is open.
+                .caretBlink(isActive: !isDescriptionFocused && !showsDatePicker, restart: model.amount)
                 .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity, minHeight: Size.amountRow)
@@ -214,8 +226,17 @@ struct AddTransactionView: View {
 
     private var dateChip: some View {
         Button {
-            // The popover only gets the space above the keyboard, which squeezes the calendar.
-            isDescriptionFocused = false
+            draftDate = model.date
+            if isDescriptionFocused {
+                // One change at a time: the keyboard leaves as the calendar opens, and the keypad comes back only
+                // once the calendar closes.
+                hidesKeypadForDatePicker = true
+                isDescriptionFocused = false
+                // Now, not when the field catches up: a popover opened while the keyboard is still up is placed
+                // and sized for the space above it, and stays squeezed after the keyboard leaves. An action isn't
+                // a view update, so resigning here doesn't hit the cycle `DescriptionField` avoids.
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
             showsDatePicker = true
         } label: {
             Text(verbatim: DayLabelFormatter(locale: locale).chipLabel(for: model.date))
@@ -229,13 +250,19 @@ struct AddTransactionView: View {
         .accessibilityLabel(Text("Date"))
         .accessibilityValue(Text(verbatim: DayLabelFormatter(locale: locale).chipLabel(for: model.date)))
         .popover(isPresented: $showsDatePicker) {
-            DatePicker("Date", selection: $model.date, in: ...Date.now, displayedComponents: .date)
-                .datePickerStyle(.graphical)
-                .tint(Color(.gold))
-                // A graphical picker has no width of its own in a popover; 320 pt is the system calendar's.
+            // A draft, not the model: a new date relabels the chip ("Today" → "Wed, Nov 12"), and moving the
+            // popover's anchor while it's open bends the popover out of shape.
+            // Picking a day is the whole job: it closes the calendar, which saves the day to the chip.
+            DayCalendar(date: $draftDate, latest: .now) { showsDatePicker = false }
+                // A calendar has no width of its own in a popover; 320 pt is the system calendar's.
                 .frame(width: 320)
                 .padding()
                 .presentationCompactAdaptation(.popover)
+        }
+        .onChange(of: showsDatePicker) { _, isShown in
+            guard !isShown else { return }
+            model.date = draftDate
+            hidesKeypadForDatePicker = false
         }
     }
 
