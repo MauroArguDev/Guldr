@@ -49,11 +49,10 @@ struct DescriptionField: UIViewRepresentable {
         field.hugsTrailingEdge = hugsTrailingEdge
         // The text or the prompt may have changed, and the text's place depends on both.
         field.setNeedsLayout()
-        if isFocused, !field.isFirstResponder {
-            field.becomeFirstResponder()
-        } else if !isFocused, field.isFirstResponder {
-            field.resignFirstResponder()
-        }
+        // Not here: resigning makes UIKit ask the hosting view whether it can take over as first responder,
+        // which reads the view graph SwiftUI is still updating. That cycle froze the app on iOS 27.
+        let coordinator = context.coordinator
+        Task { coordinator.syncFocus(of: field) }
     }
 
     final class Coordinator: NSObject, UITextFieldDelegate {
@@ -62,6 +61,15 @@ struct DescriptionField: UIViewRepresentable {
 
         init(parent: DescriptionField) {
             self.parent = parent
+        }
+
+        /// Gives or takes the keyboard to match `isFocused`, read when this runs, since it may have changed again.
+        func syncFocus(of field: UITextField) {
+            if parent.isFocused, !field.isFirstResponder {
+                field.becomeFirstResponder()
+            } else if !parent.isFocused, field.isFirstResponder {
+                field.resignFirstResponder()
+            }
         }
 
         @objc func textDidChange(_ field: UITextField) {
