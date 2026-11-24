@@ -1,5 +1,6 @@
 # Guldr
 
+[![Download on the App Store](https://img.shields.io/badge/App%20Store-Download-C8A96A?logo=apple&logoColor=white)](https://apps.apple.com/app/id6826453592)
 [![CI](https://github.com/MauroArguDev/Guldr/actions/workflows/ci.yml/badge.svg)](https://github.com/MauroArguDev/Guldr/actions/workflows/ci.yml)
 ![iOS 26+](https://img.shields.io/badge/iOS-26%2B-C8A96A)
 ![Swift 6](https://img.shields.io/badge/Swift-6-C8A96A)
@@ -8,7 +9,7 @@
 
 *Your gold, in order.* A local-first personal finance app for iPhone: everything stays on the device, with no account and no servers.
 
-**Status:** v1.0.0, preparing the App Store release · [Changelog](CHANGELOG.md)
+**Status:** v1.0.0, [on the App Store](https://apps.apple.com/app/id6826453592) since November 24, 2026 · [Changelog](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/readme/demo.gif" width="280" alt="Adding a $16 food expense from Home with the keypad, then opening Analytics">
