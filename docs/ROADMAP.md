@@ -4,7 +4,7 @@ What Guldr ships, in what order, and what it deliberately does not do.
 
 ## v1.0 — Local-first MVP
 
-Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](plan/v1.0.md).
+Released on the [App Store](https://apps.apple.com/app/id6826453592) on 2026-11-24. Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](plan/v1.0.md).
 
 ### Foundations
 - [x] Project bootstrap: CI, widget target, App Group, design system, icon, privacy manifest, localization, SwiftLint ([runbook](setup/BOOTSTRAP.md))
@@ -26,20 +26,20 @@ Step-by-step delivery, from the data layer to the App Store: [`plan/v1.0.md`](pl
 - [x] **Logging streak:** consecutive logged days with repair, earned freezes and milestones, on Home and in the widget
 - [x] **Achievements:** bronze, silver and gold coins for consistency, complete months, budgets and savings; money achievements only count complete months
 - [x] **Share cards and monthly recap:** an image of an achievement or of the month, with no amounts
-- [ ] **Starting balance:** what the user has today, asked in onboarding and once on Home for existing users, so the balance doesn't start from zero. An opening balance, not a transaction: income, the savings rate and achievements ignore it ([ADR 015](decisions/015-gold-accounts-cards-receipts.md))
+- [x] **Starting balance:** what the user has today, asked in onboarding and once on Home for existing users, so the balance doesn't start from zero. An opening balance, not a transaction: income, the savings rate and achievements ignore it ([ADR 015](decisions/015-gold-accounts-cards-receipts.md))
 
 ### Quality
 - [x] English and Spanish
 - [x] Accessibility: VoiceOver, Dynamic Type, Reduce Motion
-- [ ] Release checklist from the [Definition of Done](WORKFLOW.md#release)
+- [x] Release checklist from the [Definition of Done](WORKFLOW.md#release)
 
 ### Release
-- [ ] TestFlight (requires the paid Apple Developer Program)
-- [ ] App Store submission
+- [x] TestFlight (requires the paid Apple Developer Program)
+- [x] App Store submission
 
 ## v1.1 — Your data, safe on every device
 
-One theme: nothing the user logs can be lost, and it follows them to every iPhone they own. Planned after the v1.0 launch in its own plan document, with a new ADR for sync.
+Next. One theme: nothing the user logs can be lost, and it follows them to every iPhone they own. Planned after the v1.0 launch in its own plan document, with a new ADR for sync.
 
 ### Sync and backup
 - [ ] **iCloud sync** through CloudKit's private database (`iCloud.com.argudev.guldr`). The v1.0 models are already CloudKit-compatible ([ADR 007](decisions/007-persistence-and-widget-data.md)), so there is no data migration and existing data uploads when sync turns on. The work is what a second device brings:

@@ -2,7 +2,7 @@
 
 Notable changes to Guldr, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [semantic versioning](https://semver.org) (see [WORKFLOW.md › Versioning](docs/WORKFLOW.md#versioning)).
 
-## [1.0.0] — Unreleased
+## [1.0.0] — 2026-11-24
 
 The first release: a local-first personal finance app for iPhone, on iOS 26 and later.
 
